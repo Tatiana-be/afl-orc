@@ -51,8 +51,8 @@ jobs:
 
       - name: Run MyPy
         run: |
-          pip install mypy --install-types --non-interactive
-          mypy src/ --ignore-missing-imports
+          pip install mypy
+          mypy src/ --install-types --non-interactive --ignore-missing-imports
 
   # ============================================
   # Unit Tests
