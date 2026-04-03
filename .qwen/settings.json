@@ -6,7 +6,11 @@
       "Bash(source *)",
       "Bash(echo *)",
       "Bash(pre-commit *)",
-      "Bash(detect-secrets *)"
+      "Bash(detect-secrets *)",
+      "Bash(ruff *)",
+      "Bash(pip install *)",
+      "Bash(isort *)",
+      "Bash(pytest *)"
     ]
   },
   "$version": 3
