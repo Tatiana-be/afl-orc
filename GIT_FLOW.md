@@ -2,7 +2,8 @@
 
 ## Branch Strategy
 
-We use a modified Git Flow workflow optimized for AI/ML projects with frequent iterations.
+We use a modified Git Flow workflow optimized for AI/ML projects with frequent
+iterations.
 
 ### Branch Types
 
@@ -17,25 +18,27 @@ main
 
 ### Branch Descriptions
 
-| Branch | Pattern | Purpose | Protected |
-|--------|---------|---------|-----------|
-| **Main** | `main` | Production-ready code, auto-deployed | ✅ Yes |
-| **Develop** | `develop` | Integration branch for features | ✅ Yes |
-| **Feature** | `feature/TICKET-description` | New features | ❌ No |
-| **Bugfix** | `bugfix/TICKET-description` | Bug fixes for develop | ❌ No |
-| **Hotfix** | `hotfix/TICKET-description` | Critical production fixes | ⚠️ Review required |
-| **Release** | `release/vX.Y.Z` | Release preparation | ✅ Yes |
+| Branch      | Pattern                      | Purpose                              | Protected          |
+| ----------- | ---------------------------- | ------------------------------------ | ------------------ |
+| **Main**    | `main`                       | Production-ready code, auto-deployed | ✅ Yes             |
+| **Develop** | `develop`                    | Integration branch for features      | ✅ Yes             |
+| **Feature** | `feature/TICKET-description` | New features                         | ❌ No              |
+| **Bugfix**  | `bugfix/TICKET-description`  | Bug fixes for develop                | ❌ No              |
+| **Hotfix**  | `hotfix/TICKET-description`  | Critical production fixes            | ⚠️ Review required |
+| **Release** | `release/vX.Y.Z`             | Release preparation                  | ✅ Yes             |
 
 ---
 
 ## Branch Naming Conventions
 
 ### Format
+
 ```
 {type}/{ticket-id}-{short-description}
 ```
 
 ### Examples
+
 ```
 feature/AFL-101-add-parser-module
 bugfix/AFL-205-fix-workflow-state-machine
@@ -44,6 +47,7 @@ release/v1.0.0-mvp
 ```
 
 ### Types
+
 - `feature` - New functionality
 - `bugfix` - Bug fixes
 - `hotfix` - Critical production fixes
@@ -158,6 +162,7 @@ git push origin v1.0.0
 We use [Conventional Commits](https://www.conventionalcommits.org/) format.
 
 ### Format
+
 ```
 {type}({scope}): {description}
 
@@ -167,6 +172,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) format.
 ```
 
 ### Types
+
 - `feat` - New feature
 - `fix` - Bug fix
 - `docs` - Documentation only
@@ -176,6 +182,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) format.
 - `chore` - Build process, tooling, etc.
 
 ### Examples
+
 ```
 feat(parser): add YAML parsing with anchor support
 
@@ -228,6 +235,7 @@ pre-commit run --all-files
 ```
 
 ### Hooks Enabled
+
 - ✅ Trailing whitespace removal
 - ✅ End of file fixer
 - ✅ YAML/JSON/TOML validation
@@ -248,6 +256,7 @@ pre-commit run --all-files
 ## Protection Rules
 
 ### Main Branch (`main`)
+
 - ✅ Require pull request reviews (minimum 1)
 - ✅ Require status checks to pass
 - ✅ Require branches to be up to date before merging
@@ -256,11 +265,13 @@ pre-commit run --all-files
 - ✅ Restrict pushes (no direct commits)
 
 ### Develop Branch (`develop`)
+
 - ✅ Require pull request reviews (minimum 1)
 - ✅ Require status checks to pass
 - ⚠️ Allow force pushes (for rebasing)
 
 ### Release Branches (`release/*`)
+
 - ✅ Require pull request reviews
 - ✅ Require status checks to pass
 - ✅ Restrict deletion (keep for history)
@@ -280,6 +291,7 @@ MAJOR.MINOR.PATCH
 - **PATCH** - Bug fixes (backward compatible)
 
 ### Tag Examples
+
 ```bash
 # Regular release
 git tag -a v1.0.0 -m "Release v1.0.0"
@@ -322,6 +334,7 @@ on:
 ```
 
 ### Status Checks Required
+
 - ✅ Unit tests pass
 - ✅ Integration tests pass
 - ✅ Linting passes
@@ -368,6 +381,7 @@ git checkout develop && git merge main
 ## Troubleshooting
 
 ### Accidentally committed to wrong branch
+
 ```bash
 # If you committed to main instead of feature branch
 git checkout -b feature/correct-branch
@@ -379,6 +393,7 @@ git push origin main --force  # Be careful!
 ```
 
 ### Resolve merge conflicts
+
 ```bash
 git merge origin/develop
 # Edit conflicted files
@@ -387,11 +402,13 @@ git commit  # Complete merge
 ```
 
 ### Undo last commit (keep changes)
+
 ```bash
 git reset --soft HEAD~1
 ```
 
 ### Undo last commit (discard changes)
+
 ```bash
 git reset --hard HEAD~1
 ```

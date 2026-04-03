@@ -1,8 +1,5 @@
-name: Pull Request Template
-about: Create a pull request to contribute to AFL Orchestrator
-title: ''
-labels: ''
-assignees: ''
+name: Pull Request Template about: Create a pull request to contribute to AFL
+Orchestrator title: '' labels: '' assignees: ''
 
 ---
 
@@ -22,7 +19,8 @@ Fixes #
 
 - [ ] 🐛 Bug fix (non-breaking change that fixes an issue)
 - [ ] ✨ New feature (non-breaking change that adds functionality)
-- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to change)
+- [ ] 💥 Breaking change (fix or feature that would cause existing functionality
+      to change)
 - [ ] 📝 Documentation update
 - [ ] 🎨 Style/formatting changes
 - [ ] ♻️ Code refactoring
