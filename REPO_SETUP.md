@@ -1,6 +1,7 @@
 # AFL Orchestrator - Repository Setup Guide
 
-This guide covers Git repository configuration, branch strategy, and development workflow.
+This guide covers Git repository configuration, branch strategy, and development
+workflow.
 
 ---
 
@@ -68,12 +69,12 @@ main (production)
 
 ### Branch Naming
 
-| Type | Pattern | Example |
-|------|---------|---------|
+| Type    | Pattern                      | Example                      |
+| ------- | ---------------------------- | ---------------------------- |
 | Feature | `feature/TICKET-description` | `feature/AFL-101-add-parser` |
-| Bugfix | `bugfix/TICKET-description` | `bugfix/AFL-205-fix-state` |
-| Hotfix | `hotfix/TICKET-description` | `hotfix/AFL-301-critical` |
-| Release | `release/vX.Y.Z` | `release/v1.0.0` |
+| Bugfix  | `bugfix/TICKET-description`  | `bugfix/AFL-205-fix-state`   |
+| Hotfix  | `hotfix/TICKET-description`  | `hotfix/AFL-301-critical`    |
+| Release | `release/vX.Y.Z`             | `release/v1.0.0`             |
 
 ### Workflow Summary
 
@@ -112,20 +113,20 @@ pre-commit install
 
 ### Enabled Hooks
 
-| Hook | Purpose |
-|------|---------|
-| trailing-whitespace | Remove trailing whitespace |
-| end-of-file-fixer | Ensure file ends with newline |
-| check-yaml | Validate YAML syntax |
-| check-json | Validate JSON syntax |
-| detect-private-key | Detect private keys |
-| detect-aws-credentials | Detect AWS credentials |
-| isort | Sort Python imports |
-| black | Format Python code |
-| ruff | Lint Python code |
-| mypy | Type checking |
-| bandit | Security scanning |
-| sqlfluff | SQL linting |
+| Hook                   | Purpose                       |
+| ---------------------- | ----------------------------- |
+| trailing-whitespace    | Remove trailing whitespace    |
+| end-of-file-fixer      | Ensure file ends with newline |
+| check-yaml             | Validate YAML syntax          |
+| check-json             | Validate JSON syntax          |
+| detect-private-key     | Detect private keys           |
+| detect-aws-credentials | Detect AWS credentials        |
+| isort                  | Sort Python imports           |
+| black                  | Format Python code            |
+| ruff                   | Lint Python code              |
+| mypy                   | Type checking                 |
+| bandit                 | Security scanning             |
+| sqlfluff               | SQL linting                   |
 
 ### Manual Run
 
@@ -153,15 +154,15 @@ type(scope): description
 
 ### Types
 
-| Type | Description |
-|------|-------------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation |
-| `style` | Code style |
-| `refactor` | Refactoring |
-| `test` | Tests |
-| `chore` | Maintenance |
+| Type       | Description   |
+| ---------- | ------------- |
+| `feat`     | New feature   |
+| `fix`      | Bug fix       |
+| `docs`     | Documentation |
+| `style`    | Code style    |
+| `refactor` | Refactoring   |
+| `test`     | Tests         |
+| `chore`    | Maintenance   |
 
 ### Examples
 
@@ -194,11 +195,11 @@ Refs AFL-150
 
 ### Triggers
 
-| Event | Branches | Actions |
-|-------|----------|---------|
-| Push | `main`, `develop`, `feature/*` | Lint, Test, Security |
-| Pull Request | `main`, `develop` | Full pipeline |
-| Tag | `v*` | Release |
+| Event        | Branches                       | Actions              |
+| ------------ | ------------------------------ | -------------------- |
+| Push         | `main`, `develop`, `feature/*` | Lint, Test, Security |
+| Pull Request | `main`, `develop`              | Full pipeline        |
+| Tag          | `v*`                           | Release              |
 
 ### Pipeline Stages
 
@@ -247,6 +248,7 @@ Pre-commit hooks configuration. See file for details.
 ### `pyproject.toml`
 
 Python project configuration:
+
 - `[tool.isort]` - Import sorting
 - `[tool.black]` - Code formatting
 - `[tool.ruff]` - Linting
@@ -261,6 +263,7 @@ SQL linting configuration for PostgreSQL dialect.
 ### `.gitignore`
 
 Ignores:
+
 - Python cache (`__pycache__/`)
 - Virtual environments (`.venv/`)
 - IDE files (`.idea/`, `.vscode/`)
@@ -444,6 +447,7 @@ git reset --hard HEAD~1
 ## Support
 
 For questions or issues:
+
 - Check existing issues in GitHub
 - Contact: dev-team@afl-orchestrator.com
 - Documentation: See `docs/` folder
