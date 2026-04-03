@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(source *)",
+      "Bash(echo *)",
+      "Bash(pre-commit *)",
+      "Bash(detect-secrets *)"
     ]
   },
   "$version": 3

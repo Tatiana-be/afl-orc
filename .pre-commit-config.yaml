@@ -9,7 +9,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
-        args: ['--unsafe']
+        args: ["--unsafe"]
       - id: check-json
       - id: check-toml
       - id: check-merge-conflict
@@ -18,14 +18,14 @@ repos:
       - id: destroyed-symlinks
       - id: detect-private-key
       - id: detect-aws-credentials
-        args: ['--allow-missing-credentials']
+        args: ["--allow-missing-credentials"]
       - id: fix-byte-order-marker
       - id: mixed-line-ending
-        args: ['--fix=lf']
+        args: ["--fix=lf"]
       - id: no-commit-to-branch
-        args: ['--branch', 'main', '--branch', 'develop']
+        args: ["--branch", "main", "--branch", "develop"]
       - id: check-added-large-files
-        args: ['--maxkb=1000']
+        args: ["--maxkb=1000"]
 
   # Python hooks
   - repo: https://github.com/pycqa/isort
@@ -33,20 +33,20 @@ repos:
     hooks:
       - id: isort
         name: isort (python)
-        args: ['--profile', 'black', '--filter-files']
+        args: ["--profile", "black", "--filter-files"]
 
   - repo: https://github.com/psf/black
     rev: 24.1.1
     hooks:
       - id: black
         language_version: python3
-        args: ['--line-length', '100', '--target-version', 'py312']
+        args: ["--line-length", "100", "--target-version", "py312"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.1.14
     hooks:
       - id: ruff
-        args: ['--fix', '--exit-non-zero-on-fix', '--line-length', '100']
+        args: ["--fix", "--exit-non-zero-on-fix", "--line-length", "100"]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -59,7 +59,7 @@ repos:
           - types-requests
           - types-PyYAML
           - types-redis
-        args: ['--ignore-missing-imports', '--strict-optional']
+        args: ["--ignore-missing-imports", "--strict-optional"]
         exclude: ^tests/
 
   # Security hooks
@@ -67,14 +67,14 @@ repos:
     rev: 1.7.7
     hooks:
       - id: bandit
-        args: ['-r', '-ll', '-ii']
+        args: ["-r", "-ll", "-ii"]
         exclude: ^tests/
 
   - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.4.0
+    rev: v1.5.0
     hooks:
       - id: detect-secrets
-        args: ['--baseline', '.secrets.baseline']
+        args: ["--baseline", ".secrets.baseline"]
         exclude: package.lock.json
 
   # SQL hooks
@@ -82,10 +82,10 @@ repos:
     rev: 2.3.5
     hooks:
       - id: sqlfluff-lint
-        args: ['--dialect', 'postgres']
+        args: ["--dialect", "postgres"]
         files: \.sql$
       - id: sqlfluff-fix
-        args: ['--dialect', 'postgres']
+        args: ["--dialect", "postgres"]
         files: \.sql$
 
   # Documentation hooks
@@ -94,7 +94,7 @@ repos:
     hooks:
       - id: prettier
         types_or: [markdown, yaml, json]
-        args: ['--prose-wrap', 'always']
+        args: ["--prose-wrap", "always"]
 
   # Git hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -111,11 +111,11 @@ default_language_version:
 ci:
   autofix_commit_msg: |
     [pre-commit.ci] auto fixes from pre-commit hooks
-    
+
     For more information, see https://pre-commit.ci
   autofix_prs: true
-  autoupdate_branch: 'develop'
-  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_branch: "develop"
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
   autoupdate_schedule: weekly
   skip: []
   submodules: false

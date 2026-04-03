@@ -1,7 +1,7 @@
 [tool.isort]
 profile = "black"
 line_length = 100
-target_version = ["py312"]
+py_version = 312
 skip = [".venv", "venv", "__pycache__", ".git"]
 known_first_party = ["orchestrator"]
 known_third_party = ["fastapi", "sqlalchemy", "pydantic", "celery", "redis"]
