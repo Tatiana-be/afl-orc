@@ -32,7 +32,7 @@
 """Initial schema - projects, configs, workflows, tasks
 
 Revision ID: 001
-Revises: 
+Revises:
 Create Date: 2026-03-31 10:00:00.000000
 
 """
@@ -50,7 +50,7 @@ depends_on = None
 def upgrade():
     # Enable UUID extension
     op.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
-    
+
     # Create updated_at trigger function
     op.execute("""
         CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -61,25 +61,25 @@ def upgrade():
         END;
         $$ LANGUAGE plpgsql;
     """)
-    
+
     # === projects ===
     op.create_table('projects',
-        sa.Column('id', postgresql.UUID(as_uuid=True), 
+        sa.Column('id', postgresql.UUID(as_uuid=True),
                   server_default=sa.text('gen_random_uuid()'), nullable=False),
         sa.Column('owner_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('name', sa.String(255), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
-        sa.Column('status', sa.String(50), nullable=False, 
+        sa.Column('status', sa.String(50), nullable=False,
                   server_default='active'),
-        sa.Column('settings', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('settings', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
-        sa.Column('budget_config', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('budget_config', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
-        sa.Column('stats', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('stats', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
-        sa.Column('created_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('created_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
-        sa.Column('updated_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('updated_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('owner_id', 'name', name='uq_projects_owner_name'),
@@ -88,24 +88,24 @@ def upgrade():
             name='check_project_status'
         )
     )
-    
+
     # === config_versions ===
     op.create_table('config_versions',
-        sa.Column('id', postgresql.UUID(as_uuid=True), 
+        sa.Column('id', postgresql.UUID(as_uuid=True),
                   server_default=sa.text('gen_random_uuid()'), nullable=False),
         sa.Column('project_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('version', sa.String(50), nullable=False),
         sa.Column('content', sa.Text(), nullable=False),
         sa.Column('format', sa.String(20), nullable=False, server_default='yaml'),
         sa.Column('created_by', postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column('validation_status', sa.String(50), nullable=False, 
+        sa.Column('validation_status', sa.String(50), nullable=False,
                   server_default='pending'),
-        sa.Column('validation_result', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('validation_result', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
         sa.Column('changelog', sa.Text(), nullable=True),
         sa.Column('is_latest', sa.Boolean(), nullable=False, server_default='false'),
         sa.Column('parent_version_id', postgresql.UUID(as_uuid=True), nullable=True),
-        sa.Column('created_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('created_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('project_id', 'version', name='uq_config_project_version'),
@@ -121,10 +121,10 @@ def upgrade():
         sa.ForeignKeyConstraint(['created_by'], ['users.id'], ondelete='SET NULL'),
         sa.ForeignKeyConstraint(['parent_version_id'], ['config_versions.id'], ondelete='SET NULL'),
     )
-    
+
     # === workflows ===
     op.create_table('workflows',
-        sa.Column('id', postgresql.UUID(as_uuid=True), 
+        sa.Column('id', postgresql.UUID(as_uuid=True),
                   server_default=sa.text('gen_random_uuid()'), nullable=False),
         sa.Column('project_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('config_version_id', postgresql.UUID(as_uuid=True), nullable=False),
@@ -141,11 +141,11 @@ def upgrade():
         sa.Column('completed_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('failed_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('cancelled_at', sa.TIMESTAMP(timezone=True), nullable=True),
-        sa.Column('current_state', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('current_state', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
-        sa.Column('parameters', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('parameters', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
-        sa.Column('metadata', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('metadata', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
         sa.Column('tokens_used', sa.Integer(), nullable=False, server_default='0'),
         sa.Column('cost_usd', sa.Numeric(12, 6), nullable=False, server_default='0'),
@@ -153,9 +153,9 @@ def upgrade():
         sa.Column('error_code', sa.String(100), nullable=True),
         sa.Column('error_message', sa.Text(), nullable=True),
         sa.Column('webhook_url', sa.String(500), nullable=True),
-        sa.Column('created_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('created_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
-        sa.Column('updated_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('updated_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
         sa.PrimaryKeyConstraint('id'),
         sa.CheckConstraint(
@@ -173,10 +173,10 @@ def upgrade():
         sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['config_version_id'], ['config_versions.id'], ondelete='RESTRICT'),
     )
-    
+
     # === tasks ===
     op.create_table('tasks',
-        sa.Column('id', postgresql.UUID(as_uuid=True), 
+        sa.Column('id', postgresql.UUID(as_uuid=True),
                   server_default=sa.text('gen_random_uuid()'), nullable=False),
         sa.Column('workflow_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('agent_id', postgresql.UUID(as_uuid=True), nullable=True),
@@ -185,7 +185,7 @@ def upgrade():
         sa.Column('description', sa.Text(), nullable=True),
         sa.Column('step_order', sa.Integer(), nullable=False),
         sa.Column('status', sa.String(50), nullable=False, server_default='pending'),
-        sa.Column('input_context', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('input_context', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
         sa.Column('output', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column('error', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
@@ -196,13 +196,13 @@ def upgrade():
         sa.Column('completed_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('tokens_used', sa.Integer(), nullable=False, server_default='0'),
         sa.Column('duration_ms', sa.Integer(), nullable=True),
-        sa.Column('config', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('config', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
-        sa.Column('metadata', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('metadata', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
-        sa.Column('created_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('created_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
-        sa.Column('updated_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('updated_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('workflow_id', 'step_order', name='uq_tasks_workflow_step'),
@@ -218,14 +218,14 @@ def upgrade():
         sa.ForeignKeyConstraint(['agent_id'], ['agents.id'], ondelete='SET NULL'),
         sa.ForeignKeyConstraint(['parent_task_id'], ['tasks.id'], ondelete='SET NULL'),
     )
-    
+
     # === Indexes for projects ===
     op.create_index('idx_projects_owner_id', 'projects', ['owner_id'])
     op.create_index('idx_projects_status', 'projects', ['status'])
     op.create_index('idx_projects_created_at', 'projects', ['created_at'], postgresql_using='btree', unique=False)
-    op.create_index('idx_projects_active', 'projects', ['owner_id', 'created_at'], 
+    op.create_index('idx_projects_active', 'projects', ['owner_id', 'created_at'],
                     postgresql_where=sa.text("status = 'active'"))
-    
+
     # === Indexes for workflows ===
     op.create_index('idx_workflows_project_id', 'workflows', ['project_id'])
     op.create_index('idx_workflows_status', 'workflows', ['status'])
@@ -235,27 +235,27 @@ def upgrade():
                     postgresql_where=sa.text("status IN ('running', 'paused')"))
     op.create_index('idx_workflows_queued', 'workflows', ['priority', 'created_at'],
                     postgresql_where=sa.text("status = 'queued'"))
-    
+
     # === Indexes for tasks ===
     op.create_index('idx_tasks_workflow_id', 'tasks', ['workflow_id'])
     op.create_index('idx_tasks_step_order', 'tasks', ['workflow_id', 'step_order'])
     op.create_index('idx_tasks_status', 'tasks', ['status'])
     op.create_index('idx_tasks_pending', 'tasks', ['workflow_id', 'step_order'],
                     postgresql_where=sa.text("status = 'pending'"))
-    
+
     # === Triggers for updated_at ===
     op.execute("""
         CREATE TRIGGER update_projects_updated_at
         BEFORE UPDATE ON projects
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     """)
-    
+
     op.execute("""
         CREATE TRIGGER update_workflows_updated_at
         BEFORE UPDATE ON workflows
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     """)
-    
+
     op.execute("""
         CREATE TRIGGER update_tasks_updated_at
         BEFORE UPDATE ON tasks
@@ -268,13 +268,13 @@ def downgrade():
     op.execute('DROP TRIGGER IF EXISTS update_tasks_updated_at ON tasks')
     op.execute('DROP TRIGGER IF EXISTS update_workflows_updated_at ON workflows')
     op.execute('DROP TRIGGER IF EXISTS update_projects_updated_at ON projects')
-    
+
     # Drop tables in reverse order
     op.drop_table('tasks')
     op.drop_table('workflows')
     op.drop_table('config_versions')
     op.drop_table('projects')
-    
+
     # Drop function
     op.execute('DROP FUNCTION IF EXISTS update_updated_at_column()')
 ```
@@ -300,7 +300,7 @@ down_revision = '001'
 def upgrade():
     # === users ===
     op.create_table('users',
-        sa.Column('id', postgresql.UUID(as_uuid=True), 
+        sa.Column('id', postgresql.UUID(as_uuid=True),
                   server_default=sa.text('gen_random_uuid()'), nullable=False),
         sa.Column('email', sa.String(255), nullable=False),
         sa.Column('password_hash', sa.String(255), nullable=True),
@@ -311,11 +311,11 @@ def upgrade():
         sa.Column('status', sa.String(50), nullable=False, server_default='active'),
         sa.Column('last_login_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('last_login_ip', postgresql.INET(), nullable=True),
-        sa.Column('metadata', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('metadata', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
-        sa.Column('created_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('created_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
-        sa.Column('updated_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('updated_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
         sa.Column('deleted_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.PrimaryKeyConstraint('id'),
@@ -333,10 +333,10 @@ def upgrade():
             name='check_email_format'
         )
     )
-    
+
     # === api_keys ===
     op.create_table('api_keys',
-        sa.Column('id', postgresql.UUID(as_uuid=True), 
+        sa.Column('id', postgresql.UUID(as_uuid=True),
                   server_default=sa.text('gen_random_uuid()'), nullable=False),
         sa.Column('user_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('name', sa.String(255), nullable=False),
@@ -351,9 +351,9 @@ def upgrade():
         sa.Column('status', sa.String(50), nullable=False, server_default='active'),
         sa.Column('revoked_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('revoked_reason', sa.Text(), nullable=True),
-        sa.Column('created_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('created_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
-        sa.Column('updated_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('updated_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('key_hash', name='uq_api_keys_hash'),
@@ -363,14 +363,14 @@ def upgrade():
         ),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     )
-    
+
     # === user_projects ===
     op.create_table('user_projects',
         sa.Column('user_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('project_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('role', sa.String(50), nullable=False, server_default='member'),
         sa.Column('granted_by', postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column('granted_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('granted_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
         sa.PrimaryKeyConstraint('user_id', 'project_id'),
         sa.CheckConstraint(
@@ -381,14 +381,14 @@ def upgrade():
         sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['granted_by'], ['users.id'], ondelete='RESTRICT'),
     )
-    
+
     # === Indexes ===
     op.create_index('idx_users_email', 'users', ['email'])
     op.create_index('idx_users_role', 'users', ['role'])
     op.create_index('idx_users_status', 'users', ['status'])
     op.create_index('idx_users_email_unique', 'users', ['email'],
                     postgresql_where=sa.text('deleted_at IS NULL'))
-    
+
     op.create_index('idx_api_keys_user_id', 'api_keys', ['user_id'])
     op.create_index('idx_api_keys_key_hash', 'api_keys', ['key_hash'])
     op.create_index('idx_api_keys_key_prefix', 'api_keys', ['key_prefix'])
@@ -396,10 +396,10 @@ def upgrade():
                     postgresql_where=sa.text(
                         "status = 'active' AND (expires_at IS NULL OR expires_at > NOW())"
                     ))
-    
+
     op.create_index('idx_user_projects_user_id', 'user_projects', ['user_id'])
     op.create_index('idx_user_projects_project_id', 'user_projects', ['project_id'])
-    
+
     # === Add owner_id FK to projects ===
     op.create_foreign_key(
         'fk_projects_owner_id',
@@ -407,7 +407,7 @@ def upgrade():
         ['owner_id'], ['id'],
         ondelete='RESTRICT'
     )
-    
+
     # === Add created_by FK to config_versions ===
     op.create_foreign_key(
         'fk_config_versions_created_by',
@@ -421,7 +421,7 @@ def downgrade():
     # Drop FKs
     op.drop_constraint('fk_projects_owner_id', 'projects', type_='foreignkey')
     op.drop_constraint('fk_config_versions_created_by', 'config_versions', type_='foreignkey')
-    
+
     # Drop tables
     op.drop_table('user_projects')
     op.drop_table('api_keys')
@@ -449,7 +449,7 @@ down_revision = '002'
 def upgrade():
     # === agents ===
     op.create_table('agents',
-        sa.Column('id', postgresql.UUID(as_uuid=True), 
+        sa.Column('id', postgresql.UUID(as_uuid=True),
                   server_default=sa.text('gen_random_uuid()'), nullable=False),
         sa.Column('name', sa.String(255), nullable=False),
         sa.Column('type', sa.String(50), nullable=False),
@@ -457,21 +457,21 @@ def upgrade():
         sa.Column('status', sa.String(50), nullable=False, server_default='idle'),
         sa.Column('current_workflow_id', postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column('current_task_id', postgresql.UUID(as_uuid=True), nullable=True),
-        sa.Column('config', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('config', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
-        sa.Column('capabilities', postgresql.ARRAY(sa.String()), 
+        sa.Column('capabilities', postgresql.ARRAY(sa.String()),
                   nullable=True, server_default='{}'),
-        sa.Column('tools', postgresql.ARRAY(sa.String()), 
+        sa.Column('tools', postgresql.ARRAY(sa.String()),
                   nullable=True, server_default='{}'),
-        sa.Column('metrics', postgresql.JSONB(astext_type=sa.Text()), 
+        sa.Column('metrics', postgresql.JSONB(astext_type=sa.Text()),
                   server_default='{}', nullable=False),
-        sa.Column('last_active_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('last_active_at', sa.TIMESTAMP(timezone=True),
                   server_default=sa.text('NOW()')),
         sa.Column('last_error_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('last_error_message', sa.Text(), nullable=True),
-        sa.Column('created_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('created_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
-        sa.Column('updated_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('updated_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('name', name='uq_agents_name'),
@@ -486,7 +486,7 @@ def upgrade():
         sa.ForeignKeyConstraint(['current_workflow_id'], ['workflows.id'], ondelete='SET NULL'),
         sa.ForeignKeyConstraint(['current_task_id'], ['tasks.id'], ondelete='SET NULL'),
     )
-    
+
     # === Indexes ===
     op.create_index('idx_agents_status', 'agents', ['status'])
     op.create_index('idx_agents_type', 'agents', ['type'])
@@ -494,7 +494,7 @@ def upgrade():
     op.create_index('idx_agents_last_active', 'agents', ['last_active_at'])
     op.create_index('idx_agents_idle', 'agents', ['model', 'last_active_at'],
                     postgresql_where=sa.text("status = 'idle'"))
-    
+
     # === Add agent_id FK to tasks ===
     op.create_foreign_key(
         'fk_tasks_agent_id',
@@ -502,7 +502,7 @@ def upgrade():
         ['agent_id'], ['id'],
         ondelete='SET NULL'
     )
-    
+
     # === Trigger for agent last_active ===
     op.execute("""
         CREATE OR REPLACE FUNCTION update_agent_last_active()
@@ -513,12 +513,12 @@ def upgrade():
         END;
         $$ LANGUAGE plpgsql;
     """)
-    
+
     op.execute("""
         CREATE TRIGGER agent_activity_update
         BEFORE UPDATE ON agents
         FOR EACH ROW
-        WHEN (OLD.status IS DISTINCT FROM NEW.status 
+        WHEN (OLD.status IS DISTINCT FROM NEW.status
               OR OLD.current_task_id IS DISTINCT FROM NEW.current_task_id)
         EXECUTE FUNCTION update_agent_last_active();
     """)
@@ -527,7 +527,7 @@ def upgrade():
 def downgrade():
     op.execute('DROP TRIGGER IF EXISTS agent_activity_update ON agents')
     op.execute('DROP FUNCTION IF EXISTS update_agent_last_active()')
-    
+
     op.drop_constraint('fk_tasks_agent_id', 'tasks', type_='foreignkey')
     op.drop_table('agents')
 ```
@@ -578,48 +578,48 @@ def upgrade():
             CONSTRAINT check_cost_positive CHECK (cost_usd >= 0)
         ) PARTITION BY RANGE (created_at)
     """)
-    
+
     # Create initial partitions
     op.execute("""
-        CREATE TABLE budget_transactions_2026_01 
+        CREATE TABLE budget_transactions_2026_01
         PARTITION OF budget_transactions
         FOR VALUES FROM ('2026-01-01') TO ('2026-02-01')
     """)
-    
+
     op.execute("""
-        CREATE TABLE budget_transactions_2026_02 
+        CREATE TABLE budget_transactions_2026_02
         PARTITION OF budget_transactions
         FOR VALUES FROM ('2026-02-01') TO ('2026-03-01')
     """)
-    
+
     op.execute("""
-        CREATE TABLE budget_transactions_2026_03 
+        CREATE TABLE budget_transactions_2026_03
         PARTITION OF budget_transactions
         FOR VALUES FROM ('2026-03-01') TO ('2026-04-01')
     """)
-    
+
     # Indexes
     op.execute("CREATE INDEX idx_budget_transactions_project ON budget_transactions(project_id)")
     op.execute("CREATE INDEX idx_budget_transactions_workflow ON budget_transactions(workflow_id)")
     op.execute("CREATE INDEX idx_budget_transactions_created_at_brin ON budget_transactions USING BRIN(created_at)")
-    
+
     # === budget_alerts ===
     op.create_table('budget_alerts',
-        sa.Column('id', postgresql.UUID(as_uuid=True), 
+        sa.Column('id', postgresql.UUID(as_uuid=True),
                   server_default=sa.text('gen_random_uuid()'), nullable=False),
         sa.Column('project_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('alert_type', sa.String(50), nullable=False),
         sa.Column('threshold', sa.Numeric(10, 4), nullable=False),
-        sa.Column('notification_channels', postgresql.ARRAY(sa.String()), 
+        sa.Column('notification_channels', postgresql.ARRAY(sa.String()),
                   nullable=False, server_default='{}'),
         sa.Column('webhook_url', sa.String(500), nullable=True),
         sa.Column('enabled', sa.Boolean(), nullable=False, server_default='true'),
         sa.Column('message_template', sa.Text(), nullable=True),
         sa.Column('last_triggered_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('last_triggered_value', sa.Numeric(10, 4), nullable=True),
-        sa.Column('created_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('created_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
-        sa.Column('updated_at', sa.TIMESTAMP(timezone=True), 
+        sa.Column('updated_at', sa.TIMESTAMP(timezone=True),
                   nullable=False, server_default=sa.text('NOW()')),
         sa.Column('created_by', postgresql.UUID(as_uuid=True), nullable=True),
         sa.PrimaryKeyConstraint('id'),
@@ -630,11 +630,11 @@ def upgrade():
         sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['created_by'], ['users.id'], ondelete='SET NULL'),
     )
-    
+
     op.create_index('idx_budget_alerts_project', 'budget_alerts', ['project_id'])
     op.create_index('idx_budget_alerts_enabled', 'budget_alerts', ['project_id', 'enabled'],
                     postgresql_where=sa.text('enabled = TRUE'))
-    
+
     # Trigger for updated_at
     op.execute("""
         CREATE TRIGGER update_budget_alerts_updated_at
@@ -691,23 +691,23 @@ def upgrade():
             )
         ) PARTITION BY RANGE (created_at)
     """)
-    
+
     # Create partitions
     for month in range(1, 7):
         next_month = month + 1 if month < 6 else 1
         year_next = 2026 if month < 6 else 2027
         op.execute(f"""
-            CREATE TABLE events_2026_{month:02d} 
+            CREATE TABLE events_2026_{month:02d}
             PARTITION OF events
             FOR VALUES FROM ('2026-{month:02d}-01') TO ('2026-{next_month:02d}-01')
         """)
-    
+
     # Indexes
     op.execute("CREATE INDEX idx_events_type ON events(event_type)")
     op.execute("CREATE INDEX idx_events_category ON events(category)")
     op.execute("CREATE INDEX idx_events_created_at_brin ON events USING BRIN(created_at)")
     op.execute("CREATE INDEX idx_events_unprocessed ON events(created_at) WHERE processed = FALSE")
-    
+
     # === audit_logs (partitioned) ===
     op.execute("""
         CREATE TABLE audit_logs (
@@ -733,21 +733,21 @@ def upgrade():
             CONSTRAINT check_action_format CHECK (action ~ '^[a-z_]+\\.[a-z_]+$')
         ) PARTITION BY RANGE (created_at)
     """)
-    
+
     # Create partitions
     for month in range(1, 7):
         op.execute(f"""
-            CREATE TABLE audit_logs_2026_{month:02d} 
+            CREATE TABLE audit_logs_2026_{month:02d}
             PARTITION OF audit_logs
             FOR VALUES FROM ('2026-{month:02d}-01') TO ('2026-{month+1:02d}-01')
         """)
-    
+
     # Indexes
     op.execute("CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id)")
     op.execute("CREATE INDEX idx_audit_logs_action ON audit_logs(action)")
     op.execute("CREATE INDEX idx_audit_logs_created_at_brin ON audit_logs USING BRIN(created_at)")
     op.execute("CREATE INDEX idx_audit_logs_failures ON audit_logs(created_at) WHERE status IN ('failure', 'forbidden', 'error')")
-    
+
     # Restrict UPDATE/DELETE on audit_logs
     op.execute("REVOKE UPDATE, DELETE ON audit_logs FROM orchestrator_readwrite")
 
@@ -760,7 +760,7 @@ def downgrade():
     op.execute('DROP TABLE audit_logs_2026_02')
     op.execute('DROP TABLE audit_logs_2026_01')
     op.execute('DROP TABLE audit_logs')
-    
+
     op.execute('DROP TABLE events_2026_06')
     op.execute('DROP TABLE events_2026_05')
     op.execute('DROP TABLE events_2026_04')
@@ -825,11 +825,11 @@ GRANT ALL ON ALL TABLES IN SCHEMA public TO orchestrator_admin;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO orchestrator_admin;
 
 -- Будущие таблицы автоматически получают права
-ALTER DEFAULT PRIVILEGES IN SCHEMA public 
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
     GRANT SELECT ON TABLES TO orchestrator_readonly;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public 
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
     GRANT SELECT, INSERT, UPDATE ON TABLES TO orchestrator_readwrite;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public 
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
     GRANT ALL ON TABLES TO orchestrator_admin;
 ```
 
@@ -846,8 +846,8 @@ ALTER TABLE budget_transactions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY project_isolation ON workflows
     USING (
         project_id IN (
-            SELECT project_id 
-            FROM user_projects 
+            SELECT project_id
+            FROM user_projects
             WHERE user_id = current_setting('app.current_user_id')::uuid
         )
     );
@@ -863,7 +863,7 @@ CREATE POLICY workflows_access_policy ON workflows
     USING (
         current_setting('app.current_user_role')::text = 'admin'
         OR project_id IN (
-            SELECT project_id FROM user_projects 
+            SELECT project_id FROM user_projects
             WHERE user_id = current_setting('app.current_user_id')::uuid
         )
     );
@@ -898,7 +898,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Пример использования в таблице
-ALTER TABLE webhooks 
+ALTER TABLE webhooks
     ADD COLUMN secret_encrypted BYTEA;
 
 -- Trigger для автоматического шифрования
@@ -924,12 +924,12 @@ CREATE TRIGGER webhook_secret_encrypt
 
 ### 6.1 Стратегия Партиционирования
 
-| Таблица | Стратегия | Период | Причина |
-|---------|-----------|--------|---------|
-| **events** | RANGE by created_at | Monthly | 10M+ записей/год |
-| **audit_logs** | RANGE by created_at | Monthly | 1M+ записей/год |
-| **budget_transactions** | RANGE by created_at | Monthly | 5M+ записей/год |
-| **webhook_deliveries** | RANGE by scheduled_at | Monthly | 1M+ записей/год |
+| Таблица                 | Стратегия             | Период  | Причина          |
+| ----------------------- | --------------------- | ------- | ---------------- |
+| **events**              | RANGE by created_at   | Monthly | 10M+ записей/год |
+| **audit_logs**          | RANGE by created_at   | Monthly | 1M+ записей/год  |
+| **budget_transactions** | RANGE by created_at   | Monthly | 5M+ записей/год  |
+| **webhook_deliveries**  | RANGE by scheduled_at | Monthly | 1M+ записей/год  |
 
 ### 6.2 Автоматическое Создание Партиций
 
@@ -947,12 +947,12 @@ BEGIN
     start_date := DATE_TRUNC('month', partition_date);
     end_date := start_date + INTERVAL '1 month';
     partition_name := table_name || '_' || TO_CHAR(start_date, 'YYYY_MM');
-    
+
     EXECUTE format(
         'CREATE TABLE IF NOT EXISTS %I PARTITION OF %I FOR VALUES FROM (%L) TO (%L)',
         partition_name, table_name, start_date, end_date
     );
-    
+
     RAISE NOTICE 'Created partition % for table %', partition_name, table_name;
 END;
 $$ LANGUAGE plpgsql;
@@ -980,8 +980,8 @@ DECLARE
     partition RECORD;
 BEGIN
     cutoff_date := DATE_TRUNC('month', NOW() - (retain_months || ' months')::INTERVAL);
-    
-    FOR partition IN 
+
+    FOR partition IN
         SELECT inhrelid::regclass::TEXT AS partition_name
         FROM pg_inherits
         JOIN pg_class ON pg_inherits.inhparent = pg_class.oid
@@ -1026,7 +1026,7 @@ ALTER TABLE budget_transactions SET (
 );
 
 -- Мониторинг bloat
-SELECT 
+SELECT
     schemaname,
     relname,
     pg_size_pretty(pg_total_relation_size(relid)) AS total_size,
@@ -1045,23 +1045,23 @@ ORDER BY n_dead_tup DESC;
 
 ### 7.1 Прогноз на 1/6/12 месяцев
 
-| Таблица | 1 месяц | 6 месяцев | 12 месяцев |
-|---------|---------|-----------|------------|
-| **users** | 100 rows / 50 KB | 500 rows / 250 KB | 1K rows / 500 KB |
-| **projects** | 50 rows / 25 KB | 200 rows / 100 KB | 500 rows / 250 KB |
-| **workflows** | 5K rows / 5 MB | 30K rows / 30 MB | 60K rows / 60 MB |
-| **tasks** | 50K rows / 50 MB | 300K rows / 300 MB | 600K rows / 600 MB |
-| **budget_transactions** | 100K rows / 50 MB | 600K rows / 300 MB | 1.2M rows / 600 MB |
-| **events** | 500K rows / 250 MB | 3M rows / 1.5 GB | 6M rows / 3 GB |
-| **audit_logs** | 50K rows / 25 MB | 300K rows / 150 MB | 600K rows / 300 MB |
-| **Итого** | ~655K rows / ~380 MB | ~4.2M rows / ~2.3 GB | ~8.4M rows / ~4.6 GB |
+| Таблица                 | 1 месяц              | 6 месяцев            | 12 месяцев           |
+| ----------------------- | -------------------- | -------------------- | -------------------- |
+| **users**               | 100 rows / 50 KB     | 500 rows / 250 KB    | 1K rows / 500 KB     |
+| **projects**            | 50 rows / 25 KB      | 200 rows / 100 KB    | 500 rows / 250 KB    |
+| **workflows**           | 5K rows / 5 MB       | 30K rows / 30 MB     | 60K rows / 60 MB     |
+| **tasks**               | 50K rows / 50 MB     | 300K rows / 300 MB   | 600K rows / 600 MB   |
+| **budget_transactions** | 100K rows / 50 MB    | 600K rows / 300 MB   | 1.2M rows / 600 MB   |
+| **events**              | 500K rows / 250 MB   | 3M rows / 1.5 GB     | 6M rows / 3 GB       |
+| **audit_logs**          | 50K rows / 25 MB     | 300K rows / 150 MB   | 600K rows / 300 MB   |
+| **Итого**               | ~655K rows / ~380 MB | ~4.2M rows / ~2.3 GB | ~8.4M rows / ~4.6 GB |
 
 ### 7.2 Скрипт Генерации Тестовых Данных
 
 ```sql
 -- Генерация тестовых пользователей
 INSERT INTO users (email, name, role, status)
-SELECT 
+SELECT
     'user' || i || '@example.com',
     'User ' || i,
     (ARRAY['admin', 'developer', 'viewer'])[floor(random() * 3 + 1)],
@@ -1070,7 +1070,7 @@ FROM generate_series(1, 100) AS i;
 
 -- Генерация тестовых проектов
 INSERT INTO projects (owner_id, name, description, status)
-SELECT 
+SELECT
     (SELECT id FROM users ORDER BY random() LIMIT 1),
     'Project ' || i,
     'Description for project ' || i,
@@ -1079,7 +1079,7 @@ FROM generate_series(1, 50) AS i;
 
 -- Генерация конфигов
 INSERT INTO config_versions (project_id, version, content, format, created_by, validation_status)
-SELECT 
+SELECT
     p.id,
     '1.' || i || '.0',
     'version: "1.0"\nproject: "Test"',
@@ -1090,7 +1090,7 @@ FROM projects p, generate_series(1, 3) AS i;
 
 -- Генерация workflow
 INSERT INTO workflows (project_id, config_version_id, status, priority, total_steps, completed_steps, tokens_used, cost_usd)
-SELECT 
+SELECT
     p.id,
     (SELECT id FROM config_versions WHERE project_id = p.id ORDER BY random() LIMIT 1),
     (ARRAY['pending', 'queued', 'running', 'completed', 'failed'])[floor(random() * 5 + 1)],
@@ -1103,7 +1103,7 @@ FROM projects p, generate_series(1, 20) AS i;
 
 -- Генерация задач
 INSERT INTO tasks (workflow_id, name, step_order, status, tokens_used)
-SELECT 
+SELECT
     w.id,
     'Task ' || i,
     i,
@@ -1113,7 +1113,7 @@ FROM workflows w, generate_series(1, 5) AS i;
 
 -- Генерация транзакций бюджета
 INSERT INTO budget_transactions (project_id, workflow_id, provider, model, total_tokens, cost_usd, created_at)
-SELECT 
+SELECT
     w.project_id,
     w.id,
     (ARRAY['openai', 'anthropic', 'azure'])[floor(random() * 3 + 1)],
