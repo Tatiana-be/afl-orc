@@ -1,9 +1,7 @@
 # AFL Orchestrator: Детальная Архитектура Системы
 
-**Версия**: 1.0  
-**Дата**: 2026-03-31  
-**Статус**: Approved  
-**Автор**: Senior System Architect
+**Версия**: 1.0 **Дата**: 2026-03-31 **Статус**: Approved **Автор**: Senior
+System Architect
 
 ---
 
@@ -12,20 +10,22 @@
 ### 1.1 Архитектурный стиль
 
 AFL Orchestrator использует **гибридную архитектуру**, сочетающую:
+
 - **Event-Driven Architecture** для асинхронной коммуникации компонентов
 - **Pipeline Pattern** для обработки workflow
-- **Strategy Pattern** для вариативности алгоритмов (сжатие контекста, гардрейлы)
+- **Strategy Pattern** для вариативности алгоритмов (сжатие контекста,
+  гардрейлы)
 - **Actor Model** для изоляции выполнения агентов
 
 ### 1.2 Принципы проектирования
 
-| Принцип | Реализация |
-|---------|------------|
-| **Single Responsibility** | Каждый компонент решает одну задачу |
-| **Loose Coupling** | Компоненты общаются через шину событий |
-| **High Cohesion** | Связанные функции сгруппированы |
-| **Failure Isolation** | Сбой агента не ломет весь workflow |
-| **Graceful Degradation** | Fallback стратегии при ошибках |
+| Принцип                   | Реализация                             |
+| ------------------------- | -------------------------------------- |
+| **Single Responsibility** | Каждый компонент решает одну задачу    |
+| **Loose Coupling**        | Компоненты общаются через шину событий |
+| **High Cohesion**         | Связанные функции сгруппированы        |
+| **Failure Isolation**     | Сбой агента не ломет весь workflow     |
+| **Graceful Degradation**  | Fallback стратегии при ошибках         |
 
 ---
 
@@ -147,19 +147,19 @@ graph TB
 
 ### 2.1 Описание компонентов
 
-| Компонент | Ответственность | Технология | Критичность |
-|-----------|----------------|------------|-------------|
-| **REST API** | Приём запросов, аутентификация | FastAPI | 🔴 High |
-| **WebSocket Server** | Real-time уведомления | FastAPI WebSocket | 🟡 Medium |
-| **AFL Parser** | Валидация конфигов | Pydantic + PyYAML | 🔴 High |
-| **Workflow Engine** | Управление состоянием | State Machine | 🔴 High |
-| **Task Scheduler** | Планирование задач | Celery + Redis | 🔴 High |
-| **Agent Pool** | Управление воркерами | asyncio.TaskGroup | 🔴 High |
-| **Context Manager** | Сжатие и передача контекста | Custom + ChromaDB | 🟡 Medium |
-| **Guardrail Engine** | Проверки безопасности | Chain of Responsibility | 🔴 High |
-| **Budget Tracker** | Учёт токенов и затрат | Event Sourcing | 🟡 Medium |
-| **Artifact Manager** | Работа с файлами | MinIO SDK | 🟡 Medium |
-| **Event Bus** | Асинхронная коммуникация | Redis Pub/Sub | 🔴 High |
+| Компонент            | Ответственность                | Технология              | Критичность |
+| -------------------- | ------------------------------ | ----------------------- | ----------- |
+| **REST API**         | Приём запросов, аутентификация | FastAPI                 | 🔴 High     |
+| **WebSocket Server** | Real-time уведомления          | FastAPI WebSocket       | 🟡 Medium   |
+| **AFL Parser**       | Валидация конфигов             | Pydantic + PyYAML       | 🔴 High     |
+| **Workflow Engine**  | Управление состоянием          | State Machine           | 🔴 High     |
+| **Task Scheduler**   | Планирование задач             | Celery + Redis          | 🔴 High     |
+| **Agent Pool**       | Управление воркерами           | asyncio.TaskGroup       | 🔴 High     |
+| **Context Manager**  | Сжатие и передача контекста    | Custom + ChromaDB       | 🟡 Medium   |
+| **Guardrail Engine** | Проверки безопасности          | Chain of Responsibility | 🔴 High     |
+| **Budget Tracker**   | Учёт токенов и затрат          | Event Sourcing          | 🟡 Medium   |
+| **Artifact Manager** | Работа с файлами               | MinIO SDK               | 🟡 Medium   |
+| **Event Bus**        | Асинхронная коммуникация       | Redis Pub/Sub           | 🔴 High     |
 
 ---
 
@@ -188,7 +188,7 @@ sequenceDiagram
     Parser->>Parser: Schema validation
     Parser->>Parser: Dependency graph check
     Parser-->>API: AFLConfig object
-    
+
     alt Config Invalid
         API-->>User: 400 Bad Request (errors)
     else Config Valid
@@ -198,14 +198,14 @@ sequenceDiagram
         Engine->>Events: publish("workflow.started")
         Engine-->>API: {execution_id, status: "pending"}
         API-->>User: 202 Accepted
-        
+
         Note over User,Events: Фаза 2: Планирование Задач
         Engine->>Engine: Build execution graph
         Engine->>Scheduler: schedule_steps(graph)
         Scheduler->>Scheduler: Topological sort
         Scheduler->>Scheduler: Priority assignment
         Scheduler-->>Engine: Scheduled steps
-        
+
         Note over User,Events: Фаза 3: Выполнение Агента (Step 1)
         Engine->>AgentPool: execute_step(step_1)
         AgentPool->>Agent: assign(agent_worker_1)
@@ -213,7 +213,7 @@ sequenceDiagram
         Context->>Storage: LOAD conversation_history
         Context->>Context: Apply compression strategy
         Context-->>Agent: Optimized context
-        
+
         Agent->>Budget: check_budget(step_1)
         Budget->>Storage: LOAD budget_state
         Budget->>Budget: Calculate remaining tokens
@@ -223,15 +223,15 @@ sequenceDiagram
             Budget-->>Agent: {allowed: false, reason: "limit"}
             Agent-->>AgentPool: Error(BudgetExceeded)
         end
-        
+
         Agent->>LLM: chat_completion(messages)
         Note over LLM: External API call
         LLM-->>Agent: {content, usage: {tokens: 1500}}
-        
+
         Agent->>Budget: report_usage(tokens=1500)
         Budget->>Storage: UPSERT cost_record
         Budget->>Events: publish("budget.updated")
-        
+
         Note over User,Events: Фаза 4: Проверка Гардрейлов
         Agent->>Guardrail: check(content, guardrails)
         loop For each guardrail
@@ -244,7 +244,7 @@ sequenceDiagram
             end
         end
         Guardrail-->>Agent: {passed: true}
-        
+
         Note over User,Events: Фаза 5: Сохранение Результата
         Agent->>Storage: SAVE agent_execution
         Agent->>Context: update_context(result)
@@ -252,17 +252,17 @@ sequenceDiagram
         Context->>Events: publish("context.updated")
         Agent-->>AgentPool: Success(result)
         AgentPool-->>Engine: Step completed
-        
+
         Engine->>Storage: UPDATE workflow_execution
         Engine->>Events: publish("step.completed")
-        
+
         Note over User,Events: Фаза 6: Следующие Шаги
         loop For each remaining step
             Engine->>Engine: Check dependencies
             Engine->>AgentPool: execute_step(step_N)
             Note over AgentPool,Events: Repeat phases 3-5
         end
-        
+
         Note over User,Events: Фаза 7: Завершение
         Engine->>Storage: UPDATE status=COMPLETED
         Engine->>Events: publish("workflow.completed")
@@ -273,17 +273,17 @@ sequenceDiagram
 
 ### 3.1 Временные характеристики
 
-| Фаза | Операция | Ожидаемое время | P95 |
-|------|----------|-----------------|-----|
-| 1 | Валидация конфига | <50 мс | <100 мс |
-| 1 | Создание записи в БД | <10 мс | <20 мс |
-| 2 | Построение графа | <20 мс | <50 мс |
-| 3 | Получение контекста | <100 мс | <200 мс |
-| 3 | Проверка бюджета | <10 мс | <20 мс |
-| 3 | LLM вызов | 2-15 сек | <30 сек |
-| 4 | Проверка гардрейлов | <100 мс | <200 мс |
-| 5 | Сохранение результата | <20 мс | <50 мс |
-| 7 | Финализация | <10 мс | <20 мс |
+| Фаза | Операция              | Ожидаемое время | P95     |
+| ---- | --------------------- | --------------- | ------- |
+| 1    | Валидация конфига     | <50 мс          | <100 мс |
+| 1    | Создание записи в БД  | <10 мс          | <20 мс  |
+| 2    | Построение графа      | <20 мс          | <50 мс  |
+| 3    | Получение контекста   | <100 мс         | <200 мс |
+| 3    | Проверка бюджета      | <10 мс          | <20 мс  |
+| 3    | LLM вызов             | 2-15 сек        | <30 сек |
+| 4    | Проверка гардрейлов   | <100 мс         | <200 мс |
+| 5    | Сохранение результата | <20 мс          | <50 мс  |
+| 7    | Финализация           | <10 мс          | <20 мс  |
 
 ---
 
@@ -291,54 +291,55 @@ sequenceDiagram
 
 ### 4.1 Выбор паттернов проектирования
 
-| Паттерн | Где используется | Почему выбран | Альтернативы |
-|---------|-----------------|---------------|--------------|
-| **State Machine** | Workflow Engine | Явные состояния, лёгкая отладка, восстановление | Spaghetti code с if/else |
-| **Event-Driven** | Event Bus | Слабая связанность, масштабируемость | Прямые вызовы методов |
-| **Strategy** | Context Compression | Динамическая смена алгоритмов | Hardcoded логика |
-| **Chain of Responsibility** | Guardrail Engine | Композиция проверок, ранний выход | Последовательные if/else |
-| **Repository** | Data Access | Абстракция БД, тестируемость | Прямые SQL запросы |
-| **Factory** | Agent/Tool Creation | Инкапсуляция создания | Прямые конструкторы |
-| **Circuit Breaker** | LLM Integration | Защита от cascade failures | Простые retry |
-| **Event Sourcing** | Budget Tracker | Аудит, воспроизводимость | CRUD подход |
+| Паттерн                     | Где используется    | Почему выбран                                   | Альтернативы             |
+| --------------------------- | ------------------- | ----------------------------------------------- | ------------------------ |
+| **State Machine**           | Workflow Engine     | Явные состояния, лёгкая отладка, восстановление | Spaghetti code с if/else |
+| **Event-Driven**            | Event Bus           | Слабая связанность, масштабируемость            | Прямые вызовы методов    |
+| **Strategy**                | Context Compression | Динамическая смена алгоритмов                   | Hardcoded логика         |
+| **Chain of Responsibility** | Guardrail Engine    | Композиция проверок, ранний выход               | Последовательные if/else |
+| **Repository**              | Data Access         | Абстракция БД, тестируемость                    | Прямые SQL запросы       |
+| **Factory**                 | Agent/Tool Creation | Инкапсуляция создания                           | Прямые конструкторы      |
+| **Circuit Breaker**         | LLM Integration     | Защита от cascade failures                      | Простые retry            |
+| **Event Sourcing**          | Budget Tracker      | Аудит, воспроизводимость                        | CRUD подход              |
 
 ### 4.2 Выбор технологий
 
 #### 4.2.1 Асинхронность: asyncio vs Celery
 
-| Критерий | asyncio | Celery | Выбор |
-|----------|---------|--------|-------|
-| Производительность | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | **asyncio** для I/O |
-| Сложность | ⭐⭐⭐ | ⭐⭐⭐⭐ | asyncio проще |
-| Распределённость | ❌ | ✅ | **Celery** для воркеров |
-| Retry логика | Ручная | Встроенная | **Celery** |
-| Мониторинг | Сложнее | Flower UI | **Celery** |
+| Критерий           | asyncio    | Celery     | Выбор                   |
+| ------------------ | ---------- | ---------- | ----------------------- |
+| Производительность | ⭐⭐⭐⭐⭐ | ⭐⭐⭐     | **asyncio** для I/O     |
+| Сложность          | ⭐⭐⭐     | ⭐⭐⭐⭐   | asyncio проще           |
+| Распределённость   | ❌         | ✅         | **Celery** для воркеров |
+| Retry логика       | Ручная     | Встроенная | **Celery**              |
+| Мониторинг         | Сложнее    | Flower UI  | **Celery**              |
 
 **Решение**: Гибридный подход
+
 - **asyncio**: Внутри агента (LLM calls, context management)
 - **Celery**: Между агентами (task queue, retry, distribution)
 
 #### 4.2.2 База данных: PostgreSQL vs MongoDB
 
-| Критерий | PostgreSQL | MongoDB | Выбор |
-|----------|------------|---------|-------|
-| Транзакции | ✅ ACID | ⚠️ Limited | **PostgreSQL** |
-| JSON поддержка | ✅ JSONB | ✅ Native | Tie |
-| Сложные запросы | ✅ SQL | ⚠️ Aggregation | **PostgreSQL** |
-| Миграции | ✅ Alembic | ⚠️ Ручные | **PostgreSQL** |
-| Векторный поиск | ⚠️ pgvector | ❌ | **PostgreSQL + ChromaDB** |
+| Критерий        | PostgreSQL  | MongoDB        | Выбор                     |
+| --------------- | ----------- | -------------- | ------------------------- |
+| Транзакции      | ✅ ACID     | ⚠️ Limited     | **PostgreSQL**            |
+| JSON поддержка  | ✅ JSONB    | ✅ Native      | Tie                       |
+| Сложные запросы | ✅ SQL      | ⚠️ Aggregation | **PostgreSQL**            |
+| Миграции        | ✅ Alembic  | ⚠️ Ручные      | **PostgreSQL**            |
+| Векторный поиск | ⚠️ pgvector | ❌             | **PostgreSQL + ChromaDB** |
 
 **Решение**: PostgreSQL для метаданных + ChromaDB для векторной памяти
 
 #### 4.2.3 Event Bus: Redis Pub/Sub vs Kafka vs RabbitMQ
 
-| Критерий | Redis | Kafka | RabbitMQ | Выбор |
-|----------|-------|-------|----------|-------|
-| Задержка | <1 мс | ~10 мс | ~5 мс | **Redis** |
-| Пропускная способность | 100K/msg/s | 1M/msg/s | 50K/msg/s | Kafka |
-| Персистентность | ⚠️ Опционально | ✅ | ✅ | Kafka |
-| Сложность | ⭐ | ⭐⭐⭐ | ⭐⭐ | **Redis** |
-| Для MVP | ✅ | Overkill | ✅ | **Redis** |
+| Критерий               | Redis          | Kafka    | RabbitMQ  | Выбор     |
+| ---------------------- | -------------- | -------- | --------- | --------- |
+| Задержка               | <1 мс          | ~10 мс   | ~5 мс     | **Redis** |
+| Пропускная способность | 100K/msg/s     | 1M/msg/s | 50K/msg/s | Kafka     |
+| Персистентность        | ⚠️ Опционально | ✅       | ✅        | Kafka     |
+| Сложность              | ⭐             | ⭐⭐⭐   | ⭐⭐      | **Redis** |
+| Для MVP                | ✅             | Overkill | ✅        | **Redis** |
 
 **Решение**: Redis Pub/Sub для MVP, миграция на Kafka при 1000+ workflow/день
 
@@ -464,38 +465,38 @@ graph LR
         LB[Load Balancer]
         API[API Servers]
     end
-    
+
     subgraph "Application Layer"
         ENGINE[Workflow Engine]
         SCHED[Scheduler]
         AGENTS[Agent Workers]
     end
-    
+
     subgraph "Data Layer"
         PG[(PostgreSQL)]
         REDIS[(Redis)]
         MINIO[(MinIO)]
     end
-    
+
     subgraph "External"
         LLM[LLM Providers]
         GIT[Git Services]
     end
-    
+
     LB --> API
     API --> ENGINE
     ENGINE --> SCHED
     SCHED --> AGENTS
-    
+
     API --> PG
     ENGINE --> PG
     SCHED --> REDIS
     AGENTS --> REDIS
     AGENTS --> MINIO
-    
+
     AGENTS --> LLM
     AGENTS --> GIT
-    
+
     style LB fill:#ff6b6b
     style API fill:#ffd93d
     style ENGINE fill:#ffd93d
@@ -510,21 +511,21 @@ graph LR
 
 ### 5.2 Анализ точек отказа
 
-| Компонент | Тип отказа | Вероятность | Влияние | Стратегия восстановления |
-|-----------|------------|-------------|---------|-------------------------|
-| **Load Balancer** | Полный отказ | Низкая | Критическое | DNS failover, health checks |
-| **API Server** | Crash одного инстанса | Средняя | Высокое | Auto-restart, multiple replicas |
-| **Workflow Engine** | Потеря состояния | Низкая | Критическое | State persistence в БД после каждого шага |
-| **Scheduler** | Зависание очереди | Средняя | Высокое | Redis persistence, retry queue |
-| **Agent Worker** | Crash во время выполнения | Высокая | Среднее | Task retry, checkpoint context |
-| **PostgreSQL** | Connection pool exhausted | Средняя | Высокое | Connection pooling, read replicas |
-| **PostgreSQL** | Disk full | Низкая | Критическое | Monitoring, auto-scaling storage |
-| **Redis** | Memory limit reached | Средняя | Высокое | LRU eviction, cluster mode |
-| **MinIO** | Storage failure | Низкая | Высокое | Replication, S3 fallback |
-| **LLM Provider** | Rate limiting | Высокая | Высокое | Circuit breaker, fallback models |
-| **LLM Provider** | Timeout | Высокая | Среднее | Retry with backoff, async queue |
-| **LLM Provider** | API change | Низкая | Высокое | Abstraction layer, versioning |
-| **Network** | Partition | Низкая | Критическое | Retry, eventual consistency |
+| Компонент           | Тип отказа                | Вероятность | Влияние     | Стратегия восстановления                  |
+| ------------------- | ------------------------- | ----------- | ----------- | ----------------------------------------- |
+| **Load Balancer**   | Полный отказ              | Низкая      | Критическое | DNS failover, health checks               |
+| **API Server**      | Crash одного инстанса     | Средняя     | Высокое     | Auto-restart, multiple replicas           |
+| **Workflow Engine** | Потеря состояния          | Низкая      | Критическое | State persistence в БД после каждого шага |
+| **Scheduler**       | Зависание очереди         | Средняя     | Высокое     | Redis persistence, retry queue            |
+| **Agent Worker**    | Crash во время выполнения | Высокая     | Среднее     | Task retry, checkpoint context            |
+| **PostgreSQL**      | Connection pool exhausted | Средняя     | Высокое     | Connection pooling, read replicas         |
+| **PostgreSQL**      | Disk full                 | Низкая      | Критическое | Monitoring, auto-scaling storage          |
+| **Redis**           | Memory limit reached      | Средняя     | Высокое     | LRU eviction, cluster mode                |
+| **MinIO**           | Storage failure           | Низкая      | Высокое     | Replication, S3 fallback                  |
+| **LLM Provider**    | Rate limiting             | Высокая     | Высокое     | Circuit breaker, fallback models          |
+| **LLM Provider**    | Timeout                   | Высокая     | Среднее     | Retry with backoff, async queue           |
+| **LLM Provider**    | API change                | Низкая      | Высокое     | Abstraction layer, versioning             |
+| **Network**         | Partition                 | Низкая      | Критическое | Retry, eventual consistency               |
 
 ### 5.3 Стратегии восстановления
 
@@ -533,15 +534,15 @@ graph LR
 ```python
 class WorkflowRecoveryStrategy:
     """Стратегия восстановления workflow после сбоя"""
-    
+
     async def recover_workflow(self, execution_id: str) -> RecoveryResult:
         # 1. Загрузка последнего сохранённого состояния
         state = await self.storage.load_workflow_state(execution_id)
-        
+
         # 2. Определение точки восстановления
         last_completed_step = state.get("last_completed_step")
         current_step = state.get("current_step")
-        
+
         # 3. Проверка идемпотентности
         if await self.is_step_idempotent(current_step):
             # Можно безопасно повторить
@@ -549,7 +550,7 @@ class WorkflowRecoveryStrategy:
         else:
             # Нужен rollback к последнему completed
             return RecoveryAction.ROLLBACK_TO(last_completed_step)
-    
+
     async def is_step_idempotent(self, step: str) -> bool:
         # Шаги без side effects идемпотентны
         non_idempotent_steps = {"commit_and_push", "create_issue", "send_notification"}
@@ -561,11 +562,11 @@ class WorkflowRecoveryStrategy:
 ```python
 class AgentWorkerRecovery:
     """Восстановление после сбоя агента"""
-    
+
     def __init__(self):
         self.max_retries = 3
         self.base_delay = 1.0  # seconds
-    
+
     async def execute_with_recovery(
         self,
         agent_id: str,
@@ -576,27 +577,27 @@ class AgentWorkerRecovery:
             try:
                 # Checkpoint перед выполнением
                 await self.checkpoint(step_id, context, attempt)
-                
+
                 result = await self.agent.execute(agent_id, context)
-                
+
                 # Ack успешного выполнения
                 await self.ack(step_id)
                 return result
-                
+
             except TransientError as e:
                 # Временная ошибка - retry
                 delay = self.base_delay * (2 ** attempt)  # Exponential backoff
                 await asyncio.sleep(delay)
-                
+
             except PermanentError as e:
                 # Постоянная ошибка - не retry
                 await self.handle_permanent_error(step_id, e)
                 raise
-                
+
         # Все retry исчерпаны
         await self.handle_exhausted_retries(step_id)
         raise MaxRetriesExceeded()
-    
+
     async def checkpoint(self, step_id: str, context: Dict, attempt: int):
         # Сохранение контекста для восстановления
         await self.redis.setex(
@@ -624,7 +625,7 @@ class LLMIntegration:
             raise LLMError("Timeout")
         except RateLimitError:
             raise LLMError("Rate limited")
-    
+
     async def _call_llm(self, messages: List[Dict]) -> LLMResponse:
         # Реальный вызов LLM
         pass
@@ -632,14 +633,14 @@ class LLMIntegration:
 
 ### 5.4 Матрица RTO/RPO
 
-| Компонент | RTO (Recovery Time) | RPO (Recovery Point) | Стратегия |
-|-----------|---------------------|----------------------|-----------|
-| API Server | <1 мин | 0 (stateless) | Auto-restart |
-| Workflow Engine | <5 мин | <1 шаг | State persistence |
-| Agent Worker | <2 мин | <1 задача | Task retry |
-| PostgreSQL | <10 мин | 0 (sync replication) | Failover к replica |
-| Redis | <5 мин | <1 мин (AOF) | Redis Sentinel |
-| MinIO | <15 мин | 0 (erasure coding) | Replication |
+| Компонент       | RTO (Recovery Time) | RPO (Recovery Point) | Стратегия          |
+| --------------- | ------------------- | -------------------- | ------------------ |
+| API Server      | <1 мин              | 0 (stateless)        | Auto-restart       |
+| Workflow Engine | <5 мин              | <1 шаг               | State persistence  |
+| Agent Worker    | <2 мин              | <1 задача            | Task retry         |
+| PostgreSQL      | <10 мин             | 0 (sync replication) | Failover к replica |
+| Redis           | <5 мин              | <1 мин (AOF)         | Redis Sentinel     |
+| MinIO           | <15 мин             | 0 (erasure coding)   | Replication        |
 
 ---
 
@@ -655,13 +656,13 @@ graph TB
         L1_WORKERS[3 Agent Workers]
         L1_DB[(1 PostgreSQL)]
         L1_REDIS[(1 Redis)]
-        
+
         L1_API --> L1_ENGINE
         L1_ENGINE --> L1_WORKERS
         L1_WORKERS --> L1_DB
         L1_WORKERS --> L1_REDIS
     end
-    
+
     subgraph "Level 2: 50 агентов (Alpha)"
         L2_LB[Load Balancer]
         L2_API[2 API Instances]
@@ -669,14 +670,14 @@ graph TB
         L2_WORKERS[10 Agent Workers]
         L2_DB[(PostgreSQL Primary<br/>+ Read Replica)]
         L2_REDIS[(Redis Sentinel<br/>3 nodes)]
-        
+
         L2_LB --> L2_API
         L2_API --> L2_ENGINE
         L2_ENGINE --> L2_WORKERS
         L2_WORKERS --> L2_DB
         L2_WORKERS --> L2_REDIS
     end
-    
+
     subgraph "Level 3: 100+ агентов (Production)"
         L3_LB[Load Balancer]
         L3_API[4+ API Instances]
@@ -687,7 +688,7 @@ graph TB
         L3_REDIS[(Redis Cluster<br/>6 nodes)]
         L3_KAFKA[Kafka Cluster]
         L3_MINIO[MinIO Cluster]
-        
+
         L3_LB --> L3_API
         L3_API --> L3_ENGINE
         L3_ENGINE --> L3_SCHED
@@ -703,12 +704,12 @@ graph TB
 
 #### 6.2.1 API Layer: Horizontal Scaling
 
-| Метрика | 10 агентов | 50 агентов | 100 агентов |
-|---------|------------|------------|-------------|
-| Инстансы API | 1 | 2-3 | 4-6 |
-| Requests/sec | ~50 | ~250 | ~500 |
-| Load Balancer | — | nginx | nginx/ALB |
-| Rate Limiting | Local | Redis-based | Redis-based |
+| Метрика       | 10 агентов | 50 агентов  | 100 агентов |
+| ------------- | ---------- | ----------- | ----------- |
+| Инстансы API  | 1          | 2-3         | 4-6         |
+| Requests/sec  | ~50        | ~250        | ~500        |
+| Load Balancer | —          | nginx       | nginx/ALB   |
+| Rate Limiting | Local      | Redis-based | Redis-based |
 
 ```yaml
 # Kubernetes HPA для API
@@ -724,28 +725,28 @@ spec:
   minReplicas: 2
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
 ```
 
 #### 6.2.2 Agent Workers: Pool Scaling
 
-| Метрика | 10 агентов | 50 агентов | 100 агентов |
-|---------|------------|------------|-------------|
-| Worker пул | 3 воркера | 10 воркеров | 20-30 воркеров |
-| Concurrency на воркер | 3 | 5 | 5 |
-| Queue | Redis list | Celery | Celery + Kafka |
-| Auto-scaling | — | KEDA | KEDA |
+| Метрика               | 10 агентов | 50 агентов  | 100 агентов    |
+| --------------------- | ---------- | ----------- | -------------- |
+| Worker пул            | 3 воркера  | 10 воркеров | 20-30 воркеров |
+| Concurrency на воркер | 3          | 5           | 5              |
+| Queue                 | Redis list | Celery      | Celery + Kafka |
+| Auto-scaling          | —          | KEDA        | KEDA           |
 
 ```python
 # Dynamic worker scaling based on queue depth
@@ -753,17 +754,17 @@ class AgentPoolScaler:
     def __init__(self, min_workers=3, max_workers=30):
         self.min_workers = min_workers
         self.max_workers = max_workers
-    
+
     async def scale_workers(self):
         queue_depth = await self.redis.llen("task_queue")
         active_workers = await self.get_active_worker_count()
-        
+
         # 1 воркер на 5 задач в очереди
         target_workers = min(
             self.max_workers,
             max(self.min_workers, queue_depth // 5)
         )
-        
+
         if target_workers > active_workers:
             await self.spawn_workers(target_workers - active_workers)
         elif target_workers < active_workers:
@@ -772,12 +773,12 @@ class AgentPoolScaler:
 
 #### 6.2.3 Database: Read/Write Scaling
 
-| Метрика | 10 агентов | 50 агентов | 100 агентов |
-|---------|------------|------------|-------------|
-| PostgreSQL | 1 инстанс | 1 Primary + 1 Replica | 1 Primary + 3 Replicas |
-| Connection Pool | 20 conn | 50 conn | 100 conn |
-| Write traffic | Direct | Direct | Direct |
-| Read traffic | Direct | Split (80/20) | Split (60/40) |
+| Метрика         | 10 агентов | 50 агентов            | 100 агентов            |
+| --------------- | ---------- | --------------------- | ---------------------- |
+| PostgreSQL      | 1 инстанс  | 1 Primary + 1 Replica | 1 Primary + 3 Replicas |
+| Connection Pool | 20 conn    | 50 conn               | 100 conn               |
+| Write traffic   | Direct     | Direct                | Direct                 |
+| Read traffic    | Direct     | Split (80/20)         | Split (60/40)          |
 
 ```python
 # Read/Write splitting
@@ -790,11 +791,11 @@ class DatabaseRouter:
             get_database("replica-3"),
         ]
         self.replica_index = 0
-    
+
     def get_connection(self, read_only: bool = False):
         if not read_only:
             return self.primary
-        
+
         # Round-robin для read запросов
         replica = self.replicas[self.replica_index % len(self.replicas)]
         self.replica_index += 1
@@ -803,12 +804,12 @@ class DatabaseRouter:
 
 #### 6.2.4 Redis: Cluster Mode
 
-| Метрика | 10 агентов | 50 агентов | 100 агентов |
-|---------|------------|------------|-------------|
-| Режим | Standalone | Sentinel | Cluster |
-| Ноды | 1 | 3 (1 master + 2 replica) | 6 (3 master + 3 replica) |
-| Memory | 4 GB | 8 GB | 16 GB |
-| Persistence | RDB | RDB + AOF | RDB + AOF |
+| Метрика     | 10 агентов | 50 агентов               | 100 агентов              |
+| ----------- | ---------- | ------------------------ | ------------------------ |
+| Режим       | Standalone | Sentinel                 | Cluster                  |
+| Ноды        | 1          | 3 (1 master + 2 replica) | 6 (3 master + 3 replica) |
+| Memory      | 4 GB       | 8 GB                     | 16 GB                    |
+| Persistence | RDB        | RDB + AOF                | RDB + AOF                |
 
 ```python
 # Redis Cluster configuration
@@ -824,7 +825,7 @@ class RedisClusterManager:
             ],
             decode_responses=True,
         )
-    
+
     async def get_cache(self, key: str) -> Optional[str]:
         # Cluster автоматически роутит к правильной ноде
         return self.client.get(f"cache:{key}")
@@ -832,12 +833,12 @@ class RedisClusterManager:
 
 #### 6.2.5 Event Bus: Redis → Kafka Migration
 
-| Метрика | 10-50 агентов | 100+ агентов |
-|---------|---------------|--------------|
-| Event Bus | Redis Pub/Sub | Kafka |
-| Throughput | 100K msg/s | 1M+ msg/s |
-| Retention | 0 (fire & forget) | 7 дней |
-| Consumer groups | — | ✅ Поддержка |
+| Метрика         | 10-50 агентов     | 100+ агентов |
+| --------------- | ----------------- | ------------ |
+| Event Bus       | Redis Pub/Sub     | Kafka        |
+| Throughput      | 100K msg/s        | 1M+ msg/s    |
+| Retention       | 0 (fire & forget) | 7 дней       |
+| Consumer groups | —                 | ✅ Поддержка |
 
 ```python
 # Abstract event bus with provider switching
@@ -845,7 +846,7 @@ class EventBus(ABC):
     @abstractmethod
     async def publish(self, topic: str, message: Dict):
         pass
-    
+
     @abstractmethod
     async def subscribe(self, topic: str, handler: Callable):
         pass
@@ -861,14 +862,14 @@ class KafkaEventBus(EventBus):
 
 ### 6.3 Bottleneck Analysis
 
-| Компонент | Bottleneck при 10 | Bottleneck при 50 | Bottleneck при 100 |
-|-----------|-------------------|-------------------|-------------------|
-| API | CPU | Network I/O | Database connections |
-| Engine | — | Memory (state cache) | Event bus throughput |
-| Workers | LLM latency | LLM rate limits | LLM rate limits |
-| Database | — | Write throughput | Connection pool |
-| Redis | Memory | Network | Cluster coordination |
-| LLM | — | Rate limits | Rate limits |
+| Компонент | Bottleneck при 10 | Bottleneck при 50    | Bottleneck при 100   |
+| --------- | ----------------- | -------------------- | -------------------- |
+| API       | CPU               | Network I/O          | Database connections |
+| Engine    | —                 | Memory (state cache) | Event bus throughput |
+| Workers   | LLM latency       | LLM rate limits      | LLM rate limits      |
+| Database  | —                 | Write throughput     | Connection pool      |
+| Redis     | Memory            | Network              | Cluster coordination |
+| LLM       | —                 | Rate limits          | Rate limits          |
 
 ### 6.4 План масштабирования
 
@@ -877,20 +878,20 @@ graph LR
     MVP[10 агентов<br/>Single Node] -->|Trigger: CPU >70%| ALPHA[50 агентов<br/>Load Balanced]
     ALPHA -->|Trigger: Queue >100| PROD[100+ агентов<br/>Distributed]
     PROD -->|Trigger: LLM limits| OPT[Оптимизация<br/>Кэширование/Batching]
-    
+
     MVP -.->|Week 1-4| MVP
     ALPHA -.->|Week 5-10| ALPHA
     PROD -.->|Week 11-16| PROD
 ```
 
-| Триггер | Действие | Сложность |
-|---------|----------|-----------|
-| CPU API >70% 5 мин | Добавить API реплику | 🟢 Low |
-| Queue depth >100 | Добавить agent workers | 🟢 Low |
-| DB connections >80% | Добавить read replica | 🟡 Medium |
-| Redis memory >80% | Миграция на cluster | 🟡 Medium |
-| LLM rate limit | Implement batching | 🟡 Medium |
-| Event loss >0.1% | Миграция на Kafka | 🔴 High |
+| Триггер             | Действие               | Сложность |
+| ------------------- | ---------------------- | --------- |
+| CPU API >70% 5 мин  | Добавить API реплику   | 🟢 Low    |
+| Queue depth >100    | Добавить agent workers | 🟢 Low    |
+| DB connections >80% | Добавить read replica  | 🟡 Medium |
+| Redis memory >80%   | Миграция на cluster    | 🟡 Medium |
+| LLM rate limit      | Implement batching     | 🟡 Medium |
+| Event loss >0.1%    | Миграция на Kafka      | 🔴 High   |
 
 ---
 
@@ -920,13 +921,13 @@ class StateTransition:
 
 class WorkflowStateMachine:
     """Машина состояний для workflow"""
-    
+
     # Определение допустимых переходов
     TRANSITIONS = [
         StateTransition(WorkflowState.PENDING, WorkflowState.RUNNING),
         StateTransition(WorkflowState.RUNNING, WorkflowState.PAUSED),
         StateTransition(WorkflowState.PAUSED, WorkflowState.RUNNING),
-        StateTransition(WorkflowState.RUNNING, WorkflowState.COMPLETED, 
+        StateTransition(WorkflowState.RUNNING, WorkflowState.COMPLETED,
                        lambda ctx: ctx.all_steps_completed),
         StateTransition(WorkflowState.RUNNING, WorkflowState.FAILED),
         StateTransition(WorkflowState.RUNNING, WorkflowState.CANCELLED),
@@ -934,40 +935,40 @@ class WorkflowStateMachine:
         StateTransition(WorkflowState.FAILED, WorkflowState.RUNNING,
                        lambda ctx: ctx.retry_allowed),
     ]
-    
+
     def __init__(self, execution_id: str, storage: Storage):
         self.execution_id = execution_id
         self.storage = storage
         self.current_state = WorkflowState.PENDING
-    
+
     async def transition_to(
         self,
         target_state: WorkflowState,
         context: Optional[Dict] = None
     ) -> bool:
         """Выполнить переход состояния"""
-        
+
         # Поиск допустимого перехода
         transition = self._find_transition(self.current_state, target_state)
-        
+
         if not transition:
             raise InvalidStateTransition(
                 f"Cannot transition from {self.current_state} to {target_state}"
             )
-        
+
         # Проверка условия перехода
         if transition.condition and not transition.condition(context):
             raise TransitionConditionFailed(
                 f"Transition condition not met for {target_state}"
             )
-        
+
         # Сохранение текущего состояния для rollback
         previous_state = self.current_state
-        
+
         try:
             # Выполнение перехода
             self.current_state = target_state
-            
+
             # Персистентность в БД
             await self.storage.save_workflow_state(
                 execution_id=self.execution_id,
@@ -975,7 +976,7 @@ class WorkflowStateMachine:
                 context=context,
                 timestamp=datetime.utcnow()
             )
-            
+
             # Публикация события
             await self.event_bus.publish(
                 "workflow.state_changed",
@@ -986,14 +987,14 @@ class WorkflowStateMachine:
                     "timestamp": datetime.utcnow().isoformat()
                 }
             )
-            
+
             return True
-            
+
         except Exception as e:
             # Rollback при ошибке
             self.current_state = previous_state
             raise WorkflowStateError(f"Failed to transition: {e}")
-    
+
     def _find_transition(
         self,
         from_state: WorkflowState,
@@ -1022,10 +1023,10 @@ class CompressionStrategy(ABC):
 
 class SlidingWindowStrategy(CompressionStrategy):
     """Сохраняет только последние N сообщений"""
-    
+
     def __init__(self, window_size: int = 20):
         self.window_size = window_size
-    
+
     async def compress(
         self,
         messages: List[Dict[str, str]],
@@ -1034,19 +1035,19 @@ class SlidingWindowStrategy(CompressionStrategy):
         # System message всегда сохраняется
         system = [m for m in messages if m["role"] == "system"]
         other = [m for m in messages if m["role"] != "system"]
-        
+
         # Берём последние window_size сообщений
         recent = other[-self.window_size:]
-        
+
         return system + recent
 
 class SummarizationStrategy(CompressionStrategy):
     """LLM-суммаризация старых сообщений"""
-    
+
     def __init__(self, llm: LLMProvider, summary_ratio: float = 0.3):
         self.llm = llm
         self.summary_ratio = summary_ratio
-    
+
     async def compress(
         self,
         messages: List[Dict[str, str]],
@@ -1054,12 +1055,12 @@ class SummarizationStrategy(CompressionStrategy):
     ) -> List[Dict[str, str]]:
         system = [m for m in messages if m["role"] == "system"]
         other = [m for m in messages if m["role"] != "system"]
-        
+
         # Разделение на старую и новую часть
         split_idx = int(len(other) * self.summary_ratio)
         old_messages = other[:split_idx]
         recent_messages = other[split_idx:]
-        
+
         # Суммаризация старой части
         if old_messages:
             summary = await self._summarize(old_messages)
@@ -1069,44 +1070,44 @@ class SummarizationStrategy(CompressionStrategy):
             }
         else:
             summary_message = None
-        
+
         result = system
         if summary_message:
             result.append(summary_message)
         result.extend(recent_messages)
-        
+
         return result
-    
+
     async def _summarize(self, messages: List[Dict]) -> str:
         conversation_text = "\n".join(
             f"{m['role']}: {m['content']}" for m in messages
         )
-        
+
         prompt = f"""Summarize the following conversation in 3-5 sentences.
 Focus on key decisions, facts, and action items.
 
 {conversation_text}
 
 Summary:"""
-        
+
         response = await self.llm.chat_completion(
             messages=[{"role": "user", "content": prompt}],
             model="gpt-3.5-turbo",
             max_tokens=200
         )
-        
+
         return response.content
 
 class ContextManager:
     """Управление контекстом с выбором стратегии"""
-    
+
     def __init__(self, storage: Storage, llm: LLMProvider):
         self.storage = storage
         self.strategies: Dict[str, CompressionStrategy] = {
             "sliding_window": SlidingWindowStrategy(window_size=20),
             "summarization": SummarizationStrategy(llm),
         }
-    
+
     async def get_context(
         self,
         execution_id: str,
@@ -1116,18 +1117,18 @@ class ContextManager:
     ) -> List[Dict[str, str]]:
         # Загрузка истории из БД
         history = await self.storage.load_conversation_history(execution_id)
-        
+
         # Выбор стратегии
         compressor = self.strategies.get(strategy)
         if not compressor:
             raise ValueError(f"Unknown compression strategy: {strategy}")
-        
+
         # Сжатие
         compressed = await compressor.compress(history, max_tokens)
-        
+
         # Подсчёт токенов
         token_count = await self._count_tokens(compressed)
-        
+
         # Логирование метрик
         await self.metrics.record(
             "context_compression_ratio",
@@ -1135,7 +1136,7 @@ class ContextManager:
             compressed=len(compressed),
             tokens=token_count
         )
-        
+
         return compressed
 ```
 
@@ -1152,13 +1153,13 @@ class GuardrailResult(Enum):
 
 class GuardrailChain:
     """Цепочка гардрейлов"""
-    
+
     def __init__(self):
         self.guardrails: List[BaseGuardrail] = []
-    
+
     def add_guardrail(self, guardrail: BaseGuardrail):
         self.guardrails.append(guardrail)
-    
+
     async def execute(
         self,
         content: str,
@@ -1170,15 +1171,15 @@ class GuardrailChain:
         """
         current_content = content
         all_metadata = {}
-        
+
         for guardrail in self.guardrails:
             result = await guardrail.check(current_content, context)
-            
+
             all_metadata[guardrail.id] = {
                 "passed": result.passed,
                 "message": result.message,
             }
-            
+
             if not result.passed:
                 # Ранний выход при блокировке
                 if result.action == GuardrailAction.BLOCK:
@@ -1187,17 +1188,17 @@ class GuardrailChain:
                         "reason": result.message,
                         "all_results": all_metadata
                     }
-                
+
                 # Модификация контента
                 elif result.action == GuardrailAction.MODIFY:
                     if result.modified_content:
                         current_content = result.modified_content
                         all_metadata[guardrail.id]["modified"] = True
-            
+
             # Флагирование (продолжаем выполнение)
             elif result.action == GuardrailAction.FLAG:
                 all_metadata[guardrail.id]["flagged"] = True
-        
+
         # Все проверки пройдены
         return True, current_content, {
             "all_results": all_metadata,
@@ -1207,7 +1208,7 @@ class GuardrailChain:
 # Пример использования
 async def setup_guardrail_chain(config: Dict) -> GuardrailChain:
     chain = GuardrailChain()
-    
+
     # Добавление гардрейлов в порядке приоритета
     chain.add_guardrail(
         FileExtensionGuardrail(
@@ -1215,14 +1216,14 @@ async def setup_guardrail_chain(config: Dict) -> GuardrailChain:
             config={"blocked_extensions": [".exe", ".bat", ".sh"]}
         )
     )
-    
+
     chain.add_guardrail(
         TokenLimitGuardrail(
             guardrail_id="step_budget",
             config={"max_tokens": 5000, "warning_threshold": 0.8}
         )
     )
-    
+
     chain.add_guardrail(
         LLMJudgeGuardrail(
             guardrail_id="quality_check",
@@ -1233,7 +1234,7 @@ async def setup_guardrail_chain(config: Dict) -> GuardrailChain:
             }
         )
     )
-    
+
     return chain
 ```
 
@@ -1275,17 +1276,17 @@ async def setup_guardrail_chain(config: Dict) -> GuardrailChain:
 
 ## 9. Глоссарий
 
-| Термин | Определение |
-|--------|-------------|
-| **Workflow** | Последовательность шагов выполнения |
-| **Step** | Отдельный этап workflow |
-| **Agent** | Исполнитель шага (LLM-based) |
-| **Context** | Информация, передаваемая между агентами |
-| **Guardrail** | Правило проверки безопасности/качества |
-| **Artifact** | Файл/ресурс, создаваемый в workflow |
-| **Execution** | Конкретный запуск workflow |
-| **Token** | Единица измерения LLM ввода/вывода |
+| Термин        | Определение                             |
+| ------------- | --------------------------------------- |
+| **Workflow**  | Последовательность шагов выполнения     |
+| **Step**      | Отдельный этап workflow                 |
+| **Agent**     | Исполнитель шага (LLM-based)            |
+| **Context**   | Информация, передаваемая между агентами |
+| **Guardrail** | Правило проверки безопасности/качества  |
+| **Artifact**  | Файл/ресурс, создаваемый в workflow     |
+| **Execution** | Конкретный запуск workflow              |
+| **Token**     | Единица измерения LLM ввода/вывода      |
 
 ---
 
-*Документ утверждён для реализации MVP*
+_Документ утверждён для реализации MVP_

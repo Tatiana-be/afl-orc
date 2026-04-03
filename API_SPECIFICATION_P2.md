@@ -12,13 +12,13 @@ info:
   title: AFL Orchestrator API
   description: |
     API для управления мульти-агентными AI-пайплайнами.
-    
+
     ## Аутентификация
     Bearer Token в header `Authorization`.
-    
+
     ## Rate Limiting
     - Free: 30 req/min
-    - Pro: 100 req/min  
+    - Pro: 100 req/min
     - Enterprise: 500 req/min
   version: 1.0.0
   contact:
@@ -56,41 +56,46 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateProjectRequest' }
+            schema: { $ref: "#/components/schemas/CreateProjectRequest" }
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Project' }
-        '400':
+              schema: { $ref: "#/components/schemas/Project" }
+        "400":
           description: Bad Request
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Error' }
-        '401': { description: Unauthorized }
-        '409': { description: Conflict }
-    
+              schema: { $ref: "#/components/schemas/Error" }
+        "401": { description: Unauthorized }
+        "409": { description: Conflict }
+
     get:
       tags: [Projects]
       summary: Список проектов
       operationId: listProjects
       parameters:
-        - { $ref: '#/components/parameters/CursorParam' }
-        - { $ref: '#/components/parameters/LimitParam' }
+        - { $ref: "#/components/parameters/CursorParam" }
+        - { $ref: "#/components/parameters/LimitParam" }
         - name: status
           in: query
-          schema: { type: string, enum: [active, archived, all], default: active }
+          schema:
+            { type: string, enum: [active, archived, all], default: active }
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { type: array, items: { $ref: '#/components/schemas/ProjectSummary' } }
-                  pagination: { $ref: '#/components/schemas/Pagination' }
+                  data:
+                    {
+                      type: array,
+                      items: { $ref: "#/components/schemas/ProjectSummary" },
+                    }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
 
   /workflows:
     post:
@@ -101,39 +106,47 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateWorkflowRequest' }
+            schema: { $ref: "#/components/schemas/CreateWorkflowRequest" }
       responses:
-        '202':
+        "202":
           description: Accepted
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/WorkflowAccepted' }
-        '400': { description: Bad Request }
-        '403': { description: Forbidden }
-    
+              schema: { $ref: "#/components/schemas/WorkflowAccepted" }
+        "400": { description: Bad Request }
+        "403": { description: Forbidden }
+
     get:
       tags: [Workflows]
       summary: Список workflow
       operationId: listWorkflows
       parameters:
-        - { $ref: '#/components/parameters/CursorParam' }
-        - { $ref: '#/components/parameters/LimitParam' }
+        - { $ref: "#/components/parameters/CursorParam" }
+        - { $ref: "#/components/parameters/LimitParam" }
         - name: project_id
           in: query
           schema: { type: string }
         - name: status
           in: query
-          schema: { type: string, enum: [queued, running, paused, completed, failed, cancelled] }
+          schema:
+            {
+              type: string,
+              enum: [queued, running, paused, completed, failed, cancelled],
+            }
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { type: array, items: { $ref: '#/components/schemas/WorkflowSummary' } }
-                  pagination: { $ref: '#/components/schemas/Pagination' }
+                  data:
+                    {
+                      type: array,
+                      items: { $ref: "#/components/schemas/WorkflowSummary" },
+                    }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
 
   /workflows/{id}:
     get:
@@ -146,13 +159,13 @@ paths:
           required: true
           schema: { type: string }
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Workflow' }
-        '404': { description: Not Found }
-    
+              schema: { $ref: "#/components/schemas/Workflow" }
+        "404": { description: Not Found }
+
     delete:
       tags: [Workflows]
       summary: Отмена workflow
@@ -163,9 +176,9 @@ paths:
           required: true
           schema: { type: string }
       responses:
-        '204': { description: No Content }
-        '400': { description: Bad Request }
-        '404': { description: Not Found }
+        "204": { description: No Content }
+        "400": { description: Bad Request }
+        "404": { description: Not Found }
 
   /agents:
     get:
@@ -173,22 +186,26 @@ paths:
       summary: Список агентов
       operationId: listAgents
       parameters:
-        - { $ref: '#/components/parameters/CursorParam' }
-        - { $ref: '#/components/parameters/LimitParam' }
+        - { $ref: "#/components/parameters/CursorParam" }
+        - { $ref: "#/components/parameters/LimitParam" }
         - name: status
           in: query
           schema: { type: string, enum: [idle, busy, error, offline] }
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { type: array, items: { $ref: '#/components/schemas/Agent' } }
-                  pagination: { $ref: '#/components/schemas/Pagination' }
-                  summary: { $ref: '#/components/schemas/AgentPoolSummary' }
+                  data:
+                    {
+                      type: array,
+                      items: { $ref: "#/components/schemas/Agent" },
+                    }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+                  summary: { $ref: "#/components/schemas/AgentPoolSummary" }
 
   /budget/alerts:
     post:
@@ -199,13 +216,13 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateBudgetAlertRequest' }
+            schema: { $ref: "#/components/schemas/CreateBudgetAlertRequest" }
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/BudgetAlert' }
+              schema: { $ref: "#/components/schemas/BudgetAlert" }
 
   /webhooks:
     post:
@@ -216,13 +233,13 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateWebhookRequest' }
+            schema: { $ref: "#/components/schemas/CreateWebhookRequest" }
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Webhook' }
+              schema: { $ref: "#/components/schemas/Webhook" }
 
   /admin/audit-logs:
     get:
@@ -232,21 +249,25 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - { $ref: '#/components/parameters/CursorParam' }
-        - { $ref: '#/components/parameters/LimitParam' }
+        - { $ref: "#/components/parameters/CursorParam" }
+        - { $ref: "#/components/parameters/LimitParam" }
         - name: user_id
           in: query
           schema: { type: string }
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { type: array, items: { $ref: '#/components/schemas/AuditLogEntry' } }
-                  pagination: { $ref: '#/components/schemas/Pagination' }
+                  data:
+                    {
+                      type: array,
+                      items: { $ref: "#/components/schemas/AuditLogEntry" },
+                    }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
 
   /admin/system/health:
     get:
@@ -254,11 +275,11 @@ paths:
       summary: Health check
       operationId: getSystemHealth
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/SystemHealth' }
+              schema: { $ref: "#/components/schemas/SystemHealth" }
 
 components:
   securitySchemes:
@@ -290,7 +311,7 @@ components:
             timestamp: { type: string, format: date-time }
             request_id: { type: string }
             documentation_url: { type: string, format: uri }
-    
+
     Pagination:
       type: object
       properties:
@@ -299,7 +320,7 @@ components:
         prev_cursor: { type: string }
         limit: { type: integer }
         has_more: { type: boolean }
-    
+
     Project:
       type: object
       properties:
@@ -310,9 +331,9 @@ components:
         updated_at: { type: string, format: date-time }
         created_by: { type: string }
         status: { type: string, enum: [active, archived] }
-        settings: { $ref: '#/components/schemas/ProjectSettings' }
-        budget: { $ref: '#/components/schemas/ProjectBudget' }
-    
+        settings: { $ref: "#/components/schemas/ProjectSettings" }
+        budget: { $ref: "#/components/schemas/ProjectBudget" }
+
     ProjectSummary:
       type: object
       properties:
@@ -322,7 +343,7 @@ components:
         created_at: { type: string, format: date-time }
         workflow_count: { type: integer }
         total_tokens_used: { type: integer }
-    
+
     CreateProjectRequest:
       type: object
       required: [name]
@@ -334,14 +355,18 @@ components:
           properties:
             total_tokens: { type: integer }
             warning_threshold: { type: number, min: 0, max: 1 }
-    
+
     Workflow:
       type: object
       properties:
         workflow_id: { type: string }
         project_id: { type: string }
         config_version: { type: string }
-        status: { type: string, enum: [queued, running, paused, completed, failed, cancelled] }
+        status:
+          {
+            type: string,
+            enum: [queued, running, paused, completed, failed, cancelled],
+          }
         progress: { type: number, min: 0, max: 1 }
         current_step: { type: string, nullable: true }
         total_steps: { type: integer }
@@ -351,10 +376,16 @@ components:
         finished_at: { type: string, format: date-time, nullable: true }
         tokens_used: { type: integer }
         cost_usd: { type: number }
-        steps: { type: array, items: { $ref: '#/components/schemas/WorkflowStep' } }
-        artifacts: { type: array, items: { $ref: '#/components/schemas/ArtifactSummary' } }
-        errors: { type: array, items: { $ref: '#/components/schemas/WorkflowError' } }
-    
+        steps:
+          { type: array, items: { $ref: "#/components/schemas/WorkflowStep" } }
+        artifacts:
+          {
+            type: array,
+            items: { $ref: "#/components/schemas/ArtifactSummary" },
+          }
+        errors:
+          { type: array, items: { $ref: "#/components/schemas/WorkflowError" } }
+
     WorkflowSummary:
       type: object
       properties:
@@ -365,7 +396,7 @@ components:
         current_step: { type: string, nullable: true }
         created_at: { type: string, format: date-time }
         tokens_used: { type: integer }
-    
+
     CreateWorkflowRequest:
       type: object
       required: [project_id, config_version]
@@ -373,10 +404,11 @@ components:
         project_id: { type: string }
         config_version: { type: string }
         parameters: { type: object }
-        priority: { type: string, enum: [low, normal, high, critical], default: normal }
+        priority:
+          { type: string, enum: [low, normal, high, critical], default: normal }
         webhook_url: { type: string, format: uri }
         metadata: { type: object }
-    
+
     WorkflowAccepted:
       type: object
       properties:
@@ -386,19 +418,20 @@ components:
         created_at: { type: string, format: date-time }
         estimated_duration: { type: integer }
         status_url: { type: string, format: uri }
-    
+
     WorkflowStep:
       type: object
       properties:
         step_id: { type: string }
         name: { type: string }
-        status: { type: string, enum: [pending, running, completed, failed, skipped] }
+        status:
+          { type: string, enum: [pending, running, completed, failed, skipped] }
         agent_id: { type: string }
         started_at: { type: string, format: date-time, nullable: true }
         completed_at: { type: string, format: date-time, nullable: true }
         tokens_used: { type: integer }
         retry_count: { type: integer }
-    
+
     WorkflowError:
       type: object
       properties:
@@ -407,7 +440,7 @@ components:
         message: { type: string }
         timestamp: { type: string, format: date-time }
         recoverable: { type: boolean }
-    
+
     ArtifactSummary:
       type: object
       properties:
@@ -417,7 +450,7 @@ components:
         size_bytes: { type: integer }
         created_at: { type: string, format: date-time }
         download_url: { type: string, format: uri }
-    
+
     Agent:
       type: object
       properties:
@@ -433,7 +466,7 @@ components:
         tasks_completed: { type: integer }
         tokens_used_total: { type: integer }
         error_count: { type: integer }
-    
+
     AgentPoolSummary:
       type: object
       properties:
@@ -442,7 +475,7 @@ components:
         busy: { type: integer }
         error: { type: integer }
         offline: { type: integer }
-    
+
     BudgetAlert:
       type: object
       properties:
@@ -452,7 +485,7 @@ components:
         threshold: { type: number }
         enabled: { type: boolean }
         created_at: { type: string, format: date-time }
-    
+
     CreateBudgetAlertRequest:
       type: object
       required: [project_id, alert_type, threshold, notification_channels]
@@ -460,10 +493,14 @@ components:
         project_id: { type: string }
         alert_type: { type: string, enum: [percentage, absolute, forecast] }
         threshold: { type: number }
-        notification_channels: { type: array, items: { type: string, enum: [email, slack, webhook] } }
+        notification_channels:
+          {
+            type: array,
+            items: { type: string, enum: [email, slack, webhook] },
+          }
         webhook_url: { type: string, format: uri }
         enabled: { type: boolean, default: true }
-    
+
     Webhook:
       type: object
       properties:
@@ -473,7 +510,7 @@ components:
         events: { type: array, items: { type: string } }
         active: { type: boolean }
         created_at: { type: string, format: date-time }
-    
+
     CreateWebhookRequest:
       type: object
       required: [project_id, url, events, secret]
@@ -489,7 +526,7 @@ components:
           properties:
             max_retries: { type: integer, default: 3 }
             backoff_seconds: { type: integer, default: 60 }
-    
+
     AuditLogEntry:
       type: object
       properties:
@@ -503,7 +540,7 @@ components:
         ip_address: { type: string }
         status: { type: string, enum: [success, failure, forbidden] }
         details: { type: object }
-    
+
     SystemHealth:
       type: object
       properties:
@@ -513,21 +550,21 @@ components:
         timestamp: { type: string, format: date-time }
         components: { type: object }
         metrics: { type: object }
-    
+
     HealthStatus:
       type: object
       properties:
         status: { type: string, enum: [healthy, degraded, unhealthy] }
         latency_ms: { type: integer }
         last_check: { type: string, format: date-time }
-    
+
     ProjectSettings:
       type: object
       properties:
         default_agent: { type: string }
         timezone: { type: string }
         allowed_integrations: { type: array, items: { type: string } }
-    
+
     ProjectBudget:
       type: object
       properties:
@@ -547,21 +584,21 @@ components:
 
 ```typescript
 interface Project {
-  project_id: string;        // UUID v4
-  name: string;              // 1-100 символов
-  description?: string;      // 0-500 символов
-  created_at: string;        // ISO 8601
-  updated_at: string;        // ISO 8601
-  created_by: string;        // User ID
-  status: 'active' | 'archived';
+  project_id: string; // UUID v4
+  name: string; // 1-100 символов
+  description?: string; // 0-500 символов
+  created_at: string; // ISO 8601
+  updated_at: string; // ISO 8601
+  created_by: string; // User ID
+  status: "active" | "archived";
   settings: ProjectSettings;
   budget: ProjectBudget;
   stats?: ProjectStats;
 }
 
 interface ProjectSettings {
-  default_agent: string;     // Модель по умолчанию
-  timezone: string;          // IANA timezone
+  default_agent: string; // Модель по умолчанию
+  timezone: string; // IANA timezone
   allowed_integrations: string[];
   custom_fields?: Record<string, any>;
 }
@@ -587,16 +624,22 @@ interface ProjectStats {
 ### 4.2 Workflow
 
 ```typescript
-type WorkflowStatus = 'queued' | 'running' | 'paused' | 'completed' | 'failed' | 'cancelled';
+type WorkflowStatus =
+  | "queued"
+  | "running"
+  | "paused"
+  | "completed"
+  | "failed"
+  | "cancelled";
 
-type StepStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped';
+type StepStatus = "pending" | "running" | "completed" | "failed" | "skipped";
 
 interface Workflow {
   workflow_id: string;
   project_id: string;
   config_version: string;
   status: WorkflowStatus;
-  progress: number;          // 0.0-1.0
+  progress: number; // 0.0-1.0
   current_step?: string;
   total_steps: number;
   completed_steps: number;
@@ -647,9 +690,9 @@ interface WorkflowError {
 ### 4.3 Agent
 
 ```typescript
-type AgentType = 'llm' | 'tool' | 'hybrid' | 'custom';
+type AgentType = "llm" | "tool" | "hybrid" | "custom";
 
-type AgentStatus = 'idle' | 'busy' | 'error' | 'offline';
+type AgentStatus = "idle" | "busy" | "error" | "offline";
 
 interface Agent {
   agent_id: string;
@@ -668,7 +711,7 @@ interface Agent {
 }
 
 interface AgentConfig {
-  temperature: number;       // 0.0-2.0
+  temperature: number; // 0.0-2.0
   max_tokens: number;
   timeout_seconds: number;
   retry_count: number;
@@ -680,7 +723,7 @@ interface CurrentTask {
   step_id: string;
   step_name: string;
   started_at: string;
-  progress: number;          // 0.0-1.0
+  progress: number; // 0.0-1.0
 }
 
 interface AgentMetrics {
@@ -689,22 +732,28 @@ interface AgentMetrics {
   tokens_used_total: number;
   tokens_used_today: number;
   average_task_duration: number;
-  success_rate: number;      // 0.0-1.0
+  success_rate: number; // 0.0-1.0
 }
 
 interface AgentHealth {
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
   last_check: string;
-  cpu_usage: number;         // 0.0-1.0
-  memory_usage: number;      // 0.0-1.0
-  error_rate_1h: number;     // 0.0-1.0
+  cpu_usage: number; // 0.0-1.0
+  memory_usage: number; // 0.0-1.0
+  error_rate_1h: number; // 0.0-1.0
 }
 ```
 
 ### 4.4 Artifact
 
 ```typescript
-type ArtifactType = 'file' | 'directory' | 'json' | 'text' | 'image' | 'archive';
+type ArtifactType =
+  | "file"
+  | "directory"
+  | "json"
+  | "text"
+  | "image"
+  | "archive";
 
 interface Artifact {
   artifact_id: string;
@@ -712,13 +761,13 @@ interface Artifact {
   step_id: string;
   name: string;
   type: ArtifactType;
-  storage_path: string;      // S3 path
+  storage_path: string; // S3 path
   size_bytes: number;
   mime_type: string;
   created_at: string;
-  created_by: string;        // Agent ID
+  created_by: string; // Agent ID
   version: number;
-  checksum: string;          // SHA256
+  checksum: string; // SHA256
   metadata?: Record<string, any>;
   permissions: ArtifactPermissions;
 }
@@ -736,35 +785,35 @@ interface ArtifactPermissions {
 ```typescript
 type EventType =
   // Workflow
-  | 'workflow.started'
-  | 'workflow.progress'
-  | 'workflow.step_completed'
-  | 'workflow.step_failed'
-  | 'workflow.step_retrying'
-  | 'workflow.completed'
-  | 'workflow.failed'
-  | 'workflow.paused'
-  | 'workflow.resumed'
-  | 'workflow.cancelled'
+  | "workflow.started"
+  | "workflow.progress"
+  | "workflow.step_completed"
+  | "workflow.step_failed"
+  | "workflow.step_retrying"
+  | "workflow.completed"
+  | "workflow.failed"
+  | "workflow.paused"
+  | "workflow.resumed"
+  | "workflow.cancelled"
   // Budget
-  | 'budget.warning'
-  | 'budget.exceeded'
-  | 'budget.updated'
+  | "budget.warning"
+  | "budget.exceeded"
+  | "budget.updated"
   // Agent
-  | 'agent.created'
-  | 'agent.destroyed'
-  | 'agent.error'
-  | 'agent.idle'
-  | 'agent.busy'
+  | "agent.created"
+  | "agent.destroyed"
+  | "agent.error"
+  | "agent.idle"
+  | "agent.busy"
   // Config
-  | 'config.created'
-  | 'config.updated'
-  | 'config.validated'
+  | "config.created"
+  | "config.updated"
+  | "config.validated"
   // Security
-  | 'guardrail.violation'
-  | 'auth.login'
-  | 'auth.logout'
-  | 'auth.failed';
+  | "guardrail.violation"
+  | "auth.login"
+  | "auth.logout"
+  | "auth.failed";
 
 interface Event {
   id: string;
@@ -779,13 +828,22 @@ interface Event {
 ### 4.6 User
 
 ```typescript
-type UserRole = 'admin' | 'developer' | 'viewer' | 'service';
+type UserRole = "admin" | "developer" | "viewer" | "service";
 
 type Permission =
-  | 'project:create' | 'project:read' | 'project:update' | 'project:delete'
-  | 'workflow:create' | 'workflow:read' | 'workflow:update' | 'workflow:cancel'
-  | 'config:create' | 'config:read' | 'config:update'
-  | 'admin:read' | 'admin:write';
+  | "project:create"
+  | "project:read"
+  | "project:update"
+  | "project:delete"
+  | "workflow:create"
+  | "workflow:read"
+  | "workflow:update"
+  | "workflow:cancel"
+  | "config:create"
+  | "config:read"
+  | "config:update"
+  | "admin:read"
+  | "admin:write";
 
 interface User {
   user_id: string;
@@ -800,7 +858,7 @@ interface User {
 
 interface ProjectMembership {
   project_id: string;
-  role: 'owner' | 'admin' | 'member' | 'viewer';
+  role: "owner" | "admin" | "member" | "viewer";
   granted_at: string;
   granted_by: string;
 }
@@ -814,13 +872,13 @@ interface AuditLogEntry {
   timestamp: string;
   user_id: string;
   user_email: string;
-  action: string;          // "resource.operation"
+  action: string; // "resource.operation"
   resource_type: string;
   resource_id: string;
   ip_address: string;
   user_agent: string;
   details: Record<string, any>;
-  status: 'success' | 'failure' | 'forbidden';
+  status: "success" | "failure" | "forbidden";
   error_code?: string;
   request_id: string;
 }
@@ -847,29 +905,29 @@ interface AuditLogEntry {
 
 ### 5.2 Коды ошибок
 
-| Код | HTTP | Описание | Обработка |
-|-----|------|----------|-----------|
-| `VALIDATION_ERROR` | 400 | Ошибка валидации полей | Проверить `details.errors` |
-| `PROJECT_NOT_FOUND` | 404 | Проект не найден | Проверить ID проекта |
-| `PROJECT_NAME_EXISTS` | 409 | Имя проекта занято | Использовать другое имя |
-| `WORKFLOW_NOT_FOUND` | 404 | Workflow не найден | Проверить ID workflow |
-| `WORKFLOW_CANNOT_PAUSE` | 400 | Нельзя приостановить | Проверить статус workflow |
-| `WORKFLOW_CANNOT_CANCEL` | 400 | Нельзя отменить | Проверить статус workflow |
-| `CONFIG_VALIDATION_ERROR` | 400 | Ошибка валидации конфига | Исправить YAML/JSON |
-| `CONFIG_VERSION_EXISTS` | 409 | Версия конфига существует | Использовать другую версию |
-| `BUDGET_EXCEEDED` | 403 | Превышен бюджет | Увеличить лимит или завершить workflow |
-| `AGENT_NOT_FOUND` | 404 | Агент не найден | Проверить ID агента |
-| `ARTIFACT_NOT_FOUND` | 404 | Артефакт не найден | Проверить ID артефакта |
-| `ARTIFACT_ACCESS_DENIED` | 403 | Нет доступа к артефакту | Запросить доступ |
-| `WEBHOOK_URL_EXISTS` | 409 | Webhook URL существует | Использовать другой URL |
-| `WEBHOOK_INACTIVE` | 400 | Webhook не активен | Активировать webhook |
-| `INSUFFICIENT_PERMISSIONS` | 403 | Недостаточно прав | Запросить роль admin |
-| `VERSION_CONFLICT` | 409 | Конфликт версий | Перечитать и повторить |
-| `DUPLICATE_WORKFLOW` | 409 | Дубликат workflow | Использовать другой ID |
-| `RATE_LIMIT_EXCEEDED` | 429 | Превышен лимит | Ждать `Retry-After` |
-| `UNAUTHORIZED` | 401 | Неверный токен | Обновить токен |
-| `INTERNAL_ERROR` | 500 | Внутренняя ошибка | Повторить позже |
-| `SERVICE_UNAVAILABLE` | 503 | Сервис недоступен | Проверить статус системы |
+| Код                        | HTTP | Описание                  | Обработка                              |
+| -------------------------- | ---- | ------------------------- | -------------------------------------- |
+| `VALIDATION_ERROR`         | 400  | Ошибка валидации полей    | Проверить `details.errors`             |
+| `PROJECT_NOT_FOUND`        | 404  | Проект не найден          | Проверить ID проекта                   |
+| `PROJECT_NAME_EXISTS`      | 409  | Имя проекта занято        | Использовать другое имя                |
+| `WORKFLOW_NOT_FOUND`       | 404  | Workflow не найден        | Проверить ID workflow                  |
+| `WORKFLOW_CANNOT_PAUSE`    | 400  | Нельзя приостановить      | Проверить статус workflow              |
+| `WORKFLOW_CANNOT_CANCEL`   | 400  | Нельзя отменить           | Проверить статус workflow              |
+| `CONFIG_VALIDATION_ERROR`  | 400  | Ошибка валидации конфига  | Исправить YAML/JSON                    |
+| `CONFIG_VERSION_EXISTS`    | 409  | Версия конфига существует | Использовать другую версию             |
+| `BUDGET_EXCEEDED`          | 403  | Превышен бюджет           | Увеличить лимит или завершить workflow |
+| `AGENT_NOT_FOUND`          | 404  | Агент не найден           | Проверить ID агента                    |
+| `ARTIFACT_NOT_FOUND`       | 404  | Артефакт не найден        | Проверить ID артефакта                 |
+| `ARTIFACT_ACCESS_DENIED`   | 403  | Нет доступа к артефакту   | Запросить доступ                       |
+| `WEBHOOK_URL_EXISTS`       | 409  | Webhook URL существует    | Использовать другой URL                |
+| `WEBHOOK_INACTIVE`         | 400  | Webhook не активен        | Активировать webhook                   |
+| `INSUFFICIENT_PERMISSIONS` | 403  | Недостаточно прав         | Запросить роль admin                   |
+| `VERSION_CONFLICT`         | 409  | Конфликт версий           | Перечитать и повторить                 |
+| `DUPLICATE_WORKFLOW`       | 409  | Дубликат workflow         | Использовать другой ID                 |
+| `RATE_LIMIT_EXCEEDED`      | 429  | Превышен лимит            | Ждать `Retry-After`                    |
+| `UNAUTHORIZED`             | 401  | Неверный токен            | Обновить токен                         |
+| `INTERNAL_ERROR`           | 500  | Внутренняя ошибка         | Повторить позже                        |
+| `SERVICE_UNAVAILABLE`      | 503  | Сервис недоступен         | Проверить статус системы               |
 
 ### 5.3 Рекомендации по обработке
 
@@ -877,36 +935,36 @@ interface AuditLogEntry {
 // Пример обработки ошибок в клиенте
 async function handleApiError(error: ApiError): Promise<void> {
   switch (error.code) {
-    case 'VALIDATION_ERROR':
+    case "VALIDATION_ERROR":
       // Показать ошибки валидации в форме
       displayValidationErrors(error.details.errors);
       break;
-    
-    case 'RATE_LIMIT_EXCEEDED':
+
+    case "RATE_LIMIT_EXCEEDED":
       // Ждать указанное время и повторить
-      const retryAfter = parseInt(error.headers['Retry-After'] || '60');
+      const retryAfter = parseInt(error.headers["Retry-After"] || "60");
       await sleep(retryAfter * 1000);
       return retry();
-    
-    case 'VERSION_CONFLICT':
+
+    case "VERSION_CONFLICT":
       // Перечитать ресурс и повторить
       const latest = await fetchResource(error.details.resource_id);
       return updateResource(latest.id, mergeChanges(latest, pendingChanges));
-    
-    case 'BUDGET_EXCEEDED':
+
+    case "BUDGET_EXCEEDED":
       // Уведомить пользователя
-      notifyUser('Бюджет превышен. Обратитесь к администратору.');
+      notifyUser("Бюджет превышен. Обратитесь к администратору.");
       break;
-    
-    case 'UNAUTHORIZED':
+
+    case "UNAUTHORIZED":
       // Обновить токен
       await refreshToken();
       return retry();
-    
+
     default:
       // Логировать и показать общее сообщение
       logError(error);
-      showError('Произошла ошибка. Попробуйте позже.');
+      showError("Произошла ошибка. Попробуйте позже.");
   }
 }
 ```
@@ -925,6 +983,7 @@ Authentication: Bearer Token в query param или subprotocol
 ### 6.2 Формат сообщений
 
 **Клиент → Сервер:**
+
 ```json
 {
   "type": "subscribe",
@@ -934,6 +993,7 @@ Authentication: Bearer Token в query param или subprotocol
 ```
 
 **Сервер → Клиент:**
+
 ```json
 {
   "type": "event",
@@ -952,23 +1012,23 @@ Authentication: Bearer Token в query param или subprotocol
 
 ### 6.3 Типы сообщений
 
-| Тип | Направление | Описание |
-|-----|-------------|----------|
-| `subscribe` | Client → Server | Подписка на каналы |
+| Тип           | Направление     | Описание           |
+| ------------- | --------------- | ------------------ |
+| `subscribe`   | Client → Server | Подписка на каналы |
 | `unsubscribe` | Client → Server | Отписка от каналов |
-| `ping` | Client → Server | Keep-alive |
-| `pong` | Server → Client | Keep-alive ответ |
-| `event` | Server → Client | Событие |
-| `error` | Server → Client | Ошибка подписки |
+| `ping`        | Client → Server | Keep-alive         |
+| `pong`        | Server → Client | Keep-alive ответ   |
+| `event`       | Server → Client | Событие            |
+| `error`       | Server → Client | Ошибка подписки    |
 
 ### 6.4 Каналы событий
 
-| Канал | События | Пример |
-|-------|---------|--------|
-| `workflow:{id}` | workflow.* | `workflow:wf-123` |
-| `project:{id}` | config.*, budget.* | `project:proj-456` |
-| `agent:{id}` | agent.* | `agent:agent-789` |
-| `user:{id}` | Все события пользователя | `user:user-001` |
+| Канал           | События                  | Пример             |
+| --------------- | ------------------------ | ------------------ |
+| `workflow:{id}` | workflow.\*              | `workflow:wf-123`  |
+| `project:{id}`  | config._, budget._       | `project:proj-456` |
+| `agent:{id}`    | agent.\*                 | `agent:agent-789`  |
+| `user:{id}`     | Все события пользователя | `user:user-001`    |
 
 ### 6.5 Reconnect логика
 
@@ -976,20 +1036,20 @@ Authentication: Bearer Token в query param или subprotocol
 class WebSocketClient {
   private reconnectDelay = 1000;
   private maxReconnectDelay = 30000;
-  
+
   connect() {
     this.ws = new WebSocket(this.url);
-    
+
     this.ws.onclose = () => {
       setTimeout(() => {
         this.reconnectDelay = Math.min(
           this.reconnectDelay * 1.5,
-          this.maxReconnectDelay
+          this.maxReconnectDelay,
         );
         this.connect();
       }, this.reconnectDelay);
     };
-    
+
     this.ws.onopen = () => {
       this.reconnectDelay = 1000;
       this.resubscribe();
@@ -1027,6 +1087,7 @@ class WebSocketClient {
 ### 7.2 Signature для верификации
 
 **Headers:**
+
 ```
 X-Webhook-Signature: sha256=abc123...
 X-Webhook-Timestamp: 2026-03-31T10:35:00Z
@@ -1034,6 +1095,7 @@ X-Webhook-ID: evt-abc123
 ```
 
 **Верификация (Python):**
+
 ```python
 import hmac
 import hashlib
@@ -1044,22 +1106,21 @@ def verify_webhook(payload: bytes, signature: str, secret: str) -> bool:
         payload,
         hashlib.sha256
     ).hexdigest()
-    
+
     return hmac.compare_digest(f"sha256={expected}", signature)
 ```
 
 ### 7.3 Retry логика
 
 | Attempt | Delay | Cumulative |
-|---------|-------|------------|
-| 1 | 0s | 0s |
-| 2 | 60s | 1m |
-| 3 | 300s | 6m |
-| 4 | 900s | 21m |
-| 5 | 2700s | 66m |
+| ------- | ----- | ---------- |
+| 1       | 0s    | 0s         |
+| 2       | 60s   | 1m         |
+| 3       | 300s  | 6m         |
+| 4       | 900s  | 21m        |
+| 5       | 2700s | 66m        |
 
-**Max retries:** 5  
-**Max age:** 24 часа
+**Max retries:** 5 **Max age:** 24 часа
 
 ---
 
@@ -1068,6 +1129,7 @@ def verify_webhook(payload: bytes, signature: str, secret: str) -> bool:
 ### 8.1 Аутентификация
 
 **JWT Token:**
+
 ```json
 {
   "sub": "user-123",
@@ -1080,23 +1142,23 @@ def verify_webhook(payload: bytes, signature: str, secret: str) -> bool:
 ```
 
 **Refresh Token:**
+
 - Срок жизни: 7 дней
 - Хранение: HttpOnly cookie
 - Rotation: при каждом использовании
 
 ### 8.2 Авторизация (Роли)
 
-| Роль | Права |
-|------|-------|
-| **admin** | Полный доступ ко всем ресурсам |
+| Роль          | Права                             |
+| ------------- | --------------------------------- |
+| **admin**     | Полный доступ ко всем ресурсам    |
 | **developer** | CRUD проектов, workflow, конфигов |
-| **viewer** | Только чтение |
-| **service** | Доступ по API key для сервисов |
+| **viewer**    | Только чтение                     |
+| **service**   | Доступ по API key для сервисов    |
 
 ### 8.3 Rate Limiting
 
-**Алгоритм:** Token Bucket  
-**Ключи:** User ID, IP, API Key
+**Алгоритм:** Token Bucket **Ключи:** User ID, IP, API Key
 
 ```python
 from slowapi import Limiter
@@ -1136,7 +1198,7 @@ import re
 class CreateProjectRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     description: str = Field(None, max_length=500)
-    
+
     @validator('name')
     def validate_name(cls, v):
         if not re.match(r'^[\w\s\-]+$', v):
@@ -1155,6 +1217,7 @@ class CreateProjectRequest(BaseModel):
 **URL Path:** `/api/v1/`, `/api/v2/`
 
 **Deprecation политика:**
+
 1. Объявление deprecation за 3 месяца
 2. Поддержка минимум 2 версий одновременно
 3. Sunset header в ответах
@@ -1171,14 +1234,17 @@ Link: <https://api.afl-orchestrator.com/api/v2>; rel="successor-version"
 ## Breaking Changes в v2
 
 ### Projects
+
 - `project_id` переименован в `id`
 - `default_budget` теперь объект `BudgetConfig`
 
 ### Workflows
+
 - Новый обязательный параметр `priority`
 - `status` добавлены значения `queued`, `cancelled`
 
 ### Response Format
+
 - Все списки теперь в поле `data`
 - Добавлена пагинация `pagination`
 ```
@@ -1198,9 +1264,17 @@ Accept-Version: v1
 
 ```json
 {
-  "info": { "name": "AFL Orchestrator API", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
-  "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}" }] },
-  "variable": [{ "key": "base_url", "value": "https://api.afl-orchestrator.com/api/v1" }],
+  "info": {
+    "name": "AFL Orchestrator API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{jwt_token}}" }]
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://api.afl-orchestrator.com/api/v1" }
+  ],
   "item": [
     {
       "name": "Projects",
@@ -1292,4 +1366,4 @@ async def test_create_workflow():
 
 ---
 
-*Документ готов для передачи backend-команде*
+_Документ готов для передачи backend-команде_
