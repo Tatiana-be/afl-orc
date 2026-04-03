@@ -151,18 +151,6 @@ jobs:
           --health-cmd "redis-cli ping" --health-interval 10s --health-timeout
           5s --health-retries 5
 
-      minio:
-        image: minio/minio:RELEASE.2024-01-01T16-33-00Z
-        env:
-          MINIO_ROOT_USER: minioadmin
-          MINIO_ROOT_PASSWORD: minioadmin
-        ports:
-          - 9000:9000
-          - 9001:9001
-        options: >-
-          --health-cmd "curl -f http://localhost:9000/minio/health/live"
-          --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
