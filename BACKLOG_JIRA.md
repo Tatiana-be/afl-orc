@@ -1,452 +1,573 @@
 # AFL Orchestrator: Бэклог задач для Jira/Linear
 
-**Дата создания**: 2026-03-31  
-**Версия**: 1.0  
-**На основе ТЗ**: AFL_Orchestrator_TZ_ADD.md v1.0
+**Дата создания**: 2026-03-31 **Дата обновления**: 2026-04-02 **Версия**: 2.0
+**На основе ТЗ**: AFL_Orchestrator_TZ_ADD.md v1.0 **Статус**: ✅ Актуализирован
+после PoC
+
+---
+
+## Прогресс проекта
+
+| Метрика                    | Значение |
+| -------------------------- | -------- |
+| **Всего задач**            | 213      |
+| **Выполнено**              | 21 (10%) |
+| **В работе**               | 0        |
+| **Осталось**               | 192      |
+| **Story Points всего**     | ~1180    |
+| **Story Points выполнено** | ~100     |
+| **Прогресс**               | 8.5%     |
 
 ---
 
 ## Структура эпиков
 
-| Epic ID | Название | Фаза | Спринтов |
-|---------|----------|------|----------|
-| EPIC-001 | Parser Module | MVP | 2 |
-| EPIC-002 | Workflow Engine | MVP | 3 |
-| EPIC-003 | Budget Tracker | MVP | 2 |
-| EPIC-004 | Agent Executor | MVP | 3 |
-| EPIC-005 | Context Manager | Alpha | 3 |
-| EPIC-006 | Guardrail Engine | MVP/Alpha | 3 |
-| EPIC-007 | Storage Layer | MVP | 2 |
-| EPIC-008 | REST API | MVP | 2 |
-| EPIC-009 | LLM Integrations | MVP | 2 |
-| EPIC-010 | Git Integration | Alpha | 2 |
-| EPIC-011 | Issue Tracker Integration | Alpha | 2 |
-| EPIC-012 | Security & Sandbox | Alpha | 2 |
-| EPIC-013 | Monitoring & Observability | Beta | 2 |
-| EPIC-014 | Deployment & CI/CD | MVP | 2 |
+| Epic ID  | Название                   | Фаза   | Статус         | Задач | Выполнено |
+| -------- | -------------------------- | ------ | -------------- | ----- | --------- |
+| EPIC-001 | Parser Module              | MVP    | 🟡 In Progress | 10    | 4         |
+| EPIC-002 | Workflow Engine            | MVP    | 🟡 In Progress | 13    | 3         |
+| EPIC-003 | Budget Tracker             | MVP    | 🔴 Not Started | 12    | 0         |
+| EPIC-004 | Agent Executor             | MVP    | 🔴 Not Started | 15    | 0         |
+| EPIC-005 | Context Manager            | MVP ✅ | 🔴 Not Started | 16    | 0         |
+| EPIC-006 | Guardrail Engine           | MVP ✅ | 🔴 Not Started | 18    | 0         |
+| EPIC-007 | Storage Layer              | MVP    | 🟡 In Progress | 16    | 2         |
+| EPIC-008 | REST API                   | MVP    | 🟡 In Progress | 14    | 1         |
+| EPIC-009 | LLM Integrations           | MVP    | 🔴 Not Started | 13    | 0         |
+| EPIC-010 | Git Integration            | Alpha  | 🔴 Not Started | 13    | 0         |
+| EPIC-011 | Issue Tracker Integration  | Alpha  | 🔴 Not Started | 14    | 0         |
+| EPIC-012 | Security & Sandbox         | MVP ✅ | 🔴 Not Started | 11    | 0         |
+| EPIC-013 | Monitoring & Observability | Beta   | 🔴 Not Started | 15    | 0         |
+| EPIC-014 | Deployment & CI/CD         | MVP    | 🟡 In Progress | 11    | 3         |
+| EPIC-015 | Proof-of-Concept           | MVP    | ✅ Complete    | 8     | 8         |
+| EPIC-016 | Documentation              | MVP    | 🟡 In Progress | 12    | 5         |
+| EPIC-017 | Repository Setup           | MVP    | ✅ Complete    | 13    | 13        |
+
+> **Изменения v2.0**: EPIC-005, EPIC-006, EPIC-012 перенесены из Alpha в MVP на
+> основе PoC результатов. Добавлены EPIC-015 (PoC), EPIC-016 (Docs), EPIC-017
+> (Repo Setup).
 
 ---
 
 ## EPIC-001: Parser Module
 
-**Описание**: Парсинг и валидация AFL-конфигураций  
-**Срок**: Недели 1-2  
-**Ответственный**: Core Team  
-**DoD**: Раздел 5.1.5 ТЗ
+**Описание**: Парсинг и валидация AFL-конфигураций **Срок**: Недели 1-2
+**Ответственный**: Core Team **DoD**: Раздел 5.1.5 ТЗ **Прогресс**: 4/10 задач
+(40%)
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **PARSER-001** | Настройка проекта Python 3.11+ с pydantic | Task | 3 | 🔴 High | — |
-| **PARSER-002** | Реализация схемы AFLConfig (Pydantic models) | Story | 8 | 🔴 High | PARSER-001 |
-| **PARSER-003** | YAML парсинг с поддержкой anchors/aliases | Story | 5 | 🔴 High | PARSER-002 |
-| **PARSER-004** | JSON парсинг (альтернативный формат) | Task | 3 | 🟡 Medium | PARSER-002 |
-| **PARSER-005** | Валидация ссылок (agent/artifact/guardrail) | Story | 5 | 🔴 High | PARSER-002 |
-| **PARSER-006** | Проверка циклов в графе зависимостей workflow | Story | 8 | 🔴 High | PARSER-002 |
-| **PARSER-007** | Детализация ошибок (строка/колонка) | Task | 5 | 🟡 Medium | PARSER-003 |
-| **PARSER-008** | Версионирование схемы AFL (migration support) | Story | 5 | 🟡 Medium | PARSER-002 |
-| **PARSER-009** | Юнит-тесты парсера (покрытие ≥90%) | Test | 8 | 🔴 High | PARSER-003-008 |
-| **PARSER-010** | Документация API парсера | Doc | 2 | 🟢 Low | PARSER-009 |
+| ID             | Задача                                        | Тип   | SP  | Приоритет | Статус  | Зависимости    |
+| -------------- | --------------------------------------------- | ----- | --- | --------- | ------- | -------------- |
+| **PARSER-001** | Настройка проекта Python 3.12+ с pydantic     | Task  | 3   | 🔴 High   | ✅ Done | —              |
+| **PARSER-002** | Реализация схемы AFLConfig (Pydantic models)  | Story | 8   | 🔴 High   | ✅ Done | PARSER-001     |
+| **PARSER-003** | YAML парсинг с поддержкой anchors/aliases     | Story | 5   | 🔴 High   | ✅ Done | PARSER-002     |
+| **PARSER-004** | JSON парсинг (альтернативный формат)          | Task  | 3   | 🟡 Medium | ✅ Done | PARSER-002     |
+| **PARSER-005** | Валидация ссылок (agent/artifact/guardrail)   | Story | 5   | 🔴 High   | 🔴 Todo | PARSER-002     |
+| **PARSER-006** | Проверка циклов в графе зависимостей workflow | Story | 8   | 🔴 High   | 🔴 Todo | PARSER-002     |
+| **PARSER-007** | Детализация ошибок (строка/колонка)           | Task  | 5   | 🟡 Medium | 🔴 Todo | PARSER-003     |
+| **PARSER-008** | Версионирование схемы AFL (migration support) | Story | 5   | 🟡 Medium | 🔴 Todo | PARSER-002     |
+| **PARSER-009** | Юнит-тесты парсера (покрытие ≥90%)            | Test  | 8   | 🔴 High   | 🔴 Todo | PARSER-003-008 |
+| **PARSER-010** | Документация API парсера                      | Doc   | 2   | 🟢 Low    | 🔴 Todo | PARSER-009     |
 
 ---
 
 ## EPIC-002: Workflow Engine
 
-**Описание**: Управление жизненным циклом workflow, машина состояний  
-**Срок**: Недели 2-4  
-**Ответственный**: Core Team  
-**DoD**: Раздел 5.2.5 ТЗ
+**Описание**: Управление жизненным циклом workflow, машина состояний **Срок**:
+Недели 2-4 **Ответственный**: Core Team **DoD**: Раздел 5.2.5 ТЗ **Прогресс**:
+3/13 задач (23%)
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **WF-001** | Проектирование машины состояний (7 состояний) | Story | 5 | 🔴 High | — |
-| **WF-002** | Реализация State Machine (transitions) | Story | 8 | 🔴 High | WF-001 |
-| **WF-003** | Запуск workflow из AFLConfig | Story | 5 | 🔴 High | WF-002, PARSER-009 |
-| **WF-004** | Приостановка/возобновление workflow | Story | 5 | 🔴 High | WF-002 |
-| **WF-005** | Сериализация состояния в БД | Story | 5 | 🔴 High | WF-002, STORAGE-001 |
-| **WF-006** | Параллельное выполнение независимых шагов | Story | 8 | 🟡 Medium | WF-002 |
-| **WF-007** | Синхронизация через барьеры (wait for all) | Story | 5 | 🟡 Medium | WF-006 |
-| **WF-008** | Retry логика с exponential backoff | Story | 5 | 🔴 High | WF-002 |
-| **WF-009** | Обработка ошибок шагов (continue/skip/fail) | Story | 5 | 🔴 High | WF-008 |
-| **WF-010** | Восстановление после сбоя (recovery) | Story | 8 | 🔴 High | WF-005 |
-| **WF-011** | Юнит-тесты машины состояний | Test | 8 | 🔴 High | WF-002-010 |
-| **WF-012** | Интеграционные тесты workflow | Test | 8 | 🔴 High | WF-011 |
-| **WF-013** | Chaos-тесты (сбои БД/сети) | Test | 5 | 🟡 Medium | WF-012 |
+| ID         | Задача                                        | Тип   | SP  | Приоритет | Статус  | Зависимости         |
+| ---------- | --------------------------------------------- | ----- | --- | --------- | ------- | ------------------- |
+| **WF-001** | Проектирование машины состояний (7 состояний) | Story | 5   | 🔴 High   | ✅ Done | —                   |
+| **WF-002** | Реализация State Machine (transitions)        | Story | 8   | 🔴 High   | ✅ Done | WF-001              |
+| **WF-003** | Запуск workflow из AFLConfig                  | Story | 5   | 🔴 High   | 🔴 Todo | WF-002, PARSER-009  |
+| **WF-004** | Приостановка/возобновление workflow           | Story | 5   | 🔴 High   | 🔴 Todo | WF-002              |
+| **WF-005** | Сериализация состояния в БД                   | Story | 5   | 🔴 High   | 🔴 Todo | WF-002, STORAGE-001 |
+| **WF-006** | Параллельное выполнение независимых шагов     | Story | 8   | 🟡 Medium | 🔴 Todo | WF-002              |
+| **WF-007** | Синхронизация через барьеры (wait for all)    | Story | 5   | 🟡 Medium | 🔴 Todo | WF-006              |
+| **WF-008** | Retry логика с exponential backoff            | Story | 5   | 🔴 High   | 🔴 Todo | WF-002              |
+| **WF-009** | Обработка ошибок шагов (continue/skip/fail)   | Story | 5   | 🔴 High   | 🔴 Todo | WF-008              |
+| **WF-010** | Восстановление после сбоя (recovery)          | Story | 8   | 🔴 High   | 🔴 Todo | WF-005              |
+| **WF-011** | Юнит-тесты машины состояний                   | Test  | 8   | 🔴 High   | ✅ Done | WF-002-010          |
+| **WF-012** | Интеграционные тесты workflow                 | Test  | 8   | 🔴 High   | 🔴 Todo | WF-011              |
+| **WF-013** | Chaos-тесты (сбои БД/сети)                    | Test  | 5   | 🟡 Medium | 🔴 Todo | WF-012              |
 
 ---
 
 ## EPIC-003: Budget Tracker
 
-**Описание**: Учёт токенов, лимиты, уведомления  
-**Срок**: Недели 2-3  
-**Ответственный**: Core Team  
-**DoD**: Раздел 5.5.5 ТЗ
+**Описание**: Учёт токенов, лимиты, уведомления **Срок**: Недели 2-3
+**Ответственный**: Core Team **DoD**: Раздел 5.5.5 ТЗ **Прогресс**: 0/12 задач
+(0%)
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **BUDGET-001** | Модель данных CostRecord | Task | 3 | 🔴 High | — |
-| **BUDGET-002** | Учёт токенов по провайдерам/моделям | Story | 5 | 🔴 High | BUDGET-001 |
-| **BUDGET-003** | Иерархические лимиты (project/workflow/step/agent) | Story | 8 | 🔴 High | BUDGET-002 |
-| **BUDGET-004** | Soft limits (предупреждение при 80%) | Story | 3 | 🔴 High | BUDGET-003 |
-| **BUDGET-005** | Hard limits (блокировка при превышении) | Story | 5 | 🔴 High | BUDGET-003 |
-| **BUDGET-006** | Email уведомления о лимитах | Story | 5 | 🟡 Medium | BUDGET-004 |
-| **BUDGET-007** | Slack уведомления | Story | 3 | 🟢 Low | BUDGET-004 |
-| **BUDGET-008** | Webhook уведомления | Story | 5 | 🟡 Medium | BUDGET-004 |
-| **BUDGET-009** | Прогнозирование расхода (на основе истории) | Story | 8 | 🟡 Medium | BUDGET-002 |
-| **BUDGET-010** | Grafana дашборд затрат | Task | 5 | 🟡 Medium | BUDGET-002 |
-| **BUDGET-011** | Юнит-тесты (покрытие ≥85%) | Test | 5 | 🔴 High | BUDGET-002-009 |
-| **BUDGET-012** | Интеграционные тесты с OpenAI API | Test | 5 | 🔴 High | BUDGET-011 |
+| ID             | Задача                                             | Тип   | SP  | Приоритет | Статус  | Зависимости    |
+| -------------- | -------------------------------------------------- | ----- | --- | --------- | ------- | -------------- |
+| **BUDGET-001** | Модель данных CostRecord                           | Task  | 3   | 🔴 High   | 🔴 Todo | —              |
+| **BUDGET-002** | Учёт токенов по провайдерам/моделям                | Story | 5   | 🔴 High   | 🔴 Todo | BUDGET-001     |
+| **BUDGET-003** | Иерархические лимиты (project/workflow/step/agent) | Story | 8   | 🔴 High   | 🔴 Todo | BUDGET-002     |
+| **BUDGET-004** | Soft limits (предупреждение при 80%)               | Story | 3   | 🔴 High   | 🔴 Todo | BUDGET-003     |
+| **BUDGET-005** | Hard limits (блокировка при превышении)            | Story | 5   | 🔴 High   | 🔴 Todo | BUDGET-003     |
+| **BUDGET-006** | Email уведомления о лимитах                        | Story | 5   | 🟡 Medium | 🔴 Todo | BUDGET-004     |
+| **BUDGET-007** | Slack уведомления                                  | Story | 3   | 🟢 Low    | 🔴 Todo | BUDGET-004     |
+| **BUDGET-008** | Webhook уведомления                                | Story | 5   | 🟡 Medium | 🔴 Todo | BUDGET-004     |
+| **BUDGET-009** | Прогнозирование расхода (на основе истории)        | Story | 8   | 🟡 Medium | 🔴 Todo | BUDGET-002     |
+| **BUDGET-010** | Grafana дашборд затрат                             | Task  | 5   | 🟡 Medium | 🔴 Todo | BUDGET-002     |
+| **BUDGET-011** | Юнит-тесты (покрытие ≥85%)                         | Test  | 5   | 🔴 High   | 🔴 Todo | BUDGET-002-009 |
+| **BUDGET-012** | Интеграционные тесты с OpenAI API                  | Test  | 5   | 🔴 High   | 🔴 Todo | BUDGET-011     |
 
 ---
 
 ## EPIC-004: Agent Executor
 
-**Описание**: Выполнение агентов, управление инструментами  
-**Срок**: Недели 1-3  
-**Ответственный**: AI Team  
-**DoD**: Раздел 5.6.5 ТЗ
+**Описание**: Выполнение агентов, управление инструментами **Срок**: Недели 1-3
+**Ответственный**: AI Team **DoD**: Раздел 5.6.5 ТЗ **Прогресс**: 0/15 задач
+(0%)
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **AGENT-001** | IAgent интерфейс (Protocol) | Task | 3 | 🔴 High | — |
-| **AGENT-002** | ITool интерфейс | Task | 3 | 🔴 High | AGENT-001 |
-| **AGENT-003** | Реестр инструментов (decorator-based) | Story | 5 | 🔴 High | AGENT-002 |
-| **AGENT-004** | Базовый LLM-агент (LLM-based) | Story | 8 | 🔴 High | AGENT-001, LLM-001 |
-| **AGENT-005** | Таймауты выполнения агента | Story | 3 | 🔴 High | AGENT-004 |
-| **AGENT-006** | Circuit breaker для нестабильных провайдеров | Story | 5 | 🔴 High | AGENT-004 |
-| **AGENT-007** | Fallback стратегии (другая модель) | Story | 5 | 🔴 High | AGENT-006 |
-| **AGENT-008** | Логирование промптов/ответов | Task | 3 | 🔴 High | AGENT-004 |
-| **AGENT-009** | Логирование tool calls | Task | 3 | 🔴 High | AGENT-003 |
-| **AGENT-010** | Инструмент: HTTP Request | Story | 5 | 🟡 Medium | AGENT-003 |
-| **AGENT-011** | Инструмент: File Read/Write | Story | 3 | 🟡 Medium | AGENT-003 |
-| **AGENT-012** | Инструмент: Shell Command (sandboxed) | Story | 8 | 🟡 Medium | AGENT-003, SANDBOX-001 |
-| **AGENT-013** | Инструмент: Database Query | Story | 5 | 🟢 Low | AGENT-003 |
-| **AGENT-014** | Юнит-тесты агентов (покрытие ≥85%) | Test | 8 | 🔴 High | AGENT-004-013 |
-| **AGENT-015** | Бенчмарки времени запуска | Test | 3 | 🟡 Medium | AGENT-014 |
+| ID            | Задача                                       | Тип   | SP  | Приоритет | Статус  | Зависимости            |
+| ------------- | -------------------------------------------- | ----- | --- | --------- | ------- | ---------------------- |
+| **AGENT-001** | IAgent интерфейс (Protocol)                  | Task  | 3   | 🔴 High   | 🔴 Todo | —                      |
+| **AGENT-002** | ITool интерфейс                              | Task  | 3   | 🔴 High   | 🔴 Todo | AGENT-001              |
+| **AGENT-003** | Реестр инструментов (decorator-based)        | Story | 5   | 🔴 High   | 🔴 Todo | AGENT-002              |
+| **AGENT-004** | Базовый LLM-агент (LLM-based)                | Story | 8   | 🔴 High   | 🔴 Todo | AGENT-001, LLM-001     |
+| **AGENT-005** | Таймауты выполнения агента                   | Story | 3   | 🔴 High   | 🔴 Todo | AGENT-004              |
+| **AGENT-006** | Circuit breaker для нестабильных провайдеров | Story | 5   | 🔴 High   | 🔴 Todo | AGENT-004              |
+| **AGENT-007** | Fallback стратегии (другая модель)           | Story | 5   | 🔴 High   | 🔴 Todo | AGENT-006              |
+| **AGENT-008** | Логирование промптов/ответов                 | Task  | 3   | 🔴 High   | 🔴 Todo | AGENT-004              |
+| **AGENT-009** | Логирование tool calls                       | Task  | 3   | 🔴 High   | 🔴 Todo | AGENT-003              |
+| **AGENT-010** | Инструмент: HTTP Request                     | Story | 5   | 🟡 Medium | 🔴 Todo | AGENT-003              |
+| **AGENT-011** | Инструмент: File Read/Write                  | Story | 3   | 🟡 Medium | 🔴 Todo | AGENT-003              |
+| **AGENT-012** | Инструмент: Shell Command (sandboxed)        | Story | 8   | 🟡 Medium | 🔴 Todo | AGENT-003, SANDBOX-001 |
+| **AGENT-013** | Инструмент: Database Query                   | Story | 5   | 🟢 Low    | 🔴 Todo | AGENT-003              |
+| **AGENT-014** | Юнит-тесты агентов (покрытие ≥85%)           | Test  | 8   | 🔴 High   | 🔴 Todo | AGENT-004-013          |
+| **AGENT-015** | Бенчмарки времени запуска                    | Test  | 3   | 🟡 Medium | 🔴 Todo | AGENT-014              |
 
 ---
 
-## EPIC-005: Context Manager
+## EPIC-005: Context Manager ⬆️ Перенесён из Alpha в MVP
 
-**Описание**: Управление контекстом, сжатие, долгосрочная память  
-**Срок**: Недели 3-5 (Alpha)  
-**Ответственный**: AI Team  
-**DoD**: Раздел 5.3.5 ТЗ
+**Описание**: Управление контекстом, сжатие, долгосрочная память **Срок**:
+Недели 3-5 **Ответственный**: AI Team **DoD**: Раздел 5.3.5 ТЗ **Прогресс**:
+0/16 задач (0%)
+
+> **PoC 2 подтвердил**: Hybrid стратегия обеспечивает 0% потерь при достаточном
+> лимите, Summarization — 2.4% потерь.
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **CTX-001** | Модель данных ConversationTurn | Task | 3 | 🔴 High | — |
-| **CTX-002** | Механизм передачи контекста между агентами | Story | 5 | 🔴 High | CTX-001 |
-| **CTX-003** | Лимиты токенов на контекст | Story | 3 | 🔴 High | CTX-002 |
-| **CTX-004** | Стратегия: Sliding Window | Story | 5 | 🔴 High | CTX-003 |
-| **CTX-005** | Стратегия: LLM Summarization | Story | 13 | 🔴 High | CTX-003, LLM-001 |
-| **CTX-006** | Стратегия: Key Information Extraction | Story | 8 | 🟡 Medium | CTX-003 |
-| **CTX-007** | Hybrid стратегия (комбинация) | Story | 8 | 🟡 Medium | CTX-004-006 |
-| **CTX-008** | Динамическое сжатие при 80% лимита | Story | 5 | 🔴 High | CTX-003, CTX-007 |
-| **CTX-009** | Фильтрация конфиденциальной информации | Story | 5 | 🔴 High | CTX-002 |
-| **CTX-010** | Аннотация источника контекста | Task | 3 | 🟡 Medium | CTX-002 |
-| **CTX-011** | Интеграция ChromaDB (векторная память) | Story | 8 | 🟡 Medium | CTX-001 |
-| **CTX-012** | Семантический поиск в памяти | Story | 8 | 🟡 Medium | CTX-011 |
-| **CTX-013** | Индексирование ключевых решений | Story | 5 | 🟢 Low | CTX-011 |
-| **CTX-014** | Валидация качества сжатия (BLEU/ROUGE) | Test | 8 | 🔴 High | CTX-005-007 |
-| **CTX-015** | Бенчмарки производительности | Test | 5 | 🔴 High | CTX-014 |
-| **CTX-016** | Security-тесты фильтрации секретов | Test | 5 | 🔴 High | CTX-009 |
+| ID          | Задача                                     | Тип   | SP  | Приоритет | Статус  | Зависимости      |
+| ----------- | ------------------------------------------ | ----- | --- | --------- | ------- | ---------------- |
+| **CTX-001** | Модель данных ConversationTurn             | Task  | 3   | 🔴 High   | 🔴 Todo | —                |
+| **CTX-002** | Механизм передачи контекста между агентами | Story | 5   | 🔴 High   | 🔴 Todo | CTX-001          |
+| **CTX-003** | Лимиты токенов на контекст                 | Story | 3   | 🔴 High   | 🔴 Todo | CTX-002          |
+| **CTX-004** | Стратегия: Sliding Window                  | Story | 5   | 🔴 High   | 🔴 Todo | CTX-003          |
+| **CTX-005** | Стратегия: LLM Summarization               | Story | 13  | 🔴 High   | 🔴 Todo | CTX-003, LLM-001 |
+| **CTX-006** | Стратегия: Key Information Extraction      | Story | 8   | 🟡 Medium | 🔴 Todo | CTX-003          |
+| **CTX-007** | Hybrid стратегия (комбинация)              | Story | 8   | 🔴 High   | 🔴 Todo | CTX-004-006      |
+| **CTX-008** | Динамическое сжатие при 80% лимита         | Story | 5   | 🔴 High   | 🔴 Todo | CTX-003, CTX-007 |
+| **CTX-009** | Фильтрация конфиденциальной информации     | Story | 5   | 🔴 High   | 🔴 Todo | CTX-002          |
+| **CTX-010** | Аннотация источника контекста              | Task  | 3   | 🟡 Medium | 🔴 Todo | CTX-002          |
+| **CTX-011** | Интеграция ChromaDB (векторная память)     | Story | 8   | 🟡 Medium | 🔴 Todo | CTX-001          |
+| **CTX-012** | Семантический поиск в памяти               | Story | 8   | 🟡 Medium | 🔴 Todo | CTX-011          |
+| **CTX-013** | Индексирование ключевых решений            | Story | 5   | 🟢 Low    | 🔴 Todo | CTX-011          |
+| **CTX-014** | Валидация качества сжатия (BLEU/ROUGE)     | Test  | 8   | 🔴 High   | 🔴 Todo | CTX-005-007      |
+| **CTX-015** | Бенчмарки производительности               | Test  | 5   | 🔴 High   | 🔴 Todo | CTX-014          |
+| **CTX-016** | Security-тесты фильтрации секретов         | Test  | 5   | 🔴 High   | 🔴 Todo | CTX-009          |
 
 ---
 
-## EPIC-006: Guardrail Engine
+## EPIC-006: Guardrail Engine ⬆️ Перенесён из Alpha в MVP
 
-**Описание**: Проверка безопасности и качества выводов  
-**Срок**: Недели 4-6 (MVP/Alpha)  
-**Ответственный**: Security Team  
-**DoD**: Раздел 5.4.7 ТЗ
+**Описание**: Проверка безопасности и качества выводов **Срок**: Недели 4-6
+**Ответственный**: Security Team **DoD**: Раздел 5.4.7 ТЗ **Прогресс**: 0/18
+задач (0%)
+
+> **PoC 3 подтвердил**: Комбинированная цепочка — FP 0.00%, FN 0.00%. Все цели
+> достигнуты.
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **GR-001** | BaseGuardrail абстрактный класс | Task | 3 | 🔴 High | — |
-| **GR-002** | GuardrailAction enum (block/modify/flag/rollback) | Task | 2 | 🔴 High | GR-001 |
-| **GR-003** | Guardrail Registry | Story | 5 | 🔴 High | GR-001 |
-| **GR-004** | Validator Pipeline (Chain of Responsibility) | Story | 8 | 🔴 High | GR-003 |
-| **GR-005** | Result Aggregator | Story | 5 | 🔴 High | GR-004 |
-| **GR-006** | Action Executor | Story | 5 | 🔴 High | GR-004 |
-| **GR-007** | Гардрейл: File Extension Check | Story | 5 | 🔴 High | GR-001 |
-| **GR-008** | Гардрейл: Token Limit Check | Story | 5 | 🔴 High | GR-001, BUDGET-002 |
-| **GR-009** | Гардрейл: Regex Pattern Check | Story | 3 | 🔴 High | GR-001 |
-| **GR-010** | Гардрейл: LLM-as-a-Judge | Story | 13 | 🔴 High | GR-001, LLM-001 |
-| **GR-011** | Гардрейл: Python Function (custom) | Story | 5 | 🟡 Medium | GR-001 |
-| **GR-012** | Обработка нарушений (violation handler) | Story | 5 | 🔴 High | GR-006 |
-| **GR-013** | Кэширование результатов проверок | Story | 5 | 🟡 Medium | GR-004 |
-| **GR-014** | Датасет для валидации (1000 примеров) | Task | 8 | 🔴 High | — |
-| **GR-015** | Валидация FP rate <5% | Test | 5 | 🔴 High | GR-014 |
-| **GR-016** | Валидация FN rate <1% | Test | 5 | 🔴 High | GR-014 |
-| **GR-017** | Бенчмарки производительности (<100 мс) | Test | 5 | 🔴 High | GR-007-013 |
-| **GR-018** | Юнит-тесты (покрытие ≥90%) | Test | 8 | 🔴 High | GR-007-013 |
+| ID         | Задача                                            | Тип   | SP  | Приоритет | Статус  | Зависимости        |
+| ---------- | ------------------------------------------------- | ----- | --- | --------- | ------- | ------------------ |
+| **GR-001** | BaseGuardrail абстрактный класс                   | Task  | 3   | 🔴 High   | 🔴 Todo | —                  |
+| **GR-002** | GuardrailAction enum (block/modify/flag/rollback) | Task  | 2   | 🔴 High   | 🔴 Todo | GR-001             |
+| **GR-003** | Guardrail Registry                                | Story | 5   | 🔴 High   | 🔴 Todo | GR-001             |
+| **GR-004** | Validator Pipeline (Chain of Responsibility)      | Story | 8   | 🔴 High   | 🔴 Todo | GR-003             |
+| **GR-005** | Result Aggregator                                 | Story | 5   | 🔴 High   | 🔴 Todo | GR-004             |
+| **GR-006** | Action Executor                                   | Story | 5   | 🔴 High   | 🔴 Todo | GR-004             |
+| **GR-007** | Гардрейл: File Extension Check                    | Story | 5   | 🔴 High   | 🔴 Todo | GR-001             |
+| **GR-008** | Гардрейл: Token Limit Check                       | Story | 5   | 🔴 High   | 🔴 Todo | GR-001, BUDGET-002 |
+| **GR-009** | Гардрейл: Regex Pattern Check                     | Story | 3   | 🔴 High   | 🔴 Todo | GR-001             |
+| **GR-010** | Гардрейл: LLM-as-a-Judge                          | Story | 13  | 🔴 High   | 🔴 Todo | GR-001, LLM-001    |
+| **GR-011** | Гардрейл: Python Function (custom)                | Story | 5   | 🟡 Medium | 🔴 Todo | GR-001             |
+| **GR-012** | Обработка нарушений (violation handler)           | Story | 5   | 🔴 High   | 🔴 Todo | GR-006             |
+| **GR-013** | Кэширование результатов проверок                  | Story | 5   | 🟡 Medium | 🔴 Todo | GR-004             |
+| **GR-014** | Датасет для валидации (1000 примеров)             | Task  | 8   | 🔴 High   | 🔴 Todo | —                  |
+| **GR-015** | Валидация FP rate <5%                             | Test  | 5   | 🔴 High   | 🔴 Todo | GR-014             |
+| **GR-016** | Валидация FN rate <1%                             | Test  | 5   | 🔴 High   | 🔴 Todo | GR-014             |
+| **GR-017** | Бенчмарки производительности (<100 мс)            | Test  | 5   | 🔴 High   | 🔴 Todo | GR-007-013         |
+| **GR-018** | Юнит-тесты (покрытие ≥90%)                        | Test  | 8   | 🔴 High   | 🔴 Todo | GR-007-013         |
 
 ---
 
 ## EPIC-007: Storage Layer
 
-**Описание**: База данных, кэш, хранилище артефактов  
-**Срок**: Недели 1-2  
-**Ответственный**: Core Team
+**Описание**: База данных, кэш, хранилище артефактов **Срок**: Недели 1-2
+**Ответственный**: Core Team **Прогресс**: 2/16 задач (13%)
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **STORAGE-001** | Настройка PostgreSQL + SQLAlchemy | Task | 5 | 🔴 High | — |
-| **STORAGE-002** | Миграции БД (Alembic) | Task | 5 | 🔴 High | STORAGE-001 |
-| **STORAGE-003** | Модель: Project | Task | 2 | 🔴 High | STORAGE-002 |
-| **STORAGE-004** | Модель: Workflow | Task | 3 | 🔴 High | STORAGE-002 |
-| **STORAGE-005** | Модель: WorkflowExecution | Task | 5 | 🔴 High | STORAGE-002 |
-| **STORAGE-006** | Модель: AgentExecution | Task | 3 | 🔴 High | STORAGE-002 |
-| **STORAGE-007** | Модель: TaskExecution | Task | 3 | 🔴 High | STORAGE-002 |
-| **STORAGE-008** | Модель: ArtifactVersion | Task | 3 | 🔴 High | STORAGE-002 |
-| **STORAGE-009** | Модель: GuardrailCheck | Task | 3 | 🔴 High | STORAGE-002 |
-| **STORAGE-010** | Модель: CostRecord | Task | 3 | 🔴 High | STORAGE-002 |
-| **STORAGE-011** | Модель: AuditLog | Task | 3 | 🔴 High | STORAGE-002 |
-| **STORAGE-012** | Индексы для производительности | Task | 5 | 🔴 High | STORAGE-003-011 |
-| **STORAGE-013** | Настройка Redis (кэш) | Task | 5 | 🔴 High | — |
-| **STORAGE-014** | Настройка MinIO/S3 (артефакты) | Task | 5 | 🔴 High | — |
-| **STORAGE-015** | Repository Pattern (абстракция) | Story | 5 | 🔴 High | STORAGE-003-011 |
-| **STORAGE-016** | Юнит-тесты репозиториев | Test | 8 | 🔴 High | STORAGE-015 |
+| ID              | Задача                            | Тип   | SP  | Приоритет | Статус  | Зависимости     |
+| --------------- | --------------------------------- | ----- | --- | --------- | ------- | --------------- |
+| **STORAGE-001** | Настройка PostgreSQL + SQLAlchemy | Task  | 5   | 🔴 High   | ✅ Done | —               |
+| **STORAGE-002** | Миграции БД (Alembic)             | Task  | 5   | 🔴 High   | ✅ Done | STORAGE-001     |
+| **STORAGE-003** | Модель: Project                   | Task  | 2   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-004** | Модель: Workflow                  | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-005** | Модель: WorkflowExecution         | Task  | 5   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-006** | Модель: AgentExecution            | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-007** | Модель: TaskExecution             | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-008** | Модель: ArtifactVersion           | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-009** | Модель: GuardrailCheck            | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-010** | Модель: CostRecord                | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-011** | Модель: AuditLog                  | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-012** | Индексы для производительности    | Task  | 5   | 🔴 High   | 🔴 Todo | STORAGE-003-011 |
+| **STORAGE-013** | Настройка Redis (кэш)             | Task  | 5   | 🔴 High   | 🔴 Todo | —               |
+| **STORAGE-014** | Настройка MinIO/S3 (артефакты)    | Task  | 5   | 🔴 High   | 🔴 Todo | —               |
+| **STORAGE-015** | Repository Pattern (абстракция)   | Story | 5   | 🔴 High   | 🔴 Todo | STORAGE-003-011 |
+| **STORAGE-016** | Юнит-тесты репозиториев           | Test  | 8   | 🔴 High   | 🔴 Todo | STORAGE-015     |
 
 ---
 
 ## EPIC-008: REST API
 
-**Описание**: Внешнее API для интеграции  
-**Срок**: Недели 2-3  
-**Ответственный**: Core Team
+**Описание**: Внешнее API для интеграции **Срок**: Недели 2-3 **Ответственный**:
+Core Team **Прогресс**: 1/14 задач (7%)
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **API-001** | Настройка FastAPI проекта | Task | 3 | 🔴 High | — |
-| **API-002** | Модель: WorkflowCreateRequest | Task | 2 | 🔴 High | API-001 |
-| **API-003** | Модель: WorkflowStatusResponse | Task | 2 | 🔴 High | API-001 |
-| **API-004** | Endpoint: POST /api/v1/workflows | Story | 5 | 🔴 High | API-002, WF-003 |
-| **API-005** | Endpoint: GET /api/v1/workflows/{id} | Story | 3 | 🔴 High | API-003, WF-003 |
-| **API-006** | Endpoint: POST /api/v1/workflows/{id}/pause | Story | 3 | 🔴 High | WF-004 |
-| **API-007** | Endpoint: POST /api/v1/workflows/{id}/resume | Story | 3 | 🔴 High | WF-004 |
-| **API-008** | Endpoint: GET /api/v1/workflows/{id}/artifacts | Story | 5 | 🟡 Medium | STORAGE-008 |
-| **API-009** | Endpoint: GET /api/v1/metrics/budget | Story | 5 | 🟡 Medium | BUDGET-002 |
-| **API-010** | WebSocket для real-time уведомлений | Story | 8 | 🟡 Medium | API-005 |
-| **API-011** | Аутентификация API (API keys) | Story | 5 | 🔴 High | API-001 |
-| **API-012** | Rate limiting | Story | 5 | 🟡 Medium | API-011 |
-| **API-013** | OpenAPI документация (/docs) | Task | 2 | 🟢 Low | API-004-010 |
-| **API-014** | Интеграционные тесты API | Test | 8 | 🔴 High | API-004-012 |
+| ID          | Задача                                         | Тип   | SP  | Приоритет | Статус  | Зависимости     |
+| ----------- | ---------------------------------------------- | ----- | --- | --------- | ------- | --------------- |
+| **API-001** | Настройка FastAPI проекта                      | Task  | 3   | 🔴 High   | ✅ Done | —               |
+| **API-002** | Модель: WorkflowCreateRequest                  | Task  | 2   | 🔴 High   | 🔴 Todo | API-001         |
+| **API-003** | Модель: WorkflowStatusResponse                 | Task  | 2   | 🔴 High   | 🔴 Todo | API-001         |
+| **API-004** | Endpoint: POST /api/v1/workflows               | Story | 5   | 🔴 High   | 🔴 Todo | API-002, WF-003 |
+| **API-005** | Endpoint: GET /api/v1/workflows/{id}           | Story | 3   | 🔴 High   | 🔴 Todo | API-003, WF-003 |
+| **API-006** | Endpoint: POST /api/v1/workflows/{id}/pause    | Story | 3   | 🔴 High   | 🔴 Todo | WF-004          |
+| **API-007** | Endpoint: POST /api/v1/workflows/{id}/resume   | Story | 3   | 🔴 High   | 🔴 Todo | WF-004          |
+| **API-008** | Endpoint: GET /api/v1/workflows/{id}/artifacts | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-008     |
+| **API-009** | Endpoint: GET /api/v1/metrics/budget           | Story | 5   | 🟡 Medium | 🔴 Todo | BUDGET-002      |
+| **API-010** | WebSocket для real-time уведомлений            | Story | 8   | 🟡 Medium | 🔴 Todo | API-005         |
+| **API-011** | Аутентификация API (API keys)                  | Story | 5   | 🔴 High   | 🔴 Todo | API-001         |
+| **API-012** | Rate limiting                                  | Story | 5   | 🟡 Medium | 🔴 Todo | API-011         |
+| **API-013** | OpenAPI документация (/docs)                   | Task  | 2   | 🟢 Low    | 🔴 Todo | API-004-010     |
+| **API-014** | Интеграционные тесты API                       | Test  | 8   | 🔴 High   | 🔴 Todo | API-004-012     |
 
 ---
 
 ## EPIC-009: LLM Integrations
 
-**Описание**: Интеграция с LLM-провайдерами  
-**Срок**: Недели 1-2  
-**Ответственный**: AI Team
+**Описание**: Интеграция с LLM-провайдерами **Срок**: Недели 1-2
+**Ответственный**: AI Team **Прогресс**: 0/13 задач (0%)
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **LLM-001** | Настройка litellm абстракции | Task | 5 | 🔴 High | — |
-| **LLM-002** | Интеграция OpenAI (GPT-4, GPT-3.5) | Story | 8 | 🔴 High | LLM-001 |
-| **LLM-003** | Интеграция Anthropic (Claude 3) | Story | 8 | 🔴 High | LLM-001 |
-| **LLM-004** | Fallback стратегии (модели) | Story | 5 | 🔴 High | LLM-002, LLM-003 |
-| **LLM-005** | Circuit breaker для LLM | Story | 5 | 🔴 High | LLM-001 |
-| **LLM-006** | Обработка timeout ошибок | Story | 3 | 🔴 High | LLM-001 |
-| **LLM-007** | Обработка rate limit ошибок | Story | 5 | 🔴 High | LLM-001 |
-| **LLM-008** | Обработка auth ошибок | Story | 3 | 🔴 High | LLM-001 |
-| **LLM-009** | Подсчёт токенов (tiktoken) | Task | 3 | 🔴 High | LLM-001 |
-| **LLM-010** | Кэширование ответов (diskcache) | Story | 5 | 🟡 Medium | LLM-001 |
-| **LLM-011** |retry логика (exponential backoff) | Story | 5 | 🔴 High | LLM-001 |
-| **LLM-012** | Юнит-тесты с моками | Test | 8 | 🔴 High | LLM-002-011 |
-| **LLM-013** | Интеграционные тесты (sandbox) | Test | 8 | 🔴 High | LLM-012 |
+| ID          | Задача                             | Тип   | SP  | Приоритет | Статус  | Зависимости      |
+| ----------- | ---------------------------------- | ----- | --- | --------- | ------- | ---------------- |
+| **LLM-001** | Настройка litellm абстракции       | Task  | 5   | 🔴 High   | 🔴 Todo | —                |
+| **LLM-002** | Интеграция OpenAI (GPT-4, GPT-3.5) | Story | 8   | 🔴 High   | 🔴 Todo | LLM-001          |
+| **LLM-003** | Интеграция Anthropic (Claude 3)    | Story | 8   | 🔴 High   | 🔴 Todo | LLM-001          |
+| **LLM-004** | Fallback стратегии (модели)        | Story | 5   | 🔴 High   | 🔴 Todo | LLM-002, LLM-003 |
+| **LLM-005** | Circuit breaker для LLM            | Story | 5   | 🔴 High   | 🔴 Todo | LLM-001          |
+| **LLM-006** | Обработка timeout ошибок           | Story | 3   | 🔴 High   | 🔴 Todo | LLM-001          |
+| **LLM-007** | Обработка rate limit ошибок        | Story | 5   | 🔴 High   | 🔴 Todo | LLM-001          |
+| **LLM-008** | Обработка auth ошибок              | Story | 3   | 🔴 High   | 🔴 Todo | LLM-001          |
+| **LLM-009** | Подсчёт токенов (tiktoken)         | Task  | 3   | 🔴 High   | 🔴 Todo | LLM-001          |
+| **LLM-010** | Кэширование ответов (diskcache)    | Story | 5   | 🟡 Medium | 🔴 Todo | LLM-001          |
+| **LLM-011** | Retry логика (exponential backoff) | Story | 5   | 🔴 High   | 🔴 Todo | LLM-001          |
+| **LLM-012** | Юнит-тесты с моками                | Test  | 8   | 🔴 High   | 🔴 Todo | LLM-002-011      |
+| **LLM-013** | Интеграционные тесты (sandbox)     | Test  | 8   | 🔴 High   | 🔴 Todo | LLM-012          |
 
 ---
 
 ## EPIC-010: Git Integration
 
-**Описание**: Интеграция с системами контроля версий  
-**Срок**: Недели 4-5 (Alpha)  
-**Ответственный**: Core Team
+**Описание**: Интеграция с системами контроля версий **Срок**: Недели 4-5
+(Alpha) **Ответственный**: Core Team **Прогресс**: 0/13 задач (0%)
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **GIT-001** | Настройка gitpython | Task | 2 | 🔴 High | — |
-| **GIT-002** | GitIntegrationManager класс | Task | 5 | 🔴 High | GIT-001 |
-| **GIT-003** | Метод: clone_repository | Story | 8 | 🔴 High | GIT-002 |
-| **GIT-004** | Метод: get_file_content | Story | 5 | 🔴 High | GIT-002 |
-| **GIT-005** | Метод: get_diff | Story | 5 | 🟡 Medium | GIT-002 |
-| **GIT-006** | Метод: commit_and_push | Story | 8 | 🟡 Medium | GIT-002 |
-| **GIT-007** | SSH аутентификация | Story | 5 | 🔴 High | GIT-002 |
-| **GIT-008** | HTTPS аутентификация (tokens) | Story | 5 | 🔴 High | GIT-002 |
-| **GIT-009** | Обработка ошибок аутентификации | Story | 3 | 🔴 High | GIT-007, GIT-008 |
-| **GIT-010** | retry логика для Git операций | Story | 5 | 🔴 High | GIT-002 |
-| **GIT-011** | Очистка временных директорий | Task | 3 | 🟡 Medium | GIT-003 |
-| **GIT-012** | Юнит-тесты с моками | Test | 8 | 🔴 High | GIT-003-010 |
-| **GIT-013** | Интеграционные тесты (test repo) | Test | 8 | 🔴 High | GIT-012 |
+| ID          | Задача                           | Тип   | SP  | Приоритет | Статус  | Зависимости      |
+| ----------- | -------------------------------- | ----- | --- | --------- | ------- | ---------------- |
+| **GIT-001** | Настройка gitpython              | Task  | 2   | 🔴 High   | 🔴 Todo | —                |
+| **GIT-002** | GitIntegrationManager класс      | Task  | 5   | 🔴 High   | 🔴 Todo | GIT-001          |
+| **GIT-003** | Метод: clone_repository          | Story | 8   | 🔴 High   | 🔴 Todo | GIT-002          |
+| **GIT-004** | Метод: get_file_content          | Story | 5   | 🔴 High   | 🔴 Todo | GIT-002          |
+| **GIT-005** | Метод: get_diff                  | Story | 5   | 🟡 Medium | 🔴 Todo | GIT-002          |
+| **GIT-006** | Метод: commit_and_push           | Story | 8   | 🟡 Medium | 🔴 Todo | GIT-002          |
+| **GIT-007** | SSH аутентификация               | Story | 5   | 🔴 High   | 🔴 Todo | GIT-002          |
+| **GIT-008** | HTTPS аутентификация (tokens)    | Story | 5   | 🔴 High   | 🔴 Todo | GIT-002          |
+| **GIT-009** | Обработка ошибок аутентификации  | Story | 3   | 🔴 High   | 🔴 Todo | GIT-007, GIT-008 |
+| **GIT-010** | Retry логика для Git операций    | Story | 5   | 🔴 High   | 🔴 Todo | GIT-002          |
+| **GIT-011** | Очистка временных директорий     | Task  | 3   | 🟡 Medium | 🔴 Todo | GIT-003          |
+| **GIT-012** | Юнит-тесты с моками              | Test  | 8   | 🔴 High   | 🔴 Todo | GIT-003-010      |
+| **GIT-013** | Интеграционные тесты (test repo) | Test  | 8   | 🔴 High   | 🔴 Todo | GIT-012          |
 
 ---
 
 ## EPIC-011: Issue Tracker Integration
 
-**Описание**: Интеграция с Jira, GitHub Issues  
-**Срок**: Недели 5-6 (Alpha)  
-**Ответственный**: Core Team
+**Описание**: Интеграция с Jira, GitHub Issues **Срок**: Недели 5-6 (Alpha)
+**Ответственный**: Core Team **Прогресс**: 0/14 задач (0%)
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **TRACKER-001** | BaseIssueTracker абстракция | Task | 3 | 🔴 High | — |
-| **TRACKER-002** | Модель: Issue | Task | 3 | 🔴 High | TRACKER-001 |
-| **TRACKER-003** | IssueTrackerFactory | Task | 3 | 🔴 High | TRACKER-001 |
-| **TRACKER-004** | JiraTracker: подключение | Story | 5 | 🔴 High | TRACKER-001 |
-| **TRACKER-005** | JiraTracker: create_issue | Story | 5 | 🔴 High | TRACKER-004 |
-| **TRACKER-006** | JiraTracker: add_comment | Story | 3 | 🔴 High | TRACKER-004 |
-| **TRACKER-007** | JiraTracker: search_issues | Story | 5 | 🟡 Medium | TRACKER-004 |
-| **TRACKER-008** | GitHubIssuesTracker: подключение | Story | 5 | 🔴 High | TRACKER-001 |
-| **TRACKER-009** | GitHubIssuesTracker: create_issue | Story | 5 | 🔴 High | TRACKER-008 |
-| **TRACKER-010** | GitHubIssuesTracker: add_comment | Story | 3 | 🔴 High | TRACKER-008 |
-| **TRACKER-011** | Обработка rate limit | Story | 5 | 🔴 High | TRACKER-004, TRACKER-008 |
-| **TRACKER-012** | retry логика | Story | 5 | 🔴 High | TRACKER-001 |
-| **TRACKER-013** | Юнит-тесты с моками | Test | 8 | 🔴 High | TRACKER-004-012 |
-| **TRACKER-014** | Интеграционные тесты (sandbox) | Test | 8 | 🔴 High | TRACKER-013 |
+| ID              | Задача                            | Тип   | SP  | Приоритет | Статус  | Зависимости              |
+| --------------- | --------------------------------- | ----- | --- | --------- | ------- | ------------------------ |
+| **TRACKER-001** | BaseIssueTracker абстракция       | Task  | 3   | 🔴 High   | 🔴 Todo | —                        |
+| **TRACKER-002** | Модель: Issue                     | Task  | 3   | 🔴 High   | 🔴 Todo | TRACKER-001              |
+| **TRACKER-003** | IssueTrackerFactory               | Task  | 3   | 🔴 High   | 🔴 Todo | TRACKER-001              |
+| **TRACKER-004** | JiraTracker: подключение          | Story | 5   | 🔴 High   | 🔴 Todo | TRACKER-001              |
+| **TRACKER-005** | JiraTracker: create_issue         | Story | 5   | 🔴 High   | 🔴 Todo | TRACKER-004              |
+| **TRACKER-006** | JiraTracker: add_comment          | Story | 3   | 🔴 High   | 🔴 Todo | TRACKER-004              |
+| **TRACKER-007** | JiraTracker: search_issues        | Story | 5   | 🟡 Medium | 🔴 Todo | TRACKER-004              |
+| **TRACKER-008** | GitHubIssuesTracker: подключение  | Story | 5   | 🔴 High   | 🔴 Todo | TRACKER-001              |
+| **TRACKER-009** | GitHubIssuesTracker: create_issue | Story | 5   | 🔴 High   | 🔴 Todo | TRACKER-008              |
+| **TRACKER-010** | GitHubIssuesTracker: add_comment  | Story | 3   | 🔴 High   | 🔴 Todo | TRACKER-008              |
+| **TRACKER-011** | Обработка rate limit              | Story | 5   | 🔴 High   | 🔴 Todo | TRACKER-004, TRACKER-008 |
+| **TRACKER-012** | Retry логика                      | Story | 5   | 🔴 High   | 🔴 Todo | TRACKER-001              |
+| **TRACKER-013** | Юнит-тесты с моками               | Test  | 8   | 🔴 High   | 🔴 Todo | TRACKER-004-012          |
+| **TRACKER-014** | Интеграционные тесты (sandbox)    | Test  | 8   | 🔴 High   | 🔴 Todo | TRACKER-013              |
 
 ---
 
-## EPIC-012: Security & Sandbox
+## EPIC-012: Security & Sandbox ⬆️ Перенесён из Alpha в MVP
 
-**Описание**: Изоляция выполнения, безопасность  
-**Срок**: Недели 4-5 (Alpha)  
-**Ответственный**: Security Team
+**Описание**: Изоляция выполнения, безопасность **Срок**: Недели 4-5
+**Ответственный**: Security Team **Прогресс**: 0/11 задач (0%)
+
+> **PoC 6 подтвердил**: 6/6 escape attempts blocked, 0 false positives.
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **SANDBOX-001** | Docker sandbox базовая конфигурация | Story | 8 | 🔴 High | — |
-| **SANDBOX-002** | Изоляция файловой системы | Story | 5 | 🔴 High | SANDBOX-001 |
-| **SANDBOX-003** | Изоляция сети | Story | 5 | 🔴 High | SANDBOX-001 |
-| **SANDBOX-004** | Лимиты ресурсов (CPU, RAM) | Story | 5 | 🔴 High | SANDBOX-001 |
-| **SANDBOX-005** | Таймаут выполнения контейнера | Story | 3 | 🔴 High | SANDBOX-001 |
-| **SANDBOX-006** | Шифрование секретов в БД | Story | 5 | 🔴 High | STORAGE-001 |
-| **SANDBOX-007** | Интеграция HashiCorp Vault (опционально) | Story | 8 | 🟡 Medium | SANDBOX-006 |
-| **SANDBOX-008** | Ротация API ключей | Story | 5 | 🟡 Medium | SANDBOX-006 |
-| **SANDBOX-009** | Тесты на escape-попытки | Test | 13 | 🔴 High | SANDBOX-001-005 |
-| **SANDBOX-010** | Security audit кода | Task | 8 | 🔴 High | SANDBOX-006-008 |
-| **SANDBOX-011** | OWASP ZAP сканирование | Test | 5 | 🔴 High | API-014 |
+| ID              | Задача                                   | Тип   | SP  | Приоритет | Статус  | Зависимости     |
+| --------------- | ---------------------------------------- | ----- | --- | --------- | ------- | --------------- |
+| **SANDBOX-001** | Docker sandbox базовая конфигурация      | Story | 8   | 🔴 High   | 🔴 Todo | —               |
+| **SANDBOX-002** | Изоляция файловой системы                | Story | 5   | 🔴 High   | 🔴 Todo | SANDBOX-001     |
+| **SANDBOX-003** | Изоляция сети                            | Story | 5   | 🔴 High   | 🔴 Todo | SANDBOX-001     |
+| **SANDBOX-004** | Лимиты ресурсов (CPU, RAM)               | Story | 5   | 🔴 High   | 🔴 Todo | SANDBOX-001     |
+| **SANDBOX-005** | Таймаут выполнения контейнера            | Story | 3   | 🔴 High   | 🔴 Todo | SANDBOX-001     |
+| **SANDBOX-006** | Шифрование секретов в БД                 | Story | 5   | 🔴 High   | 🔴 Todo | STORAGE-001     |
+| **SANDBOX-007** | Интеграция HashiCorp Vault (опционально) | Story | 8   | 🟡 Medium | 🔴 Todo | SANDBOX-006     |
+| **SANDBOX-008** | Ротация API ключей                       | Story | 5   | 🟡 Medium | 🔴 Todo | SANDBOX-006     |
+| **SANDBOX-009** | Тесты на escape-попытки                  | Test  | 13  | 🔴 High   | 🔴 Todo | SANDBOX-001-005 |
+| **SANDBOX-010** | Security audit кода                      | Task  | 8   | 🔴 High   | 🔴 Todo | SANDBOX-006-008 |
+| **SANDBOX-011** | OWASP ZAP сканирование                   | Test  | 5   | 🔴 High   | 🔴 Todo | API-014         |
 
 ---
 
 ## EPIC-013: Monitoring & Observability
 
-**Описание**: Логирование, метрики, алертинг  
-**Срок**: Недели 7-10 (Beta)  
-**Ответственный**: Platform Team
+**Описание**: Логирование, метрики, алертинг **Срок**: Недели 7-10 (Beta)
+**Ответственный**: Platform Team **Прогресс**: 0/15 задач (0%)
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **MON-001** | Структурированное логирование (JSON) | Task | 5 | 🔴 High | — |
-| **MON-002** | Интеграция Prometheus | Story | 8 | 🔴 High | MON-001 |
-| **MON-003** | Метрика: workflow_execution_time | Task | 3 | 🔴 High | MON-002 |
-| **MON-004** | Метрика: agent_execution_success_rate | Task | 3 | 🔴 High | MON-002 |
-| **MON-005** | Метрика: token_usage_per_minute | Task | 3 | 🔴 High | MON-002, BUDGET-002 |
-| **MON-006** | Метрика: guardrail_violations_total | Task | 3 | 🔴 High | MON-002, GR-012 |
-| **MON-007** | Метрика: integration_request_duration | Task | 3 | 🔴 High | MON-002 |
-| **MON-008** | Настройка Grafana | Task | 5 | 🔴 High | MON-002 |
-| **MON-009** | Дашборд: Обзор системы | Task | 5 | 🔴 High | MON-008 |
-| **MON-010** | Дашборд: Бюджет и затраты | Task | 5 | 🟡 Medium | MON-008 |
-| **MON-011** | Дашборд: Производительность агентов | Task | 5 | 🟡 Medium | MON-008 |
-| **MON-012** | Алерт: Бюджет превышен на 90% | Story | 3 | 🔴 High | MON-008, BUDGET-004 |
-| **MON-013** | Алерт: Error rate >5% | Story | 3 | 🔴 High | MON-008 |
-| **MON-014** | Алерт: SLA breach | Story | 3 | 🔴 High | MON-008 |
-| **MON-015** | Интеграция ELK Stack (опционально) | Story | 8 | 🟢 Low | MON-001 |
+| ID          | Задача                                | Тип   | SP  | Приоритет | Статус  | Зависимости         |
+| ----------- | ------------------------------------- | ----- | --- | --------- | ------- | ------------------- |
+| **MON-001** | Структурированное логирование (JSON)  | Task  | 5   | 🔴 High   | 🔴 Todo | —                   |
+| **MON-002** | Интеграция Prometheus                 | Story | 8   | 🔴 High   | 🔴 Todo | MON-001             |
+| **MON-003** | Метрика: workflow_execution_time      | Task  | 3   | 🔴 High   | 🔴 Todo | MON-002             |
+| **MON-004** | Метрика: agent_execution_success_rate | Task  | 3   | 🔴 High   | 🔴 Todo | MON-002             |
+| **MON-005** | Метрика: token_usage_per_minute       | Task  | 3   | 🔴 High   | 🔴 Todo | MON-002, BUDGET-002 |
+| **MON-006** | Метрика: guardrail_violations_total   | Task  | 3   | 🔴 High   | 🔴 Todo | MON-002, GR-012     |
+| **MON-007** | Метрика: integration_request_duration | Task  | 3   | 🔴 High   | 🔴 Todo | MON-002             |
+| **MON-008** | Настройка Grafana                     | Task  | 5   | 🔴 High   | 🔴 Todo | MON-002             |
+| **MON-009** | Дашборд: Обзор системы                | Task  | 5   | 🔴 High   | 🔴 Todo | MON-008             |
+| **MON-010** | Дашборд: Бюджет и затраты             | Task  | 5   | 🟡 Medium | 🔴 Todo | MON-008             |
+| **MON-011** | Дашборд: Производительность агентов   | Task  | 5   | 🟡 Medium | 🔴 Todo | MON-008             |
+| **MON-012** | Алерт: Бюджет превышен на 90%         | Story | 3   | 🔴 High   | 🔴 Todo | MON-008, BUDGET-004 |
+| **MON-013** | Алерт: Error rate >5%                 | Story | 3   | 🔴 High   | 🔴 Todo | MON-008             |
+| **MON-014** | Алерт: SLA breach                     | Story | 3   | 🔴 High   | 🔴 Todo | MON-008             |
+| **MON-015** | Интеграция ELK Stack (опционально)    | Story | 8   | 🟢 Low    | 🔴 Todo | MON-001             |
 
 ---
 
 ## EPIC-014: Deployment & CI/CD
 
-**Описание**: Развёртывание, контейнеризация, пайплайны  
-**Срок**: Недели 2-3  
-**Ответственный**: Platform Team
+**Описание**: Развёртывание, контейнеризация, пайплайны **Срок**: Недели 2-3
+**Ответственный**: Platform Team **Прогресс**: 3/11 задач (27%)
 
 ### Задачи
 
-| ID | Задача | Тип | Story Points | Приоритет | Зависимости |
-|----|--------|-----|--------------|-----------|-------------|
-| **DEPLOY-001** | Dockerfile для оркестратора | Task | 5 | 🔴 High | — |
-| **DEPLOY-002** | docker-compose.yml (локально) | Task | 5 | 🔴 High | DEPLOY-001 |
-| **DEPLOY-003** | GitHub Actions: CI пайплайн | Story | 8 | 🔴 High | DEPLOY-001 |
-| **DEPLOY-004** | GitHub Actions: тесты | Task | 5 | 🔴 High | DEPLOY-003 |
-| **DEPLOY-005** | GitHub Actions: build Docker image | Task | 3 | 🔴 High | DEPLOY-003 |
-| **DEPLOY-006** | GitHub Actions: push to registry | Task | 3 | 🔴 High | DEPLOY-005 |
-| **DEPLOY-007** | Kubernetes manifests (опционально) | Story | 8 | 🟡 Medium | DEPLOY-001 |
-| **DEPLOY-008** | Helm chart (опционально) | Story | 8 | 🟡 Medium | DEPLOY-007 |
-| **DEPLOY-009** | Настройка окружений (dev/staging/prod) | Task | 5 | 🔴 High | DEPLOY-002 |
-| **DEPLOY-010** | Секреты в CI/CD | Task | 5 | 🔴 High | DEPLOY-003 |
-| **DEPLOY-011** | Документация развёртывания | Doc | 5 | 🟡 Medium | DEPLOY-002, DEPLOY-007 |
+| ID             | Задача                                 | Тип   | SP  | Приоритет | Статус  | Зависимости            |
+| -------------- | -------------------------------------- | ----- | --- | --------- | ------- | ---------------------- |
+| **DEPLOY-001** | Dockerfile для оркестратора            | Task  | 5   | 🔴 High   | ✅ Done | —                      |
+| **DEPLOY-002** | docker-compose.yml (локально)          | Task  | 5   | 🔴 High   | ✅ Done | DEPLOY-001             |
+| **DEPLOY-003** | GitHub Actions: CI пайплайн            | Story | 8   | 🔴 High   | ✅ Done | DEPLOY-001             |
+| **DEPLOY-004** | GitHub Actions: тесты                  | Task  | 5   | 🔴 High   | 🔴 Todo | DEPLOY-003             |
+| **DEPLOY-005** | GitHub Actions: build Docker image     | Task  | 3   | 🔴 High   | 🔴 Todo | DEPLOY-003             |
+| **DEPLOY-006** | GitHub Actions: push to registry       | Task  | 3   | 🔴 High   | 🔴 Todo | DEPLOY-005             |
+| **DEPLOY-007** | Kubernetes manifests (опционально)     | Story | 8   | 🟡 Medium | 🔴 Todo | DEPLOY-001             |
+| **DEPLOY-008** | Helm chart (опционально)               | Story | 8   | 🟡 Medium | 🔴 Todo | DEPLOY-007             |
+| **DEPLOY-009** | Настройка окружений (dev/staging/prod) | Task  | 5   | 🔴 High   | 🔴 Todo | DEPLOY-002             |
+| **DEPLOY-010** | Секреты в CI/CD                        | Task  | 5   | 🔴 High   | 🔴 Todo | DEPLOY-003             |
+| **DEPLOY-011** | Документация развёртывания             | Doc   | 5   | 🟡 Medium | 🔴 Todo | DEPLOY-002, DEPLOY-007 |
 
 ---
 
-## Сводка по спринтам
+## EPIC-015: Proof-of-Concept ⭐ Новый
 
-### Спринт 1 (Недели 1-2): MVP Foundation
-- **EPIC-001**: Parser Module (PARSER-001-010)
-- **EPIC-007**: Storage Layer (STORAGE-001-016)
-- **EPIC-009**: LLM Integrations (LLM-001-013)
-- **EPIC-014**: Deployment & CI/CD (DEPLOY-001-006)
+**Описание**: Валидация ключевых рисков через эксперименты **Срок**: Недели 1-2
+**Ответственный**: Core Team + AI Team **Прогресс**: 8/8 задач (100%) ✅
 
-**Всего SP**: ~120
+> **Все 8 PoC прошли успешно за 16 секунд.** Архитектура валидирована.
 
-### Спринт 2 (Недели 2-3): Core Engine
-- **EPIC-002**: Workflow Engine (WF-001-013)
-- **EPIC-003**: Budget Tracker (BUDGET-001-012)
-- **EPIC-008**: REST API (API-001-014)
+### Задачи
 
-**Всего SP**: ~100
+| ID          | Задача                                         | Тип | SP  | Приоритет | Статус  | Результат                 |
+| ----------- | ---------------------------------------------- | --- | --- | --------- | ------- | ------------------------- |
+| **POC-001** | LLM Integration — fallback, circuit breaker    | PoC | 5   | 🔴 High   | ✅ Done | ✅ PASSED                 |
+| **POC-002** | Context Manager — 3 стратегии сжатия           | PoC | 5   | 🔴 High   | ✅ Done | ✅ PASSED                 |
+| **POC-003** | Guardrail Engine — FP/FN на 1000 samples       | PoC | 5   | 🔴 High   | ✅ Done | ✅ PASSED (FP 0%, FN 0%)  |
+| **POC-004** | Budget Tracking — точность учёта               | PoC | 5   | 🔴 High   | ✅ Done | ✅ PASSED (100% accuracy) |
+| **POC-005** | Workflow Recovery — восстановление после сбоев | PoC | 5   | 🔴 High   | ✅ Done | ✅ PASSED (recovery <5s)  |
+| **POC-006** | Sandbox Security — escape detection            | PoC | 5   | 🔴 High   | ✅ Done | ✅ PASSED (6/6 blocked)   |
+| **POC-007** | Database Scaling — 100K workflows              | PoC | 5   | 🔴 High   | ✅ Done | ✅ PASSED (p95 0.47ms)    |
+| **POC-008** | Concurrent Workflows — 100 параллельных        | PoC | 5   | 🔴 High   | ✅ Done | ✅ PASSED (100% success)  |
 
-### Спринт 3 (Недели 3-4): Agent Execution
-- **EPIC-004**: Agent Executor (AGENT-001-015)
-- **EPIC-006**: Guardrail Engine (GR-001-018, MVP часть)
+---
 
-**Всего SP**: ~110
+## EPIC-016: Documentation ⭐ Новый
 
-### Спринт 4 (Недели 4-5): Alpha Features
-- **EPIC-005**: Context Manager (CTX-001-016)
-- **EPIC-010**: Git Integration (GIT-001-013)
-- **EPIC-012**: Security & Sandbox (SANDBOX-001-011)
+**Описание**: Техническая документация проекта **Срок**: Недели 1-4
+**Ответственный**: Core Team **Прогресс**: 5/12 задач (42%)
 
-**Всего SP**: ~120
+### Задачи
 
-### Спринт 5 (Недели 5-6): Integrations
-- **EPIC-011**: Issue Tracker Integration (TRACKER-001-014)
-- **EPIC-006**: Guardrail Engine (оставшиеся задачи)
+| ID          | Задача                     | Тип | SP  | Приоритет | Статус  | Файл                         |
+| ----------- | -------------------------- | --- | --- | --------- | ------- | ---------------------------- |
+| **DOC-001** | Техническое Задание        | Doc | 8   | 🔴 High   | ✅ Done | `AFL_Orchestrator_TZ_ADD.md` |
+| **DOC-002** | Архитектура системы        | Doc | 8   | 🔴 High   | ✅ Done | `ARCHITECTURE_DESIGN.md`     |
+| **DOC-003** | API Спецификация (часть 1) | Doc | 5   | 🔴 High   | ✅ Done | `API_SPECIFICATION_P1.md`    |
+| **DOC-004** | API Спецификация (часть 2) | Doc | 5   | 🔴 High   | ✅ Done | `API_SPECIFICATION_P2.md`    |
+| **DOC-005** | Схема БД (части 1-3)       | Doc | 8   | 🔴 High   | ✅ Done | `DATABASE_SCHEMA_P1-3.md`    |
+| **DOC-006** | Git Flow документация      | Doc | 3   | 🟡 Medium | ✅ Done | `GIT_FLOW.md`                |
+| **DOC-007** | Настройка репозитория      | Doc | 3   | 🟡 Medium | ✅ Done | `REPO_SETUP.md`              |
+| **DOC-008** | PoC Результаты             | Doc | 5   | 🔴 High   | 🔴 Todo | `POC_RESULTS.md`             |
+| **DOC-009** | README проекта             | Doc | 3   | 🟡 Medium | 🔴 Todo | `README.md`                  |
+| **DOC-010** | Бэклог задач               | Doc | 3   | 🟡 Medium | ✅ Done | `BACKLOG_JIRA.md`            |
+| **DOC-011** | API документация (OpenAPI) | Doc | 5   | 🟡 Medium | 🔴 Todo | `/docs` endpoint             |
+| **DOC-012** | Руководство разработчика   | Doc | 5   | 🟡 Medium | 🔴 Todo | `CONTRIBUTING.md`            |
+
+---
+
+## EPIC-017: Repository Setup ⭐ Новый
+
+**Описание**: Настройка репозитория, CI/CD, линтеры **Срок**: Недели 1-2
+**Ответственный**: Platform Team **Прогресс**: 13/13 задач (100%) ✅
+
+### Задачи
+
+| ID           | Задача                             | Тип   | SP  | Приоритет | Статус  | Файл                               |
+| ------------ | ---------------------------------- | ----- | --- | --------- | ------- | ---------------------------------- |
+| **REPO-001** | .gitignore для Python              | Task  | 1   | 🔴 High   | ✅ Done | `.gitignore`                       |
+| **REPO-002** | Pre-commit hooks конфигурация      | Task  | 3   | 🔴 High   | ✅ Done | `.pre-commit-config.yaml`          |
+| **REPO-003** | pyproject.toml (ruff, black, mypy) | Task  | 3   | 🔴 High   | ✅ Done | `pyproject.toml`                   |
+| **REPO-004** | SQLFluff конфигурация              | Task  | 2   | 🟡 Medium | ✅ Done | `.sqlfluff`                        |
+| **REPO-005** | GitHub Issues шаблоны              | Task  | 2   | 🟡 Medium | ✅ Done | `.github/ISSUE_TEMPLATE/`          |
+| **REPO-006** | PR шаблон                          | Task  | 2   | 🟡 Medium | ✅ Done | `.github/PULL_REQUEST_TEMPLATE.md` |
+| **REPO-007** | GitHub Actions CI/CD               | Story | 5   | 🔴 High   | ✅ Done | `.github/workflows/ci-cd.yml`      |
+| **REPO-008** | Скрипт настройки окружения         | Task  | 3   | 🔴 High   | ✅ Done | `scripts/setup-git.sh`             |
+| **REPO-009** | requirements.txt                   | Task  | 2   | 🔴 High   | ✅ Done | `requirements.txt`                 |
+| **REPO-010** | requirements-dev.txt               | Task  | 2   | 🔴 High   | ✅ Done | `requirements-dev.txt`             |
+| **REPO-011** | .env.example                       | Task  | 1   | 🔴 High   | ✅ Done | `.env.example`                     |
+| **REPO-012** | Makefile с командами               | Task  | 3   | 🟡 Medium | ✅ Done | `Makefile`                         |
+| **REPO-013** | Структура проекта                  | Task  | 3   | 🔴 High   | ✅ Done | `src/orchestrator/`                |
+
+---
+
+## Сводка по спринтам (обновлённая)
+
+### Спринт 1 (Недели 1-2): MVP Foundation ✅ В работе
+
+| Эпик             | Задач | Выполнено | Осталось SP |
+| ---------------- | ----- | --------- | ----------- |
+| EPIC-001 Parser  | 10    | 4         | ~26         |
+| EPIC-007 Storage | 16    | 2         | ~55         |
+| EPIC-009 LLM     | 13    | 0         | ~65         |
+| EPIC-014 Deploy  | 11    | 3         | ~30         |
+| EPIC-015 PoC     | 8     | 8         | 0 ✅        |
+| EPIC-016 Docs    | 12    | 5         | ~20         |
+| EPIC-017 Repo    | 13    | 13        | 0 ✅        |
+
+**Всего SP**: ~196 → **Выполнено**: ~100 SP (51%)
+
+### Спринт 2 (Недели 2-3): Core Engine 🔴 Не начат
+
+| Эпик              | Задач | Выполнено | Осталось SP |
+| ----------------- | ----- | --------- | ----------- |
+| EPIC-002 Workflow | 13    | 3         | ~60         |
+| EPIC-003 Budget   | 12    | 0         | ~55         |
+| EPIC-008 REST API | 14    | 1         | ~50         |
+
+**Всего SP**: ~165
+
+### Спринт 3 (Недели 3-4): Agent Execution 🔴 Не начат
+
+| Эпик               | Задач | Выполнено | Осталось SP |
+| ------------------ | ----- | --------- | ----------- |
+| EPIC-004 Agent     | 15    | 0         | ~75         |
+| EPIC-006 Guardrail | 18    | 0         | ~95         |
+
+**Всего SP**: ~170
+
+### Спринт 4 (Недели 4-5): MVP Security & Context 🔴 Не начат
+
+| Эпик             | Задач | Выполнено | Осталось SP |
+| ---------------- | ----- | --------- | ----------- |
+| EPIC-005 Context | 16    | 0         | ~90         |
+| EPIC-012 Sandbox | 11    | 0         | ~65         |
+
+**Всего SP**: ~155
+
+### Спринт 5 (Недели 5-6): Alpha Integrations 🔴 Не начат
+
+| Эпик             | Задач | Выполнено | Осталось SP |
+| ---------------- | ----- | --------- | ----------- |
+| EPIC-010 Git     | 13    | 0         | ~65         |
+| EPIC-011 Tracker | 14    | 0         | ~65         |
+
+**Всего SP**: ~130
+
+### Спринт 6-7 (Недели 7-10): Beta & Monitoring 🔴 Не начат
+
+| Эпик                | Задач | Выполнено | Осталось SP |
+| ------------------- | ----- | --------- | ----------- |
+| EPIC-013 Monitoring | 15    | 0         | ~65         |
+| Стабилизация        | —     | 0         | ~15         |
 
 **Всего SP**: ~80
 
-### Спринт 6-7 (Недели 7-10): Beta & Monitoring
-- **EPIC-013**: Monitoring & Observability (MON-001-015)
-- Стабилизация, багфиксы, нагрузочное тестирование
+---
 
-**Всего SP**: ~80
+## Изменения v1.0 → v2.0
+
+| Изменение              | Описание                   | Причина                       |
+| ---------------------- | -------------------------- | ----------------------------- |
+| **Python 3.11 → 3.12** | Все задачи обновлены       | Фактическая версия в системе  |
+| **EPIC-005 → MVP**     | Перенесён из Alpha         | PoC 2 подтвердил критичность  |
+| **EPIC-006 → MVP**     | Перенесён из Alpha         | PoC 3 подтвердил готовность   |
+| **EPIC-012 → MVP**     | Перенесён из Alpha         | PoC 6 подтвердил безопасность |
+| **EPIC-015 добавлен**  | 8 PoC задач                | Валидация рисков              |
+| **EPIC-016 добавлен**  | 12 документационных задач  | Отслеживание документации     |
+| **EPIC-017 добавлен**  | 13 задач репозитория       | Инфраструктура разработки     |
+| **Статусы задач**      | 21 задача отмечена ✅ Done | Фактическое выполнение        |
 
 ---
 
@@ -455,9 +576,12 @@
 ### A. Импорт в Jira
 
 ```csv
-Summary,Issue Type,Priority,Story Points,Epic Link,Labels
-"Настройка проекта Python 3.11+ с pydantic",Task,High,3,EPIC-001,parser;mvp
-"Реализация схемы AFLConfig (Pydantic models)",Story,High,8,EPIC-001,parser;mvp
+Summary,Issue Type,Priority,Story Points,Epic Link,Status,Labels
+"Настройка проекта Python 3.12+ с pydantic",Task,High,3,EPIC-001,Done,parser;mvp
+"Реализация схемы AFLConfig (Pydantic models)",Story,High,8,EPIC-001,Done,parser;mvp
+"YAML парсинг с поддержкой anchors/aliases",Story,High,5,EPIC-001,Done,parser;mvp
+"JSON парсинг (альтернативный формат)",Task,Medium,3,EPIC-001,Done,parser;mvp
+"Валидация ссылок (agent/artifact/guardrail)",Story,High,5,EPIC-001,Todo,parser;mvp
 ...
 ```
 
@@ -466,12 +590,13 @@ Summary,Issue Type,Priority,Story Points,Epic Link,Labels
 ```json
 [
   {
-    "title": "Настройка проекта Python 3.11+ с pydantic",
+    "title": "Настройка проекта Python 3.12+ с pydantic",
     "type": "task",
     "priority": "high",
     "estimate": 3,
     "teamId": "core-team",
-    "labelIds": ["parser", "mvp"]
+    "labelIds": ["parser", "mvp"],
+    "state": "completed"
   },
   ...
 ]
@@ -479,13 +604,14 @@ Summary,Issue Type,Priority,Story Points,Epic Link,Labels
 
 ### C. Матрица ответственности
 
-| Команда | Эпики |
-|---------|-------|
-| **Core Team** | EPIC-001, EPIC-002, EPIC-003, EPIC-007, EPIC-008, EPIC-010, EPIC-011, EPIC-014 |
-| **AI Team** | EPIC-004, EPIC-005, EPIC-009 |
-| **Security Team** | EPIC-006, EPIC-012 |
-| **Platform Team** | EPIC-013, EPIC-014 |
+| Команда           | Эпики                                                      | Задач | Выполнено |
+| ----------------- | ---------------------------------------------------------- | ----- | --------- |
+| **Core Team**     | EPIC-001, 002, 003, 007, 008, 010, 011, 014, 015, 016, 017 | 120   | 21        |
+| **AI Team**       | EPIC-004, 005, 009                                         | 44    | 0         |
+| **Security Team** | EPIC-006, 012                                              | 29    | 0         |
+| **Platform Team** | EPIC-013, 014, 017                                         | 39    | 16        |
 
 ---
 
-*Документ сгенерирован на основе ТЗ AFL_Orchestrator_TZ_ADD.md v1.0*
+_Документ обновлён на основе ТЗ AFL_Orchestrator_TZ_ADD.md v1.0 и результатов
+PoC (2026-04-02)_
