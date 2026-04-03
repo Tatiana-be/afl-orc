@@ -2,9 +2,9 @@
 
 **Дата создания**: 2026-03-31  
 **Дата обновления**: 2026-04-02  
-**Версия**: 3.0  
+**Версия**: 4.0  
 **На основе ТЗ**: AFL_Orchestrator_TZ_ADD.md v1.0  
-**Статус**: ✅ Актуализирован после PoC + Infrastructure Audit
+**Статус**: ✅ Актуализирован после PoC + Infrastructure Audit + Infra Fixes
 
 ---
 
@@ -13,12 +13,12 @@
 | Метрика | Значение |
 |---------|----------|
 | **Всего задач** | 240 |
-| **Выполнено** | 21 (9%) |
+| **Выполнено** | 42 (18%) |
 | **В работе** | 0 |
-| **Осталось** | 219 |
+| **Осталось** | 198 |
 | **Story Points всего** | ~1310 |
-| **Story Points выполнено** | ~100 |
-| **Прогресс** | 7.6% |
+| **Story Points выполнено** | ~230 |
+| **Прогресс** | 17.6% |
 
 ---
 
@@ -37,15 +37,15 @@
 | EPIC-009 | LLM Integrations | MVP | 🔴 Not Started | 13 | 0 |
 | EPIC-010 | Git Integration | Alpha | 🔴 Not Started | 13 | 0 |
 | EPIC-011 | Issue Tracker Integration | Alpha | 🔴 Not Started | 14 | 0 |
-| EPIC-012 | Security & Sandbox | MVP ✅ | 🔴 Not Started | 14 | 0 |
-| EPIC-013 | Monitoring & Observability | MVP ⬆️ | 🔴 Not Started | 22 | 0 |
-| EPIC-014 | Deployment & CI/CD | MVP | 🟡 In Progress | 16 | 3 |
+| EPIC-012 | Security & Sandbox | MVP ✅ | 🟡 In Progress | 14 | 1 |
+| EPIC-013 | Monitoring & Observability | MVP ⬆️ | 🟡 In Progress | 22 | 8 |
+| EPIC-014 | Deployment & CI/CD | MVP | 🟡 In Progress | 16 | 8 |
 | EPIC-015 | Proof-of-Concept | MVP | ✅ Complete | 8 | 8 |
-| EPIC-016 | Documentation | MVP | 🟡 In Progress | 13 | 5 |
+| EPIC-016 | Documentation | MVP | 🟡 In Progress | 13 | 6 |
 | EPIC-017 | Repository Setup | MVP | ✅ Complete | 13 | 13 |
-| EPIC-018 | Infrastructure Hardening | MVP ⭐ | 🔴 Not Started | 13 | 0 |
+| EPIC-018 | Infrastructure Hardening | MVP ⭐ | ✅ Complete | 13 | 13 |
 
-> **Изменения v3.0**: Добавлен EPIC-018 (Infrastructure Hardening) на основе аудита. EPIC-013 расширен (15→22 задачи), EPIC-014 расширен (11→16 задач), EPIC-012 расширен (11→14 задачи). EPIC-013 перенесён из Beta в MVP.
+> **Изменения v4.0**: EPIC-018 завершён (13/13). EPIC-013 расширен — 8 задач выполнено (JSON логи, Prometheus метрики, Grafana, алерты). EPIC-014 расширен — 8 задач выполнено (Python 3.12, GHCR push, staging/prod deploy, OWASP ZAP). EPIC-012 — 1 задача выполнена (DAST).
 
 ---
 
@@ -390,9 +390,9 @@
 | **SANDBOX-008** | Ротация API ключей | Story | 5 | 🟡 Medium | 🔴 Todo | SANDBOX-006 |
 | **SANDBOX-009** | Тесты на escape-попытки | Test | 13 | 🔴 High | 🔴 Todo | SANDBOX-001-005 |
 | **SANDBOX-010** | Security audit кода | Task | 8 | 🔴 High | 🔴 Todo | SANDBOX-006-008 |
-| **SANDBOX-011** | OWASP ZAP сканирование | Test | 5 | 🔴 High | 🔴 Todo | API-014 |
+| **SANDBOX-011** | OWASP ZAP сканирование | Test | 5 | 🔴 High | ✅ Done | API-014 |
 | **SEC-012** | Branch protection rules (GitHub) | Task | 3 | 🔴 High | 🔴 Todo | — |
-| **SEC-013** | DAST сканирование (OWASP ZAP в CI) | Task | 5 | 🟡 Medium | 🔴 Todo | SANDBOX-011 |
+| **SEC-013** | DAST сканирование (OWASP ZAP в CI) | Task | 5 | 🟡 Medium | ✅ Done | SANDBOX-011 |
 | **SEC-014** | Secrets rotation policy | Task | 5 | 🟡 Medium | 🔴 Todo | SANDBOX-008 |
 
 ---
@@ -410,27 +410,27 @@
 
 | ID | Задача | Тип | SP | Приоритет | Статус | Зависимости |
 |----|--------|-----|----|-----------|--------|-------------|
-| **MON-001** | Структурированное логирование (JSON) | Task | 5 | 🔴 High | 🔴 Todo | — |
-| **MON-002** | Уровни логирования (DEBUG/INFO/WARN/ERROR) | Task | 3 | 🔴 High | 🔴 Todo | MON-001 |
-| **MON-003** | Интеграция Prometheus | Story | 8 | 🔴 High | 🔴 Todo | MON-001 |
-| **MON-004** | Метрика: workflow_execution_time | Task | 3 | 🔴 High | 🔴 Todo | MON-003 |
-| **MON-005** | Метрика: agent_execution_success_rate | Task | 3 | 🔴 High | 🔴 Todo | MON-003 |
-| **MON-006** | Метрика: token_usage_per_minute | Task | 3 | 🔴 High | 🔴 Todo | MON-003, BUDGET-002 |
-| **MON-007** | Метрика: guardrail_violations_total | Task | 3 | 🔴 High | 🔴 Todo | MON-003, GR-012 |
-| **MON-008** | Метрика: integration_request_duration | Task | 3 | 🔴 High | 🔴 Todo | MON-003 |
-| **MON-009** | Метрика: queue_length | Task | 3 | 🔴 High | 🔴 Todo | MON-003 |
-| **MON-010** | Метрика: error_rate | Task | 3 | 🔴 High | 🔴 Todo | MON-003 |
-| **MON-011** | Настройка Grafana | Task | 5 | 🔴 High | 🔴 Todo | MON-003 |
-| **MON-012** | Дашборд: Обзор системы | Task | 5 | 🔴 High | 🔴 Todo | MON-011 |
+| **MON-001** | Структурированное логирование (JSON) | Task | 5 | 🔴 High | ✅ Done | — |
+| **MON-002** | Уровни логирования (DEBUG/INFO/WARN/ERROR) | Task | 3 | 🔴 High | ✅ Done | MON-001 |
+| **MON-003** | Интеграция Prometheus | Story | 8 | 🔴 High | ✅ Done | MON-001 |
+| **MON-004** | Метрика: workflow_execution_time | Task | 3 | 🔴 High | ✅ Done | MON-003 |
+| **MON-005** | Метрика: agent_execution_success_rate | Task | 3 | 🔴 High | ✅ Done | MON-003 |
+| **MON-006** | Метрика: token_usage_per_minute | Task | 3 | 🔴 High | ✅ Done | MON-003, BUDGET-002 |
+| **MON-007** | Метрика: guardrail_violations_total | Task | 3 | 🔴 High | ✅ Done | MON-003, GR-012 |
+| **MON-008** | Метрика: integration_request_duration | Task | 3 | 🔴 High | ✅ Done | MON-003 |
+| **MON-009** | Метрика: queue_length | Task | 3 | 🔴 High | ✅ Done | MON-003 |
+| **MON-010** | Метрика: error_rate | Task | 3 | 🔴 High | ✅ Done | MON-003 |
+| **MON-011** | Настройка Grafana | Task | 5 | 🔴 High | ✅ Done | MON-003 |
+| **MON-012** | Дашборд: Обзор системы | Task | 5 | 🔴 High | ✅ Done | MON-011 |
 | **MON-013** | Дашборд: Бюджет и затраты | Task | 5 | 🟡 Medium | 🔴 Todo | MON-011 |
 | **MON-014** | Дашборд: Производительность агентов | Task | 5 | 🟡 Medium | 🔴 Todo | MON-011 |
 | **MON-015** | OpenTelemetry инициализация | Story | 8 | 🟡 Medium | 🔴 Todo | MON-001 |
 | **MON-016** | Distributed tracing для workflow | Story | 8 | 🟡 Medium | 🔴 Todo | MON-015 |
-| **MON-017** | Алерт: Бюджет превышен на 90% | Story | 3 | 🔴 High | 🔴 Todo | MON-011, BUDGET-004 |
-| **MON-018** | Алерт: Error rate >5% | Story | 3 | 🔴 High | 🔴 Todo | MON-011 |
-| **MON-019** | Алерт: SLA breach | Story | 3 | 🔴 High | 🔴 Todo | MON-011 |
-| **MON-020** | Алерт: Workflow failed | Story | 3 | 🔴 High | 🔴 Todo | MON-011 |
-| **MON-021** | Интеграция Slack для алертов | Story | 5 | 🔴 High | 🔴 Todo | MON-017-020 |
+| **MON-017** | Алерт: Бюджет превышен на 90% | Story | 3 | 🔴 High | ✅ Done | MON-011, BUDGET-004 |
+| **MON-018** | Алерт: Error rate >5% | Story | 3 | 🔴 High | ✅ Done | MON-011 |
+| **MON-019** | Алерт: SLA breach | Story | 3 | 🔴 High | ✅ Done | MON-011 |
+| **MON-020** | Алерт: Workflow failed | Story | 3 | 🔴 High | ✅ Done | MON-011 |
+| **MON-021** | Интеграция Slack для алертов | Story | 5 | 🔴 High | ✅ Done | MON-017-020 |
 | **MON-022** | Интеграция ELK Stack (опционально) | Story | 8 | 🟢 Low | 🔴 Todo | MON-001 |
 
 ---
@@ -449,13 +449,13 @@
 | **DEPLOY-001** | Dockerfile для оркестратора | Task | 5 | 🔴 High | ✅ Done | — |
 | **DEPLOY-002** | docker-compose.yml (локально) | Task | 5 | 🔴 High | ✅ Done | DEPLOY-001 |
 | **DEPLOY-003** | GitHub Actions: CI пайплайн | Story | 8 | 🔴 High | ✅ Done | DEPLOY-001 |
-| **DEPLOY-004** | GitHub Actions: тесты | Task | 5 | 🔴 High | 🔴 Todo | DEPLOY-003 |
-| **DEPLOY-005** | GitHub Actions: build Docker image | Task | 3 | 🔴 High | 🔴 Todo | DEPLOY-003 |
-| **DEPLOY-006** | GitHub Actions: push to registry | Task | 3 | 🔴 High | 🔴 Todo | DEPLOY-005 |
-| **DEPLOY-007** | Обновить Python до 3.12 в CI/CD | Task | 2 | 🔴 High | 🔴 Todo | DEPLOY-003 |
-| **DEPLOY-008** | Docker registry push (GHCR) | Task | 5 | 🔴 High | 🔴 Todo | DEPLOY-005 |
-| **DEPLOY-009** | Staging deploy команды | Story | 8 | 🔴 High | 🔴 Todo | DEPLOY-002 |
-| **DEPLOY-010** | Production deploy команды | Story | 8 | 🔴 High | 🔴 Todo | DEPLOY-002 |
+| **DEPLOY-004** | GitHub Actions: тесты | Task | 5 | 🔴 High | ✅ Done | DEPLOY-003 |
+| **DEPLOY-005** | GitHub Actions: build Docker image | Task | 3 | 🔴 High | ✅ Done | DEPLOY-003 |
+| **DEPLOY-006** | GitHub Actions: push to registry | Task | 3 | 🔴 High | ✅ Done | DEPLOY-005 |
+| **DEPLOY-007** | Обновить Python до 3.12 в CI/CD | Task | 2 | 🔴 High | ✅ Done | DEPLOY-003 |
+| **DEPLOY-008** | Docker registry push (GHCR) | Task | 5 | 🔴 High | ✅ Done | DEPLOY-005 |
+| **DEPLOY-009** | Staging deploy команды | Story | 8 | 🔴 High | ✅ Done | DEPLOY-002 |
+| **DEPLOY-010** | Production deploy команды | Story | 8 | 🔴 High | ✅ Done | DEPLOY-002 |
 | **DEPLOY-011** | Kubernetes manifests (опционально) | Story | 8 | 🟡 Medium | 🔴 Todo | DEPLOY-001 |
 | **DEPLOY-012** | Helm chart (опционально) | Story | 8 | 🟡 Medium | 🔴 Todo | DEPLOY-011 |
 | **DEPLOY-013** | Настройка окружений (dev/staging/prod) | Task | 5 | 🔴 High | 🔴 Todo | DEPLOY-002 |
@@ -507,7 +507,7 @@
 | **DOC-005** | Схема БД (части 1-3) | Doc | 8 | 🔴 High | ✅ Done | `DATABASE_SCHEMA_P1-3.md` |
 | **DOC-006** | Git Flow документация | Doc | 3 | 🟡 Medium | ✅ Done | `GIT_FLOW.md` |
 | **DOC-007** | Настройка репозитория | Doc | 3 | 🟡 Medium | ✅ Done | `REPO_SETUP.md` |
-| **DOC-008** | PoC Результаты | Doc | 5 | 🔴 High | 🔴 Todo | `POC_RESULTS.md` |
+| **DOC-008** | PoC Результаты | Doc | 5 | 🔴 High | ✅ Done | `POC_RESULTS.md` |
 | **DOC-009** | README проекта | Doc | 3 | 🟡 Medium | ✅ Done | `README.md` |
 | **DOC-010** | Бэклог задач | Doc | 3 | 🟡 Medium | ✅ Done | `BACKLOG_JIRA.md` |
 | **DOC-011** | Инфраструктура аудит | Doc | 3 | 🟡 Medium | ✅ Done | `INFRASTRUCTURE_AUDIT.md` |
@@ -556,23 +556,23 @@
 
 | ID | Задача | Тип | SP | Приоритет | Статус | Зависимости |
 |----|--------|-----|----|-----------|--------|-------------|
-| **INFRA-001** | Prometheus сервер (docker-compose) | Task | 5 | 🔴 High | 🔴 Todo | DEPLOY-002 |
-| **INFRA-002** | Grafana сервер (docker-compose) | Task | 5 | 🔴 High | 🔴 Todo | INFRA-001 |
-| **INFRA-003** | Seed-данные для разработки | Task | 3 | 🟡 Medium | 🔴 Todo | STORAGE-002 |
-| **INFRA-004** | Seed AFL конфиги | Task | 3 | 🟡 Medium | 🔴 Todo | INFRA-003 |
-| **INFRA-005** | Makefile target: `make seed` | Task | 2 | 🟡 Medium | 🔴 Todo | INFRA-003 |
-| **INFRA-006** | JSON форматтер для логов | Task | 5 | 🔴 High | 🔴 Todo | MON-001 |
-| **INFRA-007** | Health check endpoint | Task | 3 | 🔴 High | 🔴 Todo | API-001 |
-| **INFRA-008** | Readiness probe | Task | 3 | 🔴 High | 🔴 Todo | INFRA-007 |
-| **INFRA-009** | Liveness probe | Task | 3 | 🔴 High | 🔴 Todo | INFRA-007 |
-| **INFRA-010** | Docker healthcheck для всех сервисов | Task | 3 | 🔴 High | 🔴 Todo | DEPLOY-002 |
-| **INFRA-011** | Rate limiting middleware | Story | 5 | 🔴 High | 🔴 Todo | API-012 |
-| **INFRA-012** | Request ID middleware | Task | 3 | 🟡 Medium | 🔴 Todo | API-001 |
-| **INFRA-013** | CORS настройка | Task | 3 | 🔴 High | 🔴 Todo | API-001 |
+| **INFRA-001** | Prometheus сервер (docker-compose) | Task | 5 | 🔴 High | ✅ Done | DEPLOY-002 |
+| **INFRA-002** | Grafana сервер (docker-compose) | Task | 5 | 🔴 High | ✅ Done | INFRA-001 |
+| **INFRA-003** | Seed-данные для разработки | Task | 3 | 🟡 Medium | ✅ Done | STORAGE-002 |
+| **INFRA-004** | Seed AFL конфиги | Task | 3 | 🟡 Medium | ✅ Done | INFRA-003 |
+| **INFRA-005** | Makefile target: `make seed` | Task | 2 | 🟡 Medium | ✅ Done | INFRA-003 |
+| **INFRA-006** | JSON форматтер для логов | Task | 5 | 🔴 High | ✅ Done | MON-001 |
+| **INFRA-007** | Health check endpoint | Task | 3 | 🔴 High | ✅ Done | API-001 |
+| **INFRA-008** | Readiness probe | Task | 3 | 🔴 High | ✅ Done | INFRA-007 |
+| **INFRA-009** | Liveness probe | Task | 3 | 🔴 High | ✅ Done | INFRA-007 |
+| **INFRA-010** | Docker healthcheck для всех сервисов | Task | 3 | 🔴 High | ✅ Done | DEPLOY-002 |
+| **INFRA-011** | Rate limiting middleware | Story | 5 | 🔴 High | ✅ Done | API-012 |
+| **INFRA-012** | Request ID middleware | Task | 3 | 🟡 Medium | ✅ Done | API-001 |
+| **INFRA-013** | CORS настройка | Task | 3 | 🔴 High | ✅ Done | API-001 |
 
 ---
 
-## Сводка по спринтам (обновлённая v3.0)
+## Сводка по спринтам (обновлённая v4.0)
 
 ### Спринт 1 (Недели 1-2): MVP Foundation 🟡 В работе
 
@@ -581,13 +581,13 @@
 | EPIC-001 Parser | 10 | 4 | ~26 |
 | EPIC-007 Storage | 16 | 2 | ~55 |
 | EPIC-009 LLM | 13 | 0 | ~65 |
-| EPIC-014 Deploy | 16 | 3 | ~55 |
+| EPIC-014 Deploy | 16 | 8 | ~30 |
 | EPIC-015 PoC | 8 | 8 | 0 ✅ |
-| EPIC-016 Docs | 13 | 5 | ~20 |
+| EPIC-016 Docs | 13 | 6 | ~15 |
 | EPIC-017 Repo | 13 | 13 | 0 ✅ |
-| EPIC-018 Infra | 13 | 0 | ~46 |
+| EPIC-018 Infra | 13 | 13 | 0 ✅ |
 
-**Всего SP**: ~267 → **Выполнено**: ~100 SP (37%)
+**Всего SP**: ~267 → **Выполнено**: ~195 SP (73%) → **Осталось**: ~191 SP
 
 ### Спринт 2 (Недели 2-3): Core Engine 🔴 Не начат
 
@@ -596,8 +596,9 @@
 | EPIC-002 Workflow | 13 | 3 | ~60 |
 | EPIC-003 Budget | 12 | 0 | ~55 |
 | EPIC-008 REST API | 14 | 1 | ~50 |
+| EPIC-013 Monitoring | 22 | 8 | ~40 |
 
-**Всего SP**: ~165
+**Всего SP**: ~205 → **Выполнено**: ~40 SP (20%)
 
 ### Спринт 3 (Недели 3-4): Agent Execution 🔴 Не начат
 
@@ -638,18 +639,24 @@
 
 ---
 
-## Изменения v2.0 → v3.0
+## Изменения v3.0 → v4.0
 
-| Изменение | Описание | Причина |
-|-----------|----------|---------|
-| **EPIC-013 → MVP** | Перенесён из Beta | Аудит выявил критичность |
-| **EPIC-013 расширен** | 15 → 22 задачи | Добавлены Prometheus, Grafana, OpenTelemetry, алерты |
-| **EPIC-014 расширен** | 11 → 16 задач | Добавлены Python 3.12 fix, GHCR push, staging/prod deploy |
-| **EPIC-012 расширен** | 11 → 14 задач | Добавлены branch protection, DAST, secrets rotation |
-| **EPIC-018 добавлен** | 13 новых задач | Infrastructure Audit findings |
-| **EPIC-016 расширен** | 12 → 13 задач | Добавлен Infrastructure Audit документ |
-| **Всего задач** | 213 → 240 | +27 задач из аудита |
-| **Всего SP** | ~1180 → ~1310 | +130 SP |
+| Изменение | Описание | Статус |
+|-----------|----------|--------|
+| **EPIC-018 завершён** | 13/13 задач ✅ | ✅ Завершён |
+| **EPIC-017 завершён** | 13/13 задач ✅ | ✅ Завершён |
+| **EPIC-015 завершён** | 8/8 задач ✅ | ✅ Завершён |
+| **EPIC-013 в работе** | 8/22 задач — JSON логи, Prometheus, Grafana, алерты | 🟡 В работе |
+| **EPIC-014 в работе** | 8/16 задач — Python 3.12, GHCR, staging/prod deploy, OWASP ZAP | 🟡 В работе |
+| **EPIC-012 в работе** | 1/14 задач — DAST сканирование | 🟡 В работе |
+| **EPIC-016 в работе** | 6/13 задач — PoC результаты, аудит | 🟡 В работе |
+| **EPIC-001 в работе** | 4/10 задач — YAML/JSON парсинг готов | 🟡 В работе |
+| **EPIC-007 в работе** | 2/16 задач — PostgreSQL + Alembic готовы | 🟡 В работе |
+| **EPIC-002 в работе** | 3/13 задач — State Machine готова | 🟡 В работе |
+| **EPIC-008 в работе** | 1/14 задач — FastAPI настроен | 🟡 В работе |
+| **Pre-commit fixes** | 8 проблем исправлены — ruff, mypy, black, isort, detect-secrets | ✅ Завершён |
+| **Всего выполнено** | 42/240 задач (18%) | +21 задача с v3.0 |
+| **Story Points** | ~230/~1310 (17.6%) | +130 SP |
 
 ---
 
@@ -685,12 +692,12 @@ Summary,Issue Type,Priority,Story Points,Epic Link,Status,Labels
 
 ### C. Матрица ответственности
 
-| Команда | Эпики | Задач | Выполнено |
-|---------|-------|-------|-----------|
-| **Core Team** | EPIC-001, 002, 003, 007, 008, 010, 011, 016 | 100 | 15 |
-| **AI Team** | EPIC-004, 005, 009 | 44 | 0 |
-| **Security Team** | EPIC-006, 012 | 32 | 0 |
-| **Platform Team** | EPIC-013, 014, 017, 018 | 64 | 16 |
+| Команда | Эпики | Задач | Выполнено | Прогресс |
+|---------|-------|-------|-----------|----------|
+| **Core Team** | EPIC-001, 002, 003, 007, 008, 010, 011, 016 | 100 | 16 | 16% |
+| **AI Team** | EPIC-004, 005, 009 | 44 | 0 | 0% |
+| **Security Team** | EPIC-006, 012 | 32 | 1 | 3% |
+| **Platform Team** | EPIC-013, 014, 017, 018 | 64 | 35 | 55% |
 
 ---
 
