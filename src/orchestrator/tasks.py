@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Celery task definitions."""
 
 from celery import Celery

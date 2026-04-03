@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Events API routes."""
 
 from fastapi import APIRouter

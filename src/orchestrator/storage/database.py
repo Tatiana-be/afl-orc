@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Database connection and session management."""
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine

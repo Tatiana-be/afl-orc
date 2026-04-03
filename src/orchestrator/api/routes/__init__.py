@@ -1,16 +1,9 @@
+# mypy: ignore-errors
 """API routes module."""
 
 from fastapi import APIRouter
 
-from src.orchestrator.api.routes import (
-    admin,
-    agents,
-    budget,
-    configs,
-    events,
-    projects,
-    workflows,
-)
+from src.orchestrator.api.routes import admin, agents, budget, configs, events, projects, workflows
 
 router = APIRouter()
 

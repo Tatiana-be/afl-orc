@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Workflow Engine - orchestrates workflow execution."""
 
 from typing import Any

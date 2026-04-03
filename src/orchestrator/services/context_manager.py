@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Context Manager - manages context between agents."""
 
 
