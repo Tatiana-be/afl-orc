@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
 
 env:
-  PYTHON_VERSION: '3.11'
+  PYTHON_VERSION: '3.12'
   POSTGRES_VERSION: '15'
   REDIS_VERSION: '7'
 
@@ -219,7 +219,7 @@ jobs:
   security:
     name: Security Scan
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -235,14 +235,22 @@ jobs:
         run: |
           pip install bandit safety pip-audit
 
-      - name: Run Bandit
+      - name: Run Bandit (SAST)
         run: bandit -r src/ -ll -ii -f json -o bandit-report.json || true
 
-      - name: Run Safety
+      - name: Run Safety (dependency scan)
         run: safety check --json > safety-report.json || true
 
-      - name: Run Pip Audit
+      - name: Run Pip Audit (dependency scan)
         run: pip-audit > pip-audit-report.txt || true
+
+      - name: Run OWASP ZAP (DAST)
+        uses: zaproxy/action-baseline@v0.10.0
+        with:
+          target: 'http://localhost:8000'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a'
+        continue-on-error: true
 
       - name: Upload security reports
         uses: actions/upload-artifact@v3
@@ -262,6 +270,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [lint, test-unit]
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
@@ -270,17 +281,38 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: false
-          tags: afl-orchestrator:${{ github.sha }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true
+          load: ${{ github.event_name == 'pull_request' }}
 
       - name: Test Docker image
+        if: github.event_name == 'pull_request'
         run: |
           docker run --rm afl-orchestrator:${{ github.sha }} python --version
 
@@ -296,17 +328,30 @@ jobs:
     environment:
       name: staging
       url: https://staging.afl-orchestrator.com
+    permissions:
+      contents: read
+      packages: read
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Deploy to staging
         run: |
           echo "Deploying to staging environment..."
-          # Add your deployment commands here
+          IMAGE_TAG="ghcr.io/${{ github.repository }}:${{ github.sha }}"
+          echo "Using image: $IMAGE_TAG"
           # kubectl apply -f k8s/staging/
-          # helm upgrade --install staging ./charts/afl-orchestrator
+          # helm upgrade --install staging ./charts/afl-orchestrator \
+          #   --set image.repository=$IMAGE_TAG \
+          #   --namespace staging
 
   # ============================================
   # Deploy to Production (on main branch or tag)
@@ -320,17 +365,30 @@ jobs:
     environment:
       name: production
       url: https://api.afl-orchestrator.com
+    permissions:
+      contents: read
+      packages: read
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Deploy to production
         run: |
           echo "Deploying to production environment..."
-          # Add your deployment commands here
+          IMAGE_TAG="ghcr.io/${{ github.repository }}:${{ github.sha }}"
+          echo "Using image: $IMAGE_TAG"
           # kubectl apply -f k8s/production/
-          # helm upgrade --install production ./charts/afl-orchestrator
+          # helm upgrade --install production ./charts/afl-orchestrator \
+          #   --set image.repository=$IMAGE_TAG \
+          #   --namespace production
 
   # ============================================
   # Create Release (on tag)

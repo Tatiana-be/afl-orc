@@ -1,0 +1,208 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "Workflow Overview",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}
+    },
+    {
+      "title": "Active Workflows",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 1},
+      "targets": [
+        {
+          "expr": "sum(afl_workflow_active)",
+          "legendFormat": "Active"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 50},
+              {"color": "red", "value": 100}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Workflow Success Rate",
+      "type": "gauge",
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 1},
+      "targets": [
+        {
+          "expr": "rate(afl_workflow_completed_total[5m]) / (rate(afl_workflow_completed_total[5m]) + rate(afl_workflow_failed_total[5m])) * 100",
+          "legendFormat": "Success %"
+        }
+      ]
+    },
+    {
+      "title": "Workflow Duration (p95)",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 1},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(afl_workflow_execution_duration_seconds_bucket[5m]))",
+          "legendFormat": "p95"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      }
+    },
+    {
+      "title": "Total Workflows",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 1},
+      "targets": [
+        {
+          "expr": "sum(afl_workflow_started_total)",
+          "legendFormat": "Total"
+        }
+      ]
+    },
+    {
+      "title": "Budget & Costs",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 5}
+    },
+    {
+      "title": "Token Usage Rate",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+      "targets": [
+        {
+          "expr": "rate(afl_token_usage_total[5m])",
+          "legendFormat": "{{provider}}/{{model}}"
+        }
+      ],
+      "yAxes": [{"label": "tokens/sec"}]
+    },
+    {
+      "title": "Cost Rate (USD)",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
+      "targets": [
+        {
+          "expr": "rate(afl_cost_usd_total[5m])",
+          "legendFormat": "{{provider}}"
+        }
+      ],
+      "yAxes": [{"label": "USD/sec"}]
+    },
+    {
+      "title": "Agent Performance",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 14}
+    },
+    {
+      "title": "Agent Execution Duration (p95)",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 15},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(afl_agent_execution_duration_seconds_bucket[5m]))",
+          "legendFormat": "{{agent_id}} ({{model}})"
+        }
+      ],
+      "yAxes": [{"label": "seconds"}]
+    },
+    {
+      "title": "Agent Success Rate",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 15},
+      "targets": [
+        {
+          "expr": "rate(afl_agent_execution_total{status=\"success\"}[5m]) / rate(afl_agent_execution_total[5m]) * 100",
+          "legendFormat": "{{agent_id}}"
+        }
+      ],
+      "yAxes": [{"label": "%", "min": 0, "max": 100}]
+    },
+    {
+      "title": "API Performance",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 23}
+    },
+    {
+      "title": "API Request Rate",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+      "targets": [
+        {
+          "expr": "rate(afl_api_request_total[5m])",
+          "legendFormat": "{{method}} {{endpoint}} ({{status_code}})"
+        }
+      ]
+    },
+    {
+      "title": "API Latency (p95)",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(afl_api_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "{{method}} {{endpoint}}"
+        }
+      ],
+      "yAxes": [{"label": "seconds"}]
+    },
+    {
+      "title": "Guardrail & Security",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 32}
+    },
+    {
+      "title": "Guardrail Violations",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 33},
+      "targets": [
+        {
+          "expr": "rate(afl_guardrail_violations_total[5m])",
+          "legendFormat": "{{guardrail_id}} ({{action}})"
+        }
+      ]
+    },
+    {
+      "title": "Queue Length",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 33},
+      "targets": [
+        {
+          "expr": "afl_queue_length",
+          "legendFormat": "{{queue_name}}"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["afl-orchestrator"],
+  "templating": {
+    "list": [
+      {
+        "name": "project_id",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(afl_workflow_started_total, project_id)"
+      }
+    ]
+  },
+  "time": {"from": "now-6h", "to": "now"},
+  "title": "AFL Orchestrator Overview",
+  "uid": "afl-orchestrator-overview",
+  "version": 1
+}

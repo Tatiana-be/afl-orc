@@ -113,3 +113,7 @@ clean:
 	rm -rf .coverage
 	rm -rf build/
 	rm -rf dist/
+
+# Seed database with test data
+seed:
+	python scripts/seed_db.py
