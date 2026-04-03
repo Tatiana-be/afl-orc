@@ -31,18 +31,168 @@ class AFLParser:
             raise ValueError(f"Unsupported format: {format}")
 
     def validate(self, config: AFLConfig) -> list[dict[str, Any]]:
-        """Validate AFL configuration."""
-        errors = []
+        """Validate AFL configuration.
 
-        # Check workflow steps reference valid agents
+        Checks:
+        - Agent references in workflow steps
+        - Artifact references in workflow steps
+        - Guardrail references in agents
+        - Dependency references in workflow steps
+        - Circular dependencies in workflow
+        """
+        errors: list[dict[str, Any]] = []
+
+        # Build lookup sets
         agent_ids = {agent.id for agent in config.agents}
+        artifact_ids = {artifact.id for artifact in config.artifacts}
+        guardrail_ids = {g.id for g in config.guardrails}
+        step_ids = {step.step for step in config.workflow}
+
+        # Validate agent references in workflow steps
+        errors.extend(self._validate_agent_references(config, agent_ids))
+
+        # Validate artifact references in workflow steps
+        errors.extend(self._validate_artifact_references(config, artifact_ids))
+
+        # Validate guardrail references in agents
+        errors.extend(self._validate_guardrail_references(config, guardrail_ids))
+
+        # Validate dependency references
+        errors.extend(self._validate_dependency_references(config, step_ids))
+
+        # Check for circular dependencies
+        errors.extend(self._detect_circular_dependencies(config))
+
+        return errors
+
+    def _validate_agent_references(
+        self, config: AFLConfig, agent_ids: set[str]
+    ) -> list[dict[str, Any]]:
+        """Validate that workflow steps reference valid agents."""
+        errors = []
         for step in config.workflow:
             if step.agent not in agent_ids:
                 errors.append(
                     {
                         "type": "invalid_reference",
-                        "message": f"Step '{step.step}' references unknown agent '{step.agent}'",
+                        "field": "agent",
+                        "step": step.step,
+                        "value": step.agent,
+                        "message": (
+                            f"Step '{step.step}' references " f"unknown agent '{step.agent}'"
+                        ),
                     }
                 )
+        return errors
+
+    def _validate_artifact_references(
+        self, config: AFLConfig, artifact_ids: set[str]
+    ) -> list[dict[str, Any]]:
+        """Validate that workflow steps reference valid artifacts."""
+        errors = []
+        for step in config.workflow:
+            if step.artifact is not None and step.artifact not in artifact_ids:
+                errors.append(
+                    {
+                        "type": "invalid_reference",
+                        "field": "artifact",
+                        "step": step.step,
+                        "value": step.artifact,
+                        "message": (
+                            f"Step '{step.step}' references " f"unknown artifact '{step.artifact}'"
+                        ),
+                    }
+                )
+        return errors
+
+    def _validate_guardrail_references(
+        self, config: AFLConfig, guardrail_ids: set[str]
+    ) -> list[dict[str, Any]]:
+        """Validate that agents reference valid guardrails."""
+        errors = []
+        for agent in config.agents:
+            for guardrail_id in agent.guardrails:
+                if guardrail_id not in guardrail_ids:
+                    errors.append(
+                        {
+                            "type": "invalid_reference",
+                            "field": "guardrail",
+                            "agent": agent.id,
+                            "value": guardrail_id,
+                            "message": (
+                                f"Agent '{agent.id}' references "
+                                f"unknown guardrail '{guardrail_id}'"
+                            ),
+                        }
+                    )
+        return errors
+
+    def _validate_dependency_references(
+        self, config: AFLConfig, step_ids: set[str]
+    ) -> list[dict[str, Any]]:
+        """Validate that workflow steps reference valid dependencies."""
+        errors = []
+        for step in config.workflow:
+            for dep in step.depends_on:
+                if dep not in step_ids:
+                    errors.append(
+                        {
+                            "type": "invalid_reference",
+                            "field": "depends_on",
+                            "step": step.step,
+                            "value": dep,
+                            "message": (f"Step '{step.step}' depends on " f"unknown step '{dep}'"),
+                        }
+                    )
+        return errors
+
+    def _detect_circular_dependencies(self, config: AFLConfig) -> list[dict[str, Any]]:
+        """Detect circular dependencies in workflow using DFS."""
+        errors = []
+
+        # Build adjacency list
+        graph: dict[str, list[str]] = {}
+        for step in config.workflow:
+            graph[step.step] = list(step.depends_on)
+
+        # DFS cycle detection
+        WHITE, GRAY, BLACK = 0, 1, 2
+        color: dict[str, int] = {step: WHITE for step in graph}
+        cycles: list[list[str]] = []
+
+        def dfs(node: str, path: list[str]) -> None:
+            color[node] = GRAY
+            path.append(node)
+
+            for neighbor in graph.get(node, []):
+                if neighbor not in color:
+                    # Reference to non-existent step (caught elsewhere)
+                    continue
+                if color[neighbor] == GRAY:
+                    # Found cycle
+                    cycle_start = path.index(neighbor)
+                    cycle = path[cycle_start:] + [neighbor]
+                    cycles.append(cycle)
+                elif color[neighbor] == WHITE:
+                    dfs(neighbor, path)
+
+            path.pop()
+            color[node] = BLACK
+
+        for step_id in graph:
+            if color[step_id] == WHITE:
+                dfs(step_id, [])
+
+        # Report cycles
+        for cycle in cycles:
+            cycle_str = " -> ".join(cycle)
+            errors.append(
+                {
+                    "type": "circular_dependency",
+                    "field": "depends_on",
+                    "cycle": cycle,
+                    "message": (f"Circular dependency detected: {cycle_str}"),
+                }
+            )
 
         return errors

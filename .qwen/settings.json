@@ -12,7 +12,8 @@
       "Bash(isort *)",
       "Bash(pytest *)",
       "Bash(mkdir *)",
-      "Bash(touch *)"
+      "Bash(touch *)",
+      "Bash(git checkout *)"
     ]
   },
   "$version": 3
