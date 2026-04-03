@@ -9,9 +9,9 @@ Validates:
 
 import asyncio
 import time
-from typing import Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
 
 
 class ProviderStatus(Enum):
@@ -46,6 +46,7 @@ class MockProvider:
 
         # Simulate errors
         import random
+
         if random.random() < self.error_rate:
             self.failure_count += 1
             raise ConnectionError(f"{self.name} API error")
@@ -101,9 +102,7 @@ class LLMRouter:
 
     def __init__(self, providers: dict[str, MockProvider]):
         self.providers = providers
-        self.circuit_breakers = {
-            name: CircuitBreaker() for name in providers
-        }
+        self.circuit_breakers = {name: CircuitBreaker() for name in providers}
         self.fallback_map: dict[str, str] = {}
 
     def set_fallback(self, primary: str, fallback: str):
@@ -130,9 +129,7 @@ class LLMRouter:
                 return None
 
             try:
-                response = await self.providers[current_provider].generate(
-                    prompt, model
-                )
+                response = await self.providers[current_provider].generate(prompt, model)
                 cb.record_success()
                 return response
             except Exception as e:
@@ -199,7 +196,7 @@ async def test_llm_integration():
     response = await router.generate("test", "gpt-4", "azure")
     assert response is not None, "Should recover"
     assert cb.state == "closed", "Circuit should be closed after success"
-    print(f"  ✅ Circuit breaker recovered")
+    print("  ✅ Circuit breaker recovered")
 
     print("\n" + "=" * 60)
     print("✅ PoC 1 PASSED: LLM Integration risks mitigated")

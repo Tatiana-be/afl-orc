@@ -13,7 +13,9 @@
       "Bash(pytest *)",
       "Bash(mkdir *)",
       "Bash(touch *)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(git push *)",
+      "Bash(sed *)"
     ]
   },
   "$version": 3
