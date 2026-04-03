@@ -42,7 +42,6 @@ ignore = [
     "B008",  # do not perform function calls in argument defaults
     "ARG001", # unused function argument (common in FastAPI)
     "ARG002", # unused method argument (TODO stubs)
-    "UP042", # StrEnum warning
 ]
 
 [tool.ruff.lint.per-file-ignores]

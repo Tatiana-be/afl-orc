@@ -59,7 +59,7 @@ repos:
           - types-requests
           - types-PyYAML
           - types-redis
-        args: ["--ignore-missing-imports", "--strict-optional"]
+        args: ["--ignore-missing-imports", "--strict-optional", "--explicit-package-bases"]
         exclude: ^tests/
 
   # Security hooks
