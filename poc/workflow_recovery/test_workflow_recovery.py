@@ -12,7 +12,6 @@ import json
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 
 class StepStatus(Enum):
@@ -36,10 +35,10 @@ class WorkflowStatus(Enum):
 class StepState:
     name: str
     status: StepStatus = StepStatus.PENDING
-    output: Optional[dict] = None
-    error: Optional[str] = None
-    started_at: Optional[float] = None
-    completed_at: Optional[float] = None
+    output: dict | None = None
+    error: str | None = None
+    started_at: float | None = None
+    completed_at: float | None = None
     retry_count: int = 0
 
 
@@ -49,8 +48,8 @@ class WorkflowState:
     status: WorkflowStatus = WorkflowStatus.PENDING
     steps: list[StepState] = field(default_factory=list)
     current_step: int = 0
-    started_at: Optional[float] = None
-    completed_at: Optional[float] = None
+    started_at: float | None = None
+    completed_at: float | None = None
     context: dict = field(default_factory=dict)
 
 
@@ -69,7 +68,7 @@ class MockStorage:
             raise ConnectionError("Storage unavailable")
         self.data[key] = json.dumps(value)
 
-    async def load(self, key: str) -> Optional[dict]:
+    async def load(self, key: str) -> dict | None:
         await asyncio.sleep(self.latency_ms / 1000)
         if key not in self.data:
             return None
@@ -111,7 +110,7 @@ class WorkflowEngine:
         }
         await self.storage.save(f"workflow:{workflow.id}", state_dict)
 
-    async def load_state(self, workflow_id: str) -> Optional[WorkflowState]:
+    async def load_state(self, workflow_id: str) -> WorkflowState | None:
         """Load persisted workflow state."""
         data = await self.storage.load(f"workflow:{workflow_id}")
         if not data:

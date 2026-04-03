@@ -10,7 +10,6 @@ Validates:
 import asyncio
 import time
 from dataclasses import dataclass, field
-from typing import Optional
 
 
 @dataclass
@@ -184,7 +183,7 @@ async def test_budget_tracking():
 
     assert token_accuracy < 0.05, f"Token accuracy {token_accuracy:.2%} exceeds 5%"
     assert cost_accuracy < 0.05, f"Cost accuracy {cost_accuracy:.2%} exceeds 5%"
-    print(f"  ✅ Accuracy within ±5%")
+    print("  ✅ Accuracy within ±5%")
 
     # Test 2: Budget limits
     print("\n[Test 2] Budget Limit Enforcement")
@@ -223,19 +222,21 @@ async def test_budget_tracking():
             break
 
     assert warning_triggered, "Warning alert should trigger at 80%"
-    print(f"  ✅ Warning alert triggered at 80%")
+    print("  ✅ Warning alert triggered at 80%")
 
     # Test 3: Multi-provider aggregation
     print("\n[Test 3] Multi-Provider Cost Aggregation")
 
     breakdown = tracker.get_breakdown()
-    print(f"  Usage by provider/model:")
+    print("  Usage by provider/model:")
     for key, data in sorted(breakdown.items()):
-        print(f"    {key:30s}: {data['tokens']:6d} tokens, ${data['cost']:.4f} ({data['count']} calls)")
+        print(
+            f"    {key:30s}: {data['tokens']:6d} tokens, ${data['cost']:.4f} ({data['count']} calls)"
+        )
 
     total_from_breakdown = sum(d["tokens"] for d in breakdown.values())
     assert total_from_breakdown == tracker.state.tokens_used
-    print(f"  ✅ Aggregation accurate")
+    print("  ✅ Aggregation accurate")
 
     # Test 4: Remaining budget
     print("\n[Test 4] Remaining Budget Calculation")
@@ -245,7 +246,7 @@ async def test_budget_tracking():
 
     assert remaining["tokens"] >= 0
     assert remaining["usd"] >= 0
-    print(f"  ✅ Remaining budget calculated correctly")
+    print("  ✅ Remaining budget calculated correctly")
 
     print("\n" + "=" * 60)
     print("✅ PoC 4 PASSED: Budget Tracking risks mitigated")

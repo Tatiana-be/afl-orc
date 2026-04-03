@@ -176,7 +176,7 @@ exec(open('{code_file}').read())
                     execution_time_ms=execution_time,
                 )
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 process.kill()
                 return SandboxResult(
                     success=False,

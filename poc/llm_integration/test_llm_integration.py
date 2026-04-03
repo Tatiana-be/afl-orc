@@ -11,7 +11,6 @@ import asyncio
 import time
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 
 
 class ProviderStatus(Enum):
@@ -38,7 +37,7 @@ class MockProvider:
     call_count: int = 0
     failure_count: int = 0
 
-    async def generate(self, prompt: str, model: str) -> Optional[LLMResponse]:
+    async def generate(self, prompt: str, model: str) -> LLMResponse | None:
         self.call_count += 1
 
         # Simulate latency
@@ -71,7 +70,7 @@ class CircuitBreaker:
         self.failure_threshold = failure_threshold
         self.recovery_timeout = recovery_timeout
         self.failure_count = 0
-        self.last_failure_time: Optional[float] = None
+        self.last_failure_time: float | None = None
         self.state = "closed"  # closed, open, half-open
 
     def record_success(self):
@@ -114,7 +113,7 @@ class LLMRouter:
         model: str,
         provider: str,
         max_retries: int = 3,
-    ) -> Optional[LLMResponse]:
+    ) -> LLMResponse | None:
         current_provider = provider
         last_error = None
 

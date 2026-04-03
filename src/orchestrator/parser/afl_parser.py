@@ -157,7 +157,7 @@ class AFLParser:
 
         # DFS cycle detection
         WHITE, GRAY, BLACK = 0, 1, 2
-        color: dict[str, int] = {step: WHITE for step in graph}
+        color: dict[str, int] = dict.fromkeys(graph, WHITE)
         cycles: list[list[str]] = []
 
         def dfs(node: str, path: list[str]) -> None:
