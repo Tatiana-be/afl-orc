@@ -1,13 +1,6 @@
 """Prometheus metrics for AFL Orchestrator."""
 
-from prometheus_client import (
-    Counter,
-    Gauge,
-    Histogram,
-    Summary,
-    generate_latest,
-    CONTENT_TYPE_LATEST,
-)
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
 
 # ============================================
 # Workflow Metrics
@@ -178,6 +171,6 @@ uptime_seconds = Gauge(
 )
 
 
-def metrics_endpoint():
+def metrics_endpoint() -> tuple[bytes, str]:
     """Generate Prometheus metrics response."""
     return generate_latest(), CONTENT_TYPE_LATEST

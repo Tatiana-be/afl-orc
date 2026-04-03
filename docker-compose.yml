@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # PostgreSQL Database
@@ -66,10 +66,7 @@ services:
       target: dev
     container_name: afl-orchestrator
     command: >
-      uvicorn src.orchestrator.main:app
-      --host 0.0.0.0
-      --port 8000
-      --reload
+      uvicorn src.orchestrator.main:app --host 0.0.0.0 --port 8000 --reload
       --reload-dir /app/src
     ports:
       - "8000:8000"
@@ -101,7 +98,8 @@ services:
       context: .
       target: dev
     container_name: afl-celery-worker
-    command: celery -A src.orchestrator.tasks worker --loglevel=info --concurrency=4
+    command:
+      celery -A src.orchestrator.tasks worker --loglevel=info --concurrency=4
     environment:
       DATABASE_URL: postgresql+asyncpg://orchestrator:changeme_dev@postgres:5432/orchestrator
       REDIS_URL: redis://redis:6379/0
@@ -170,10 +168,10 @@ services:
       - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
     networks:
       - afl-network
 

@@ -2,18 +2,17 @@
 
 import asyncio
 import random
-from datetime import datetime, timezone
+from typing import Any
 
-from src.orchestrator.config import settings
 from src.orchestrator.observability.logging_config import get_logger
 
 logger = get_logger("seed")
 
 
-async def seed_users():
+async def seed_users() -> list[dict[str, Any]]:
     """Create test users."""
     logger.info("Seeding users...")
-    users = [
+    users: list[dict[str, Any]] = [
         {"email": "admin@example.com", "name": "Admin User", "role": "admin"},
         {"email": "developer@example.com", "name": "Developer User", "role": "developer"},
         {"email": "viewer@example.com", "name": "Viewer User", "role": "viewer"},
@@ -22,10 +21,10 @@ async def seed_users():
     return users
 
 
-async def seed_projects(users: list[dict]):
+async def seed_projects(users: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Create test projects."""
     logger.info("Seeding projects...")
-    projects = [
+    projects: list[dict[str, Any]] = [
         {
             "name": "Code Review Automation",
             "description": "Automated code review for repositories",
@@ -49,12 +48,12 @@ async def seed_projects(users: list[dict]):
     return projects
 
 
-async def seed_configs(projects: list[dict]):
+async def seed_configs(projects: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Create test AFL configs."""
     logger.info("Seeding configs...")
-    configs = []
+    configs: list[dict[str, Any]] = []
     for project in projects:
-        config = {
+        config: dict[str, Any] = {
             "project_id": project["id"],
             "version": "1.0.0",
             "content": f"""
@@ -78,16 +77,18 @@ workflow:
     return configs
 
 
-async def seed_workflows(projects: list[dict], configs: list[dict]):
+async def seed_workflows(
+    projects: list[dict[str, Any]], configs: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
     """Create test workflows."""
     logger.info("Seeding workflows...")
     statuses = ["completed", "completed", "completed", "running", "failed"]
-    workflows = []
-    for i in range(20):
+    workflows: list[dict[str, Any]] = []
+    for _ in range(20):
         project = random.choice(projects)
         config = random.choice(configs)
         status = random.choice(statuses)
-        workflow = {
+        workflow: dict[str, Any] = {
             "project_id": project["id"],
             "config_version_id": config["id"],
             "status": status,
@@ -100,10 +101,10 @@ async def seed_workflows(projects: list[dict], configs: list[dict]):
     return workflows
 
 
-async def seed_agents():
+async def seed_agents() -> list[dict[str, Any]]:
     """Create test agents."""
     logger.info("Seeding agents...")
-    agents = [
+    agents: list[dict[str, Any]] = [
         {
             "name": "code_analyzer_1",
             "type": "llm",
@@ -127,7 +128,7 @@ async def seed_agents():
     return agents
 
 
-async def run_seed():
+async def run_seed() -> None:
     """Run all seed operations."""
     logger.info("=" * 50)
     logger.info("Starting database seeding...")

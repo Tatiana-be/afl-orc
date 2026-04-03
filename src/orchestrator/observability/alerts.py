@@ -1,15 +1,13 @@
 """Alerting system for AFL Orchestrator."""
 
 import asyncio
-import logging
-from typing import Optional
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
+from typing import Any
 
 import httpx
 
-from src.orchestrator.config import settings
 from src.orchestrator.observability.logging_config import get_logger
 
 logger = get_logger("alerts")
@@ -35,12 +33,12 @@ class Alert:
     name: str
     severity: AlertSeverity
     message: str
-    details: dict = None
-    timestamp: datetime = None
+    details: dict[str, Any] | None = None
+    timestamp: datetime | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.timestamp is None:
-            self.timestamp = datetime.now(timezone.utc)
+            self.timestamp = datetime.now(UTC)
         if self.details is None:
             self.details = {}
 
@@ -48,18 +46,18 @@ class Alert:
 class AlertManager:
     """Manages alert routing and delivery."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.channels: dict[AlertChannel, str] = {}
         self.alert_history: list[Alert] = []
         self.suppression_window_seconds = 300  # 5 minutes
         self.suppressed_alerts: dict[str, datetime] = {}
 
-    def configure_channel(self, channel: AlertChannel, webhook_url: str):
+    def configure_channel(self, channel: AlertChannel, webhook_url: str) -> None:
         """Configure an alert channel."""
         self.channels[channel] = webhook_url
         logger.info(f"Configured alert channel: {channel.value}")
 
-    async def send_alert(self, alert: Alert):
+    async def send_alert(self, alert: Alert) -> None:
         """Send an alert to configured channels."""
         # Check suppression
         suppression_key = f"{alert.name}:{alert.message}"
@@ -84,7 +82,7 @@ class AlertManager:
 
         # Record in history
         self.alert_history.append(alert)
-        self.suppressed_alerts[suppression_key] = datetime.now(timezone.utc)
+        self.suppressed_alerts[suppression_key] = datetime.now(UTC)
 
     def _is_suppressed(self, key: str) -> bool:
         """Check if alert is within suppression window."""
@@ -92,12 +90,10 @@ class AlertManager:
             return False
 
         last_sent = self.suppressed_alerts[key]
-        elapsed = (datetime.now(timezone.utc) - last_sent).total_seconds()
+        elapsed = (datetime.now(UTC) - last_sent).total_seconds()
         return elapsed < self.suppression_window_seconds
 
-    async def _send_to_channel(
-        self, channel: AlertChannel, url: str, alert: Alert
-    ):
+    async def _send_to_channel(self, channel: AlertChannel, url: str, alert: Alert) -> None:
         """Send alert to a specific channel."""
         try:
             async with httpx.AsyncClient(timeout=10.0) as client:
@@ -112,7 +108,7 @@ class AlertManager:
         except Exception as e:
             logger.error(f"Failed to send alert to {channel.value}: {e}")
 
-    async def _send_slack(self, client: httpx.AsyncClient, url: str, alert: Alert):
+    async def _send_slack(self, client: httpx.AsyncClient, url: str, alert: Alert) -> None:
         """Send alert to Slack."""
         color = {
             AlertSeverity.INFO: "#36a64f",
@@ -120,7 +116,7 @@ class AlertManager:
             AlertSeverity.CRITICAL: "#ff0000",
         }.get(alert.severity, "#808080")
 
-        payload = {
+        payload: dict[str, Any] = {
             "attachments": [
                 {
                     "color": color,
@@ -128,17 +124,17 @@ class AlertManager:
                     "text": alert.message,
                     "fields": [
                         {"title": k, "value": str(v), "short": True}
-                        for k, v in alert.details.items()
+                        for k, v in (alert.details or {}).items()
                     ],
                     "footer": "AFL Orchestrator",
-                    "ts": int(alert.timestamp.timestamp()),
+                    "ts": int(alert.timestamp.timestamp()) if alert.timestamp else 0,
                 }
             ]
         }
 
         await client.post(url, json=payload)
 
-    async def _send_email(self, client: httpx.AsyncClient, url: str, alert: Alert):
+    async def _send_email(self, client: httpx.AsyncClient, url: str, alert: Alert) -> None:
         """Send alert via email (via webhook)."""
         payload = {
             "to": url,
@@ -147,18 +143,18 @@ class AlertManager:
         }
         await client.post(url, json=payload)
 
-    async def _send_webhook(self, client: httpx.AsyncClient, url: str, alert: Alert):
+    async def _send_webhook(self, client: httpx.AsyncClient, url: str, alert: Alert) -> None:
         """Send alert to generic webhook."""
         payload = {
             "alert": alert.name,
             "severity": alert.severity.value,
             "message": alert.message,
             "details": alert.details,
-            "timestamp": alert.timestamp.isoformat(),
+            "timestamp": alert.timestamp.isoformat() if alert.timestamp else None,
         }
         await client.post(url, json=payload)
 
-    async def _send_pagerduty(self, client: httpx.AsyncClient, url: str, alert: Alert):
+    async def _send_pagerduty(self, client: httpx.AsyncClient, url: str, alert: Alert) -> None:
         """Send alert to PagerDuty."""
         severity_map = {
             AlertSeverity.INFO: "info",
@@ -187,7 +183,8 @@ alert_manager = AlertManager()
 # Predefined Alerts
 # ============================================
 
-async def alert_budget_exceeded(project_id: str, usage_pct: float):
+
+async def alert_budget_exceeded(project_id: str, usage_pct: float) -> None:
     """Alert when budget exceeds threshold."""
     await alert_manager.send_alert(
         Alert(
@@ -199,7 +196,7 @@ async def alert_budget_exceeded(project_id: str, usage_pct: float):
     )
 
 
-async def alert_workflow_failed(workflow_id: str, error: str):
+async def alert_workflow_failed(workflow_id: str, error: str) -> None:
     """Alert when workflow fails."""
     await alert_manager.send_alert(
         Alert(
@@ -211,7 +208,7 @@ async def alert_workflow_failed(workflow_id: str, error: str):
     )
 
 
-async def alert_error_rate_high(component: str, rate: float):
+async def alert_error_rate_high(component: str, rate: float) -> None:
     """Alert when error rate exceeds threshold."""
     await alert_manager.send_alert(
         Alert(
@@ -223,7 +220,7 @@ async def alert_error_rate_high(component: str, rate: float):
     )
 
 
-async def alert_sla_breach(endpoint: str, latency_ms: float, sla_ms: float):
+async def alert_sla_breach(endpoint: str, latency_ms: float, sla_ms: float) -> None:
     """Alert when SLA is breached."""
     await alert_manager.send_alert(
         Alert(
