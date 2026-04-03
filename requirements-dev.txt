@@ -1,0 +1,32 @@
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+pytest-xdist>=3.5.0
+httpx>=0.26.0
+factory-boy>=3.3.0
+faker>=22.0.0
+
+# Linting & Formatting
+black>=24.1.0
+isort>=5.13.0
+ruff>=0.1.14
+mypy>=1.8.0
+bandit>=1.7.7
+sqlfluff>=2.3.5
+
+# Type stubs
+types-requests>=2.31.0
+types-PyYAML>=6.0.0
+types-redis>=4.6.0
+types-passlib>=1.7.0
+
+# Pre-commit
+pre-commit>=3.6.0
+detect-secrets>=1.5.0
+
+# Development tools
+ipython>=8.20.0
+ipdb>=0.13.13
+watchdog>=3.0.0
