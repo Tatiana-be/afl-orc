@@ -10,7 +10,9 @@
       "Bash(ruff *)",
       "Bash(pip install *)",
       "Bash(isort *)",
-      "Bash(pytest *)"
+      "Bash(pytest *)",
+      "Bash(mkdir *)",
+      "Bash(touch *)"
     ]
   },
   "$version": 3
