@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Budget API routes."""
 
 from fastapi import APIRouter

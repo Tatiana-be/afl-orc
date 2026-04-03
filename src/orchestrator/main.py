@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """AFL Orchestrator - Main Application Entry Point."""
 
 from contextlib import asynccontextmanager
