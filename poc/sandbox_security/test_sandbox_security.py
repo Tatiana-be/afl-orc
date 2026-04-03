@@ -11,10 +11,8 @@ Validates:
 import asyncio
 import os
 import tempfile
-import subprocess
 import time
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -97,7 +95,8 @@ class CodeSandbox:
         for cmd in self.config.blocked_commands:
             # Use word boundary matching to avoid false positives
             import re
-            pattern = r'\b' + re.escape(cmd) + r'\b'
+
+            pattern = r"\b" + re.escape(cmd) + r"\b"
             if re.search(pattern, code):
                 found.append(cmd)
         return found
@@ -156,7 +155,8 @@ exec(open('{code_file}').read())
                 env["https_proxy"] = ""
 
             process = await asyncio.create_subprocess_exec(
-                "python3", wrapper_file,
+                "python3",
+                wrapper_file,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
                 env=env,
@@ -222,7 +222,7 @@ ESCAPE_ATTEMPTS = [
     # Eval escape
     {
         "name": "Eval malicious code",
-        "code": "eval('__import__(\"os\").system(\"ls /\")')",
+        "code": 'eval(\'__import__("os").system("ls /")\')',
         "should_block": True,
     },
     # Network escape
@@ -304,7 +304,7 @@ async def test_sandbox_security():
 
         assert blocked_count == total_escape_attempts, "All escape attempts should be blocked"
         assert false_positive_count == 0, "No false positives allowed"
-        print(f"  ✅ All escape attempts blocked, no false positives")
+        print("  ✅ All escape attempts blocked, no false positives")
 
         # Test 2: Resource limits
         print("\n[Test 2] Resource Limit Enforcement")
@@ -346,7 +346,7 @@ async def test_sandbox_security():
             assert result.success
             assert str(i) in result.output
 
-        print(f"  ✅ 10 isolated executions completed")
+        print("  ✅ 10 isolated executions completed")
 
         # Test 5: Cleanup verification
         print("\n[Test 5] Sandbox Cleanup")
@@ -354,7 +354,7 @@ async def test_sandbox_security():
         work_dir = sandbox.work_dir
         sandbox.cleanup()
         assert not os.path.exists(work_dir), "Work directory should be cleaned up"
-        print(f"  ✅ Sandbox cleaned up successfully")
+        print("  ✅ Sandbox cleaned up successfully")
 
     finally:
         sandbox.cleanup()

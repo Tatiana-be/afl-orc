@@ -17,8 +17,10 @@ repos:
       - id: check-symlinks
       - id: destroyed-symlinks
       - id: detect-private-key
+        exclude: ^poc/
       - id: detect-aws-credentials
         args: ["--allow-missing-credentials"]
+        exclude: ^poc/
       - id: fix-byte-order-marker
       - id: mixed-line-ending
         args: ["--fix=lf"]
@@ -47,7 +49,9 @@ repos:
     hooks:
       - id: ruff
         args: ["--fix", "--exit-non-zero-on-fix", "--line-length", "100"]
+        exclude: ^poc/
       - id: ruff-format
+        exclude: ^poc/
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
@@ -59,8 +63,13 @@ repos:
           - types-requests
           - types-PyYAML
           - types-redis
-        args: ["--ignore-missing-imports", "--strict-optional", "--explicit-package-bases"]
-        exclude: ^tests/
+        args:
+          [
+            "--ignore-missing-imports",
+            "--strict-optional",
+            "--explicit-package-bases",
+          ]
+        exclude: ^(tests/|poc/)
 
   # Security hooks
   - repo: https://github.com/PyCQA/bandit
@@ -68,7 +77,7 @@ repos:
     hooks:
       - id: bandit
         args: ["-r", "-ll", "-ii"]
-        exclude: ^tests/
+        exclude: ^(tests/|poc/)
 
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0

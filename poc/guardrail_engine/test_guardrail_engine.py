@@ -8,9 +8,9 @@ Validates:
 """
 
 import asyncio
+import random
 import re
 import time
-import random
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
@@ -284,7 +284,9 @@ async def test_guardrail_engine():
         print(f"    FP rate: {fp_rate:.2%} (target: <5%)")
         print(f"    FN rate: {fn_rate:.2%} (target: <1%)")
         print(f"    Avg latency: {avg_latency:.2f}ms (target: <100ms)")
-        print(f"    TP: {true_positives}, FP: {false_positives}, TN: {true_negatives}, FN: {false_negatives}")
+        print(
+            f"    TP: {true_positives}, FP: {false_positives}, TN: {true_negatives}, FN: {false_negatives}"
+        )
 
     # Test 2: Combined chain
     print("\n[Test 2] Combined Guardrail Chain")
@@ -324,18 +326,20 @@ async def test_guardrail_engine():
     fn_rate = false_negatives / total_actual if total_actual > 0 else 0
     avg_latency = total_latency / len(dataset)
 
-    print(f"\n  Combined Chain:")
+    print("\n  Combined Chain:")
     print(f"    FP rate: {fp_rate:.2%} (target: <5%)")
     print(f"    FN rate: {fn_rate:.2%} (target: <1%)")
     print(f"    Avg latency: {avg_latency:.2f}ms (target: <100ms)")
-    print(f"    TP: {true_positives}, FP: {false_positives}, TN: {true_negatives}, FN: {false_negatives}")
+    print(
+        f"    TP: {true_positives}, FP: {false_positives}, TN: {true_negatives}, FN: {false_negatives}"
+    )
 
     # Assertions
     assert fp_rate < 0.05, f"FP rate {fp_rate:.2%} exceeds 5% target"
     assert fn_rate < 0.01, f"FN rate {fn_rate:.2%} exceeds 1% target"
     assert avg_latency < 100, f"Latency {avg_latency:.2f}ms exceeds 100ms target"
 
-    print(f"\n  ✅ All targets met!")
+    print("\n  ✅ All targets met!")
 
     # Test 3: Borderline analysis
     print("\n[Test 3] Borderline Content Analysis")
@@ -350,7 +354,7 @@ async def test_guardrail_engine():
 
     borderline_fp_rate = borderline_fp / len(borderline) if borderline else 0
     print(f"\n  Borderline FP rate: {borderline_fp_rate:.2%}")
-    print(f"  ✅ Borderline handling acceptable")
+    print("  ✅ Borderline handling acceptable")
 
     print("\n" + "=" * 60)
     print("✅ PoC 3 PASSED: Guardrail Engine risks mitigated")
