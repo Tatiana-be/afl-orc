@@ -8,7 +8,6 @@ Validates:
 
 import asyncio
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -188,9 +187,7 @@ class ContextManager:
             "hybrid": HybridStrategy(window_size=10, summary_ratio=0.3),
         }
 
-    def compress(
-        self, messages: list[Message], strategy: str = "hybrid"
-    ) -> CompressionResult:
+    def compress(self, messages: list[Message], strategy: str = "hybrid") -> CompressionResult:
         if strategy not in self.strategies:
             raise ValueError(f"Unknown strategy: {strategy}")
         return self.strategies[strategy].compress(messages, self.max_tokens)
@@ -233,7 +230,7 @@ async def test_context_manager():
     print(f"  Ratio: {result.compression_ratio:.2%}")
     print(f"  Information loss: {result.information_loss:.2%}")
     assert result.compressed_tokens <= manager.max_tokens or result.compression_ratio < 1.0
-    print(f"  ✅ Sliding window works")
+    print("  ✅ Sliding window works")
 
     # Test 2: Summarization
     print("\n[Test 2] Summarization Strategy")
@@ -243,7 +240,7 @@ async def test_context_manager():
     print(f"  Ratio: {result.compression_ratio:.2%}")
     print(f"  Information loss: {result.information_loss:.2%}")
     assert result.information_loss < 0.15, "Loss should be < 15%"
-    print(f"  ✅ Summarization loss within bounds")
+    print("  ✅ Summarization loss within bounds")
 
     # Test 3: Hybrid
     print("\n[Test 3] Hybrid Strategy")
@@ -255,8 +252,10 @@ async def test_context_manager():
     print(f"  Ratio: {result.compression_ratio:.2%}")
     print(f"  Information loss: {result.information_loss:.2%}")
     # With large max_tokens, hybrid should keep most content
-    assert result.information_loss < 0.10, f"Hybrid loss should be < 10%, got {result.information_loss:.2%}"
-    print(f"  ✅ Hybrid strategy optimal")
+    assert (
+        result.information_loss < 0.10
+    ), f"Hybrid loss should be < 10%, got {result.information_loss:.2%}"
+    print("  ✅ Hybrid strategy optimal")
 
     # Test 4: Comparison
     print("\n[Test 4] Strategy Comparison")
@@ -274,19 +273,21 @@ async def test_context_manager():
     for strategy in strategies:
         r = tight_manager.compress(messages, strategy)
         tight_results[strategy] = r
-        print(f"  {strategy:20s} (tight): ratio={r.compression_ratio:.2%}, loss={r.information_loss:.2%}")
+        print(
+            f"  {strategy:20s} (tight): ratio={r.compression_ratio:.2%}, loss={r.information_loss:.2%}"
+        )
 
     # With tight limits, hybrid should use summarization for old messages
-    print(f"  ✅ Strategy comparison complete")
+    print("  ✅ Strategy comparison complete")
 
     # Test 5: Token limit enforcement
     print("\n[Test 5] Token Limit Enforcement")
     small_manager = ContextManager(max_tokens=1000)
     result = small_manager.compress(messages, "hybrid")
-    print(f"  Max tokens: 1000")
+    print("  Max tokens: 1000")
     print(f"  Compressed: {result.compressed_tokens} tokens")
     # Note: May exceed if messages can't be compressed enough
-    print(f"  ✅ Compression applied")
+    print("  ✅ Compression applied")
 
     print("\n" + "=" * 60)
     print("✅ PoC 2 PASSED: Context Manager risks mitigated")

@@ -13,7 +13,6 @@ import re
 import time
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 
 
 class GuardrailAction(Enum):
@@ -28,7 +27,7 @@ class GuardrailResult:
     passed: bool
     action: GuardrailAction
     message: str = ""
-    modified_content: Optional[str] = None
+    modified_content: str | None = None
     latency_ms: float = 0.0
 
 

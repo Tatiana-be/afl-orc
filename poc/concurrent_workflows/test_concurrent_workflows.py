@@ -12,7 +12,6 @@ import random
 import time
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 
 
 class WorkflowStatus(Enum):
@@ -27,9 +26,9 @@ class WorkflowTask:
     id: str
     steps: int
     status: WorkflowStatus = WorkflowStatus.PENDING
-    started_at: Optional[float] = None
-    completed_at: Optional[float] = None
-    error: Optional[str] = None
+    started_at: float | None = None
+    completed_at: float | None = None
+    error: str | None = None
 
 
 class ConcurrentWorkflowEngine:
