@@ -152,7 +152,7 @@ jobs:
           5s --health-retries 5
 
       minio:
-        image: minio/minio:latest
+        image: minio/minio:RELEASE.2024-01-01T16-33-00Z
         env:
           MINIO_ROOT_USER: minioadmin
           MINIO_ROOT_PASSWORD: minioadmin
