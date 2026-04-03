@@ -88,7 +88,7 @@ repos:
 
   # SQL hooks
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 2.3.5
+    rev: 3.3.0
     hooks:
       - id: sqlfluff-lint
         args: ["--dialect", "postgres"]
