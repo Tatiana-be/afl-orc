@@ -283,7 +283,7 @@ jobs:
       - name: Test Docker image
         if: github.event_name == 'pull_request'
         run: |
-          docker run --rm afl-orchestrator:${{ github.sha }} python --version
+          docker run --rm ghcr.io/${{ github.repository }}:${{ github.sha }} python --version
 
   # ============================================
   # Deploy to Staging (on develop branch)
