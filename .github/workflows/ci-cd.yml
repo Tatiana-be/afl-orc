@@ -170,19 +170,10 @@ jobs:
       - name: Run integration tests
         run: |
           pytest tests/integration/ \
-            --cov=src \
-            --cov-report=xml \
-            --cov-append \
+            --no-cov \
             --junitxml=junit-integration.xml \
             -v \
             -m "not slow and not llm"
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.xml
-          flags: integration
-          name: codecov-integration
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
