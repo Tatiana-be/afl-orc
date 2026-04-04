@@ -1,8 +1,6 @@
 # AFL Orchestrator: Полная Спецификация API
 
-**Версия**: 1.0  
-**Дата**: 2026-03-31  
-**Статус**: Approved for Development  
+**Версия**: 1.0 **Дата**: 2026-03-31 **Статус**: Approved for Development
 **Автор**: Backend Lead & API Architect
 
 ---
@@ -11,42 +9,42 @@
 
 ### 1.1 Архитектурный стиль
 
-| Аспект | Решение |
-|--------|---------|
-| **Стиль** | RESTful + WebSocket (real-time) |
-| **Версионирование** | URL Path: `/api/v1/`, `/api/v2/` |
-| **Формат данных** | JSON (UTF-8) |
-| **Аутентификация** | Bearer Token (JWT) |
-| **Пагинация** | Cursor-based для списков >100 элементов |
-| **Кодировка** | UTF-8 |
-| **Время** | ISO 8601 (UTC) |
+| Аспект              | Решение                                 |
+| ------------------- | --------------------------------------- |
+| **Стиль**           | RESTful + WebSocket (real-time)         |
+| **Версионирование** | URL Path: `/api/v1/`, `/api/v2/`        |
+| **Формат данных**   | JSON (UTF-8)                            |
+| **Аутентификация**  | Bearer Token (JWT)                      |
+| **Пагинация**       | Cursor-based для списков >100 элементов |
+| **Кодировка**       | UTF-8                                   |
+| **Время**           | ISO 8601 (UTC)                          |
 
 ### 1.2 Базовые URL
 
-| Окружение | URL |
-|-----------|-----|
-| **Development** | `https://dev-api.afl-orchestrator.local/api/v1` |
-| **Staging** | `https://staging-api.afl-orchestrator.com/api/v1` |
-| **Production** | `https://api.afl-orchestrator.com/api/v1` |
-| **WebSocket** | `wss://api.afl-orchestrator.com/api/v1/ws` |
+| Окружение       | URL                                               |
+| --------------- | ------------------------------------------------- |
+| **Development** | `https://dev-api.afl-orchestrator.local/api/v1`   |
+| **Staging**     | `https://staging-api.afl-orchestrator.com/api/v1` |
+| **Production**  | `https://api.afl-orchestrator.com/api/v1`         |
+| **WebSocket**   | `wss://api.afl-orchestrator.com/api/v1/ws`        |
 
 ### 1.3 Стандартные HTTP коды
 
-| Код | Значение | Когда используется |
-|-----|----------|-------------------|
-| 200 | OK | Успешный GET, PUT, PATCH |
-| 201 | Created | Успешный POST (создание ресурса) |
-| 202 | Accepted | Асинхронная операция принята |
-| 204 | No Content | Успешное удаление |
-| 400 | Bad Request | Неверный формат запроса |
-| 401 | Unauthorized | Отсутствует или неверный токен |
-| 403 | Forbidden | Недостаточно прав |
-| 404 | Not Found | Ресурс не найден |
-| 409 | Conflict | Конфликт состояния |
-| 422 | Unprocessable Entity | Ошибка валидации |
-| 429 | Too Many Requests | Превышен rate limit |
-| 500 | Internal Server Error | Внутренняя ошибка сервера |
-| 503 | Service Unavailable | Сервис недоступен |
+| Код | Значение              | Когда используется               |
+| --- | --------------------- | -------------------------------- |
+| 200 | OK                    | Успешный GET, PUT, PATCH         |
+| 201 | Created               | Успешный POST (создание ресурса) |
+| 202 | Accepted              | Асинхронная операция принята     |
+| 204 | No Content            | Успешное удаление                |
+| 400 | Bad Request           | Неверный формат запроса          |
+| 401 | Unauthorized          | Отсутствует или неверный токен   |
+| 403 | Forbidden             | Недостаточно прав                |
+| 404 | Not Found             | Ресурс не найден                 |
+| 409 | Conflict              | Конфликт состояния               |
+| 422 | Unprocessable Entity  | Ошибка валидации                 |
+| 429 | Too Many Requests     | Превышен rate limit              |
+| 500 | Internal Server Error | Внутренняя ошибка сервера        |
+| 503 | Service Unavailable   | Сервис недоступен                |
 
 ### 1.4 Формат ошибок
 
@@ -68,6 +66,7 @@
 **Запрос:** `GET /api/v1/workflows?cursor=eyJpZCI6MTAwfQ&limit=20`
 
 **Ответ:**
+
 ```json
 {
   "data": [...],
@@ -83,13 +82,14 @@
 
 ### 1.6 Rate Limiting
 
-| Tier | Requests/мин | Requests/час | Burst |
-|------|--------------|--------------|-------|
-| **Free** | 30 | 500 | 10 |
-| **Pro** | 100 | 5000 | 30 |
-| **Enterprise** | 500 | 50000 | 100 |
+| Tier           | Requests/мин | Requests/час | Burst |
+| -------------- | ------------ | ------------ | ----- |
+| **Free**       | 30           | 500          | 10    |
+| **Pro**        | 100          | 5000         | 30    |
+| **Enterprise** | 500          | 50000        | 100   |
 
-**Headers:** `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, `Retry-After`
+**Headers:** `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`,
+`Retry-After`
 
 ---
 
@@ -97,15 +97,15 @@
 
 ### 2.1 Управление Проектами (Projects)
 
-| Endpoint | Method | MVP | Описание |
-|----------|--------|-----|----------|
-| `/projects` | POST | ✅ | Создание проекта |
-| `/projects` | GET | ✅ | Список проектов |
-| `/projects/{id}` | GET | ✅ | Детали проекта |
-| `/projects/{id}` | PUT | ✅ | Обновление проекта |
-| `/projects/{id}` | DELETE | ✅ | Удаление проекта |
-| `/projects/{id}/settings` | GET/PUT | 🟡 | Настройки проекта |
-| `/projects/{id}/members` | GET/POST | 🟡 | Участники проекта |
+| Endpoint                  | Method   | MVP | Описание           |
+| ------------------------- | -------- | --- | ------------------ |
+| `/projects`               | POST     | ✅  | Создание проекта   |
+| `/projects`               | GET      | ✅  | Список проектов    |
+| `/projects/{id}`          | GET      | ✅  | Детали проекта     |
+| `/projects/{id}`          | PUT      | ✅  | Обновление проекта |
+| `/projects/{id}`          | DELETE   | ✅  | Удаление проекта   |
+| `/projects/{id}/settings` | GET/PUT  | 🟡  | Настройки проекта  |
+| `/projects/{id}/members`  | GET/POST | 🟡  | Участники проекта  |
 
 #### POST /api/v1/projects
 
@@ -163,14 +163,14 @@ Response 200:
 
 ### 2.2 Управление Конфигами AFL (Configs)
 
-| Endpoint | Method | MVP | Описание |
-|----------|--------|-----|----------|
-| `/projects/{id}/configs` | POST | ✅ | Загрузка конфига |
-| `/projects/{id}/configs` | GET | ✅ | Список версий |
-| `/projects/{id}/configs/{version}` | GET | ✅ | Получение версии |
-| `/projects/{id}/configs/validate` | POST | ✅ | Валидация конфига |
-| `/projects/{id}/configs/{v1}/diff/{v2}` | GET | 🟡 | Сравнение версий |
-| `/projects/{id}/configs/latest` | GET | ✅ | Последняя версия |
+| Endpoint                                | Method | MVP | Описание          |
+| --------------------------------------- | ------ | --- | ----------------- |
+| `/projects/{id}/configs`                | POST   | ✅  | Загрузка конфига  |
+| `/projects/{id}/configs`                | GET    | ✅  | Список версий     |
+| `/projects/{id}/configs/{version}`      | GET    | ✅  | Получение версии  |
+| `/projects/{id}/configs/validate`       | POST   | ✅  | Валидация конфига |
+| `/projects/{id}/configs/{v1}/diff/{v2}` | GET    | 🟡  | Сравнение версий  |
+| `/projects/{id}/configs/latest`         | GET    | ✅  | Последняя версия  |
 
 #### POST /api/v1/projects/{id}/configs
 
@@ -186,7 +186,8 @@ Request Body:
   properties:
     content: { type: string, description: "YAML или JSON контент" }
     format: { type: string, enum: [yaml, json], default: "yaml" }
-    version: { type: string, description: "Semver, автогенерация если не указано" }
+    version:
+      { type: string, description: "Semver, автогенерация если не указано" }
     changelog: { type: string, maxLength: 500 }
 
 Response 201:
@@ -229,17 +230,17 @@ Response 200:
 
 ### 2.3 Управление Workflow (Workflows)
 
-| Endpoint | Method | MVP | Описание |
-|----------|--------|-----|----------|
-| `/workflows` | POST | ✅ | Запуск workflow |
-| `/workflows` | GET | ✅ | Список workflow |
-| `/workflows/{id}` | GET | ✅ | Статус workflow |
-| `/workflows/{id}` | DELETE | ✅ | Отмена workflow |
-| `/workflows/{id}/pause` | POST | ✅ | Приостановка |
-| `/workflows/{id}/resume` | POST | ✅ | Возобновление |
-| `/workflows/{id}/retry` | POST | ✅ | Повтор failed шага |
-| `/workflows/{id}/steps` | GET | ✅ | Список шагов |
-| `/workflows/{id}/artifacts` | GET | ✅ | Артефакты workflow |
+| Endpoint                    | Method | MVP | Описание           |
+| --------------------------- | ------ | --- | ------------------ |
+| `/workflows`                | POST   | ✅  | Запуск workflow    |
+| `/workflows`                | GET    | ✅  | Список workflow    |
+| `/workflows/{id}`           | GET    | ✅  | Статус workflow    |
+| `/workflows/{id}`           | DELETE | ✅  | Отмена workflow    |
+| `/workflows/{id}/pause`     | POST   | ✅  | Приостановка       |
+| `/workflows/{id}/resume`    | POST   | ✅  | Возобновление      |
+| `/workflows/{id}/retry`     | POST   | ✅  | Повтор failed шага |
+| `/workflows/{id}/steps`     | GET    | ✅  | Список шагов       |
+| `/workflows/{id}/artifacts` | GET    | ✅  | Артефакты workflow |
 
 #### POST /api/v1/workflows
 
@@ -257,7 +258,8 @@ Request Body:
     project_id: { type: string, format: uuid }
     config_version: { type: string }
     parameters: { type: object }
-    priority: { type: string, enum: [low, normal, high, critical], default: "normal" }
+    priority:
+      { type: string, enum: [low, normal, high, critical], default: "normal" }
     webhook_url: { type: string, format: uri }
     metadata: { type: object }
 
@@ -321,7 +323,11 @@ Response 200:
     workflow_id: { type: string }
     project_id: { type: string }
     config_version: { type: string }
-    status: { type: string, enum: [queued, running, paused, completed, failed, cancelled] }
+    status:
+      {
+        type: string,
+        enum: [queued, running, paused, completed, failed, cancelled],
+      }
     progress: { type: number, min: 0, max: 1 }
     current_step: { type: string, nullable: true }
     total_steps: { type: integer }
@@ -440,15 +446,15 @@ Response 204: No Content
 
 ### 2.4 Управление Агентами (Agents)
 
-| Endpoint | Method | MVP | Описание |
-|----------|--------|-----|----------|
-| `/agents` | GET | ✅ | Список активных агентов |
-| `/agents/{id}` | GET | ✅ | Детали агента |
-| `/agents/{id}/logs` | GET | ✅ | Логи агента |
-| `/agents/{id}/history` | GET | ✅ | История действий |
-| `/agents/{id}/restart` | POST | 🟡 | Перезапуск агента |
-| `/agents/pool/stats` | GET | ✅ | Статистика пула |
-| `/agents/types` | GET | ✅ | Типы агентов |
+| Endpoint               | Method | MVP | Описание                |
+| ---------------------- | ------ | --- | ----------------------- |
+| `/agents`              | GET    | ✅  | Список активных агентов |
+| `/agents/{id}`         | GET    | ✅  | Детали агента           |
+| `/agents/{id}/logs`    | GET    | ✅  | Логи агента             |
+| `/agents/{id}/history` | GET    | ✅  | История действий        |
+| `/agents/{id}/restart` | POST   | 🟡  | Перезапуск агента       |
+| `/agents/pool/stats`   | GET    | ✅  | Статистика пула         |
+| `/agents/types`        | GET    | ✅  | Типы агентов            |
 
 #### GET /api/v1/agents
 
@@ -536,13 +542,13 @@ Response 200:
 
 ### 2.5 Артефакты (Artifacts)
 
-| Endpoint | Method | MVP | Описание |
-|----------|--------|-----|----------|
-| `/workflows/{id}/artifacts` | GET | ✅ | Список артефактов |
-| `/artifacts/{id}` | GET | ✅ | Детали артефакта |
-| `/artifacts/{id}/download` | GET | ✅ | Скачивание артефакта |
-| `/artifacts/{id}/versions` | GET | 🟡 | Версии артефакта |
-| `/artifacts/{id}/permissions` | GET/PUT | 🟡 | Доступ к артефакту |
+| Endpoint                      | Method  | MVP | Описание             |
+| ----------------------------- | ------- | --- | -------------------- |
+| `/workflows/{id}/artifacts`   | GET     | ✅  | Список артефактов    |
+| `/artifacts/{id}`             | GET     | ✅  | Детали артефакта     |
+| `/artifacts/{id}/download`    | GET     | ✅  | Скачивание артефакта |
+| `/artifacts/{id}/versions`    | GET     | 🟡  | Версии артефакта     |
+| `/artifacts/{id}/permissions` | GET/PUT | 🟡  | Доступ к артефакту   |
 
 #### GET /api/v1/workflows/{id}/artifacts
 
@@ -589,15 +595,15 @@ Response 200:
 
 ### 2.6 Бюджет и Метрики (Budget & Metrics)
 
-| Endpoint | Method | MVP | Описание |
-|----------|--------|-----|----------|
-| `/projects/{id}/budget` | GET | ✅ | Текущий бюджет |
-| `/projects/{id}/budget` | PUT | ✅ | Обновление лимитов |
-| `/projects/{id}/metrics/tokens` | GET | ✅ | Расход токенов |
-| `/projects/{id}/metrics/cost` | GET | ✅ | Затраты USD |
-| `/projects/{id}/metrics/usage` | GET | ✅ | Детальное использование |
-| `/projects/{id}/metrics/export` | GET | 🟡 | Экспорт отчёта |
-| `/budget/alerts` | GET/POST | ✅ | Управление алертами |
+| Endpoint                        | Method   | MVP | Описание                |
+| ------------------------------- | -------- | --- | ----------------------- |
+| `/projects/{id}/budget`         | GET      | ✅  | Текущий бюджет          |
+| `/projects/{id}/budget`         | PUT      | ✅  | Обновление лимитов      |
+| `/projects/{id}/metrics/tokens` | GET      | ✅  | Расход токенов          |
+| `/projects/{id}/metrics/cost`   | GET      | ✅  | Затраты USD             |
+| `/projects/{id}/metrics/usage`  | GET      | ✅  | Детальное использование |
+| `/projects/{id}/metrics/export` | GET      | 🟡  | Экспорт отчёта          |
+| `/budget/alerts`                | GET/POST | ✅  | Управление алертами     |
 
 #### GET /api/v1/projects/{id}/budget
 
@@ -661,7 +667,8 @@ Request Body:
     project_id: { type: string }
     alert_type: { type: string, enum: [percentage, absolute, forecast] }
     threshold: { type: number }
-    notification_channels: { type: array, items: { enum: [email, slack, webhook] } }
+    notification_channels:
+      { type: array, items: { enum: [email, slack, webhook] } }
     webhook_url: { type: string, format: uri }
     enabled: { type: boolean, default: true }
     message_template: { type: string, maxLength: 500 }
@@ -682,14 +689,14 @@ Response 201:
 
 ### 2.7 События и Уведомления (Events & Webhooks)
 
-| Endpoint | Method | MVP | Описание |
-|----------|--------|-----|----------|
-| `/events` | GET | ✅ | Список событий |
-| `/webhooks` | GET/POST | ✅ | Управление webhook |
-| `/webhooks/{id}` | GET/PUT/DELETE | ✅ | Webhook детали |
-| `/webhooks/{id}/test` | POST | ✅ | Тест webhook |
-| `/webhooks/{id}/deliveries` | GET | ✅ | История доставок |
-| `/webhooks/{id}/deliveries/{id}/retry` | POST | ✅ | Повтор доставки |
+| Endpoint                               | Method         | MVP | Описание           |
+| -------------------------------------- | -------------- | --- | ------------------ |
+| `/events`                              | GET            | ✅  | Список событий     |
+| `/webhooks`                            | GET/POST       | ✅  | Управление webhook |
+| `/webhooks/{id}`                       | GET/PUT/DELETE | ✅  | Webhook детали     |
+| `/webhooks/{id}/test`                  | POST           | ✅  | Тест webhook       |
+| `/webhooks/{id}/deliveries`            | GET            | ✅  | История доставок   |
+| `/webhooks/{id}/deliveries/{id}/retry` | POST           | ✅  | Повтор доставки    |
 
 #### GET /api/v1/events
 
@@ -714,7 +721,10 @@ Response 200:
           example: { type: object }
 
 Available Events:
-  Workflow: workflow.started, workflow.completed, workflow.failed, workflow.paused, workflow.resumed, workflow.cancelled, workflow.step_completed, workflow.step_failed
+  Workflow:
+    workflow.started, workflow.completed, workflow.failed, workflow.paused,
+    workflow.resumed, workflow.cancelled, workflow.step_completed,
+    workflow.step_failed
   Budget: budget.warning, budget.exceeded, budget.updated
   Agent: agent.created, agent.destroyed, agent.error, agent.idle, agent.busy
   Config: config.created, config.updated, config.validated
@@ -787,15 +797,15 @@ Response 200:
 
 ### 2.8 Администрирование (Admin)
 
-| Endpoint | Method | MVP | Описание |
-|----------|--------|-----|----------|
-| `/admin/users` | GET | 🟡 | Список пользователей |
-| `/admin/users/{id}` | GET | 🟡 | Детали пользователя |
-| `/admin/users/{id}/roles` | PUT | 🟡 | Обновление роли |
-| `/admin/audit-logs` | GET | ✅ | Аудит действий |
-| `/admin/system/health` | GET | ✅ | Health check |
-| `/admin/system/config` | GET | 🟡 | Системная конфигурация |
-| `/admin/rate-limits` | GET | 🟡 | Статистика rate limits |
+| Endpoint                  | Method | MVP | Описание               |
+| ------------------------- | ------ | --- | ---------------------- |
+| `/admin/users`            | GET    | 🟡  | Список пользователей   |
+| `/admin/users/{id}`       | GET    | 🟡  | Детали пользователя    |
+| `/admin/users/{id}/roles` | PUT    | 🟡  | Обновление роли        |
+| `/admin/audit-logs`       | GET    | ✅  | Аудит действий         |
+| `/admin/system/health`    | GET    | ✅  | Health check           |
+| `/admin/system/config`    | GET    | 🟡  | Системная конфигурация |
+| `/admin/rate-limits`      | GET    | 🟡  | Статистика rate limits |
 
 #### GET /api/v1/admin/audit-logs
 
@@ -860,4 +870,5 @@ Response 200:
 
 ---
 
-**Продолжение в части 2: OpenAPI спецификация, схемы данных, обработка ошибок, WebSocket API, webhooks, безопасность**
+**Продолжение в части 2: OpenAPI спецификация, схемы данных, обработка ошибок,
+WebSocket API, webhooks, безопасность**

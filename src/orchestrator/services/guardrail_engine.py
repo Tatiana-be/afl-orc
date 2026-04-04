@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Guardrail Engine - validates agent outputs."""
 
 

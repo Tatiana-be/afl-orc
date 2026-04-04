@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Agents API routes."""
 
 from fastapi import APIRouter

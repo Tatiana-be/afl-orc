@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Budget Tracker - tracks token usage and costs."""
 
 

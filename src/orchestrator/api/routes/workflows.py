@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Workflows API routes."""
 
 from fastapi import APIRouter

@@ -8,10 +8,9 @@ Validates:
 """
 
 import asyncio
-import time
 import json
+import time
 from dataclasses import dataclass, field
-from typing import Optional
 from enum import Enum
 
 
@@ -36,10 +35,10 @@ class WorkflowStatus(Enum):
 class StepState:
     name: str
     status: StepStatus = StepStatus.PENDING
-    output: Optional[dict] = None
-    error: Optional[str] = None
-    started_at: Optional[float] = None
-    completed_at: Optional[float] = None
+    output: dict | None = None
+    error: str | None = None
+    started_at: float | None = None
+    completed_at: float | None = None
     retry_count: int = 0
 
 
@@ -49,8 +48,8 @@ class WorkflowState:
     status: WorkflowStatus = WorkflowStatus.PENDING
     steps: list[StepState] = field(default_factory=list)
     current_step: int = 0
-    started_at: Optional[float] = None
-    completed_at: Optional[float] = None
+    started_at: float | None = None
+    completed_at: float | None = None
     context: dict = field(default_factory=dict)
 
 
@@ -69,7 +68,7 @@ class MockStorage:
             raise ConnectionError("Storage unavailable")
         self.data[key] = json.dumps(value)
 
-    async def load(self, key: str) -> Optional[dict]:
+    async def load(self, key: str) -> dict | None:
         await asyncio.sleep(self.latency_ms / 1000)
         if key not in self.data:
             return None
@@ -111,7 +110,7 @@ class WorkflowEngine:
         }
         await self.storage.save(f"workflow:{workflow.id}", state_dict)
 
-    async def load_state(self, workflow_id: str) -> Optional[WorkflowState]:
+    async def load_state(self, workflow_id: str) -> WorkflowState | None:
         """Load persisted workflow state."""
         data = await self.storage.load(f"workflow:{workflow_id}")
         if not data:
@@ -268,7 +267,7 @@ async def test_workflow_recovery():
     assert loaded.status == WorkflowStatus.COMPLETED
     assert len(loaded.steps) == 5
     assert all(s.status == StepStatus.COMPLETED for s in loaded.steps)
-    print(f"  ✅ State persisted and loaded correctly")
+    print("  ✅ State persisted and loaded correctly")
     print(f"  Context preserved: {len(loaded.context)} entries")
 
     # Test 3: Recovery after failure
@@ -297,9 +296,7 @@ async def test_workflow_recovery():
     await engine.save_state(fail_workflow)
 
     # Count completed before recovery
-    completed_before = sum(
-        1 for s in fail_workflow.steps if s.status == StepStatus.COMPLETED
-    )
+    completed_before = sum(1 for s in fail_workflow.steps if s.status == StepStatus.COMPLETED)
     print(f"  Failed at step 3, {completed_before} steps completed")
 
     # Recover
@@ -319,12 +316,12 @@ async def test_workflow_recovery():
                 fail_workflow.steps[i].completed_at = time.time()
         fail_workflow.status = WorkflowStatus.COMPLETED
         await engine.save_state(fail_workflow)
-        print(f"  ✅ Manually completed workflow")
+        print("  ✅ Manually completed workflow")
 
-    assert fail_workflow.status == WorkflowStatus.COMPLETED, f"Expected COMPLETED, got {fail_workflow.status}"
-    completed_after = sum(
-        1 for s in fail_workflow.steps if s.status == StepStatus.COMPLETED
-    )
+    assert (
+        fail_workflow.status == WorkflowStatus.COMPLETED
+    ), f"Expected COMPLETED, got {fail_workflow.status}"
+    completed_after = sum(1 for s in fail_workflow.steps if s.status == StepStatus.COMPLETED)
     print(f"  ✅ Recovered: {completed_after}/{len(fail_workflow.steps)} steps completed")
 
     # Test 4: Recovery time measurement
@@ -359,11 +356,9 @@ async def test_workflow_recovery():
     assert recovered is not None
 
     # Verify all step outputs preserved
-    preserved_context = sum(
-        1 for k, v in recovered.context.items() if v is not None
-    )
+    preserved_context = sum(1 for k, v in recovered.context.items() if v is not None)
     print(f"  Context entries preserved: {preserved_context}")
-    print(f"  ✅ Data integrity maintained")
+    print("  ✅ Data integrity maintained")
 
     print("\n" + "=" * 60)
     print("✅ PoC 5 PASSED: Workflow Recovery risks mitigated")

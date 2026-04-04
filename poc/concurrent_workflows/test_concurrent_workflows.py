@@ -8,10 +8,9 @@ Validates:
 """
 
 import asyncio
-import time
 import random
-from dataclasses import dataclass, field
-from typing import Optional
+import time
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -27,9 +26,9 @@ class WorkflowTask:
     id: str
     steps: int
     status: WorkflowStatus = WorkflowStatus.PENDING
-    started_at: Optional[float] = None
-    completed_at: Optional[float] = None
-    error: Optional[str] = None
+    started_at: float | None = None
+    completed_at: float | None = None
+    error: str | None = None
 
 
 class ConcurrentWorkflowEngine:
@@ -113,10 +112,7 @@ async def test_concurrent_workflows():
     print("\n[Test 1] 50 Concurrent Workflows")
 
     engine = ConcurrentWorkflowEngine(max_concurrent=50)
-    workflows = [
-        WorkflowTask(id=f"wf-{i}", steps=5)
-        for i in range(50)
-    ]
+    workflows = [WorkflowTask(id=f"wf-{i}", steps=5) for i in range(50)]
 
     results = await engine.run_workflows(workflows)
 
@@ -128,16 +124,13 @@ async def test_concurrent_workflows():
     print(f"  Avg per workflow: {results['avg_time_per_workflow']:.2f}s")
 
     assert results["success_rate"] > 0.90, f"Success rate {results['success_rate']:.2%} below 90%"
-    print(f"  ✅ Success rate above 90%")
+    print("  ✅ Success rate above 90%")
 
     # Test 2: 100 concurrent workflows
     print("\n[Test 2] 100 Concurrent Workflows")
 
     engine2 = ConcurrentWorkflowEngine(max_concurrent=50)
-    workflows2 = [
-        WorkflowTask(id=f"wf2-{i}", steps=3)
-        for i in range(100)
-    ]
+    workflows2 = [WorkflowTask(id=f"wf2-{i}", steps=3) for i in range(100)]
 
     results2 = await engine2.run_workflows(workflows2)
 
@@ -148,7 +141,7 @@ async def test_concurrent_workflows():
     print(f"  Total time: {results2['total_time']:.2f}s")
 
     assert results2["success_rate"] > 0.90
-    print(f"  ✅ 100 workflows handled successfully")
+    print("  ✅ 100 workflows handled successfully")
 
     # Test 3: Resource contention
     print("\n[Test 3] Resource Contention Handling")
@@ -157,10 +150,7 @@ async def test_concurrent_workflows():
     batch_results = []
     for batch in range(5):
         engine_batch = ConcurrentWorkflowEngine(max_concurrent=20)
-        workflows_batch = [
-            WorkflowTask(id=f"batch{batch}-{i}", steps=2)
-            for i in range(20)
-        ]
+        workflows_batch = [WorkflowTask(id=f"batch{batch}-{i}", steps=2) for i in range(20)]
         result = await engine_batch.run_workflows(workflows_batch)
         batch_results.append(result["success_rate"])
 
@@ -169,7 +159,7 @@ async def test_concurrent_workflows():
     print(f"  Average: {avg_success_rate:.2%}")
 
     assert avg_success_rate > 0.90
-    print(f"  ✅ Consistent performance across batches")
+    print("  ✅ Consistent performance across batches")
 
     # Test 4: Concurrency limit enforcement
     print("\n[Test 4] Concurrency Limit Enforcement")
@@ -197,18 +187,15 @@ async def test_concurrent_workflows():
                 return True
 
     tracking_engine = TrackingEngine(max_concurrent=10)
-    tracking_workflows = [
-        WorkflowTask(id=f"track-{i}", steps=1)
-        for i in range(30)
-    ]
+    tracking_workflows = [WorkflowTask(id=f"track-{i}", steps=1) for i in range(30)]
 
     await tracking_engine.run_workflows(tracking_workflows)
 
     print(f"  Max concurrent observed: {max_observed_concurrent}")
-    print(f"  Limit configured: 10")
+    print("  Limit configured: 10")
 
     assert max_observed_concurrent <= 10, f"Concurrency limit exceeded: {max_observed_concurrent}"
-    print(f"  ✅ Concurrency limit enforced")
+    print("  ✅ Concurrency limit enforced")
 
     print("\n" + "=" * 60)
     print("✅ PoC 8 PASSED: Concurrent Workflow risks mitigated")

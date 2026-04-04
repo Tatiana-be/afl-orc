@@ -8,9 +8,9 @@ Validates:
 """
 
 import asyncio
-import time
 import random
-from dataclasses import dataclass, field
+import time
+from dataclasses import dataclass
 
 
 @dataclass
@@ -101,9 +101,7 @@ class MockDatabase:
         start = time.time()
         self.query_count += 1
 
-        results = [
-            w for w in self.workflows if w.status in ("running", "paused")
-        ]
+        results = [w for w in self.workflows if w.status in ("running", "paused")]
 
         latency = (time.time() - start) * 1000
         self.total_latency += latency
@@ -126,9 +124,7 @@ class MockDatabase:
         latency = (time.time() - start) * 1000
         self.total_latency += latency
 
-        return QueryResult(
-            rows=len(aggregation), latency_ms=latency, index_used=True
-        )
+        return QueryResult(rows=len(aggregation), latency_ms=latency, index_used=True)
 
     def get_stats(self) -> dict:
         """Get database statistics."""
@@ -158,7 +154,7 @@ async def test_db_scaling():
     print(f"  Inserted 10,000 workflows in {insert_time:.2f}s")
     print(f"  Rate: {10000 / insert_time:.0f} workflows/sec")
     assert insert_time < 5.0, f"Insert too slow: {insert_time:.2f}s"
-    print(f"  ✅ Insert performance acceptable")
+    print("  ✅ Insert performance acceptable")
 
     # Test 2: Query performance with indexes
     print("\n[Test 2] Query Performance with Indexes")
@@ -173,13 +169,15 @@ async def test_db_scaling():
     avg_latency = sum(latencies) / len(latencies)
     p95_latency = sorted(latencies)[int(len(latencies) * 0.95)]
 
-    print(f"  Project query (indexed):")
+    print("  Project query (indexed):")
     print(f"    Avg latency: {avg_latency:.2f}ms")
     print(f"    P95 latency: {p95_latency:.2f}ms")
-    print(f"    Avg rows: {db.workflows[0] and len([w for w in db.workflows if w.project_id == 1])}")
+    print(
+        f"    Avg rows: {db.workflows[0] and len([w for w in db.workflows if w.project_id == 1])}"
+    )
 
     assert avg_latency < 100, f"Avg latency {avg_latency:.2f}ms exceeds 100ms"
-    print(f"  ✅ Query performance within targets")
+    print("  ✅ Query performance within targets")
 
     # Test 3: Aggregation performance
     print("\n[Test 3] Aggregation Performance")
@@ -191,12 +189,12 @@ async def test_db_scaling():
         result = db.aggregate_by_project()
 
     avg_agg_latency = db.total_latency / db.query_count
-    print(f"  Aggregation (GROUP BY project):")
+    print("  Aggregation (GROUP BY project):")
     print(f"    Avg latency: {avg_agg_latency:.2f}ms")
     print(f"    Projects found: {result.rows}")
 
     assert avg_agg_latency < 200, f"Aggregation too slow: {avg_agg_latency:.2f}ms"
-    print(f"  ✅ Aggregation performance acceptable")
+    print("  ✅ Aggregation performance acceptable")
 
     # Test 4: Concurrent queries
     print("\n[Test 4] Concurrent Query Handling")
@@ -222,7 +220,7 @@ async def test_db_scaling():
 
     print(f"  500 concurrent queries in {concurrent_time:.2f}s")
     print(f"  Avg latency: {sum(all_latencies) / len(all_latencies):.2f}ms")
-    print(f"  ✅ Concurrent queries handled")
+    print("  ✅ Concurrent queries handled")
 
     # Test 5: Large dataset simulation
     print("\n[Test 5] Large Dataset Simulation")
@@ -243,7 +241,7 @@ async def test_db_scaling():
     query_time = (time.time() - start) * 1000
 
     print(f"  Active workflows query: {result.rows} rows in {query_time:.2f}ms")
-    print(f"  ✅ Large dataset queries work")
+    print("  ✅ Large dataset queries work")
 
     print("\n" + "=" * 60)
     print("✅ PoC 7 PASSED: Database Scaling risks mitigated")

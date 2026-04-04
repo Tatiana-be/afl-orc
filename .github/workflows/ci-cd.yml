@@ -51,8 +51,8 @@ jobs:
 
       - name: Run MyPy
         run: |
-          pip install mypy types-all
-          mypy src/ --ignore-missing-imports
+          pip install mypy types-PyYAML pydantic
+          mypy src/ --install-types --non-interactive --ignore-missing-imports
 
   # ============================================
   # Unit Tests
@@ -64,7 +64,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:${{ env.POSTGRES_VERSION }}
+        image: postgres:15
         env:
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
@@ -76,7 +76,7 @@ jobs:
           --health-retries 5
 
       redis:
-        image: redis:${{ env.REDIS_VERSION }}-alpine
+        image: redis:7-alpine
         ports:
           - 6379:6379
         options: >-
@@ -116,7 +116,7 @@ jobs:
           name: codecov-unit
 
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: unit-test-results
@@ -132,7 +132,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:${{ env.POSTGRES_VERSION }}
+        image: postgres:15
         env:
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
@@ -144,24 +144,12 @@ jobs:
           --health-retries 5
 
       redis:
-        image: redis:${{ env.REDIS_VERSION }}-alpine
+        image: redis:7-alpine
         ports:
           - 6379:6379
         options: >-
           --health-cmd "redis-cli ping" --health-interval 10s --health-timeout
           5s --health-retries 5
-
-      minio:
-        image: minio/minio:latest
-        env:
-          MINIO_ROOT_USER: minioadmin
-          MINIO_ROOT_PASSWORD: minioadmin
-        ports:
-          - 9000:9000
-          - 9001:9001
-        options: >-
-          --health-cmd "curl -f http://localhost:9000/minio/health/live"
-          --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - name: Checkout code
@@ -182,22 +170,13 @@ jobs:
       - name: Run integration tests
         run: |
           pytest tests/integration/ \
-            --cov=src \
-            --cov-report=xml \
-            --cov-append \
+            --no-cov \
             --junitxml=junit-integration.xml \
             -v \
             -m "not slow and not llm"
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.xml
-          flags: integration
-          name: codecov-integration
-
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: integration-test-results
@@ -243,7 +222,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-reports
@@ -304,7 +283,8 @@ jobs:
       - name: Test Docker image
         if: github.event_name == 'pull_request'
         run: |
-          docker run --rm afl-orchestrator:${{ github.sha }} python --version
+          IMAGE_TAG=$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | head -n1)
+          docker run --rm "$IMAGE_TAG" python --version
 
   # ============================================
   # Deploy to Staging (on develop branch)

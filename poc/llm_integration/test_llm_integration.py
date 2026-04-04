@@ -9,8 +9,7 @@ Validates:
 
 import asyncio
 import time
-from typing import Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -38,7 +37,7 @@ class MockProvider:
     call_count: int = 0
     failure_count: int = 0
 
-    async def generate(self, prompt: str, model: str) -> Optional[LLMResponse]:
+    async def generate(self, prompt: str, model: str) -> LLMResponse | None:
         self.call_count += 1
 
         # Simulate latency
@@ -46,6 +45,7 @@ class MockProvider:
 
         # Simulate errors
         import random
+
         if random.random() < self.error_rate:
             self.failure_count += 1
             raise ConnectionError(f"{self.name} API error")
@@ -70,7 +70,7 @@ class CircuitBreaker:
         self.failure_threshold = failure_threshold
         self.recovery_timeout = recovery_timeout
         self.failure_count = 0
-        self.last_failure_time: Optional[float] = None
+        self.last_failure_time: float | None = None
         self.state = "closed"  # closed, open, half-open
 
     def record_success(self):
@@ -101,9 +101,7 @@ class LLMRouter:
 
     def __init__(self, providers: dict[str, MockProvider]):
         self.providers = providers
-        self.circuit_breakers = {
-            name: CircuitBreaker() for name in providers
-        }
+        self.circuit_breakers = {name: CircuitBreaker() for name in providers}
         self.fallback_map: dict[str, str] = {}
 
     def set_fallback(self, primary: str, fallback: str):
@@ -115,7 +113,7 @@ class LLMRouter:
         model: str,
         provider: str,
         max_retries: int = 3,
-    ) -> Optional[LLMResponse]:
+    ) -> LLMResponse | None:
         current_provider = provider
         last_error = None
 
@@ -130,9 +128,7 @@ class LLMRouter:
                 return None
 
             try:
-                response = await self.providers[current_provider].generate(
-                    prompt, model
-                )
+                response = await self.providers[current_provider].generate(prompt, model)
                 cb.record_success()
                 return response
             except Exception as e:
@@ -199,7 +195,7 @@ async def test_llm_integration():
     response = await router.generate("test", "gpt-4", "azure")
     assert response is not None, "Should recover"
     assert cb.state == "closed", "Circuit should be closed after success"
-    print(f"  ✅ Circuit breaker recovered")
+    print("  ✅ Circuit breaker recovered")
 
     print("\n" + "=" * 60)
     print("✅ PoC 1 PASSED: LLM Integration risks mitigated")
