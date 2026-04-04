@@ -25,7 +25,7 @@ async def test_root_endpoint(client):
 @pytest.mark.asyncio
 async def test_list_projects(client):
     """Test list projects endpoint."""
-    response = await client.get("/api/v1/projects")
+    response = await client.get("/api/v1/projects/")
     assert response.status_code == 200
     data = response.json()
     assert "data" in data
@@ -34,7 +34,7 @@ async def test_list_projects(client):
 @pytest.mark.asyncio
 async def test_list_workflows(client):
     """Test list workflows endpoint."""
-    response = await client.get("/api/v1/workflows")
+    response = await client.get("/api/v1/workflows/")
     assert response.status_code == 200
     data = response.json()
     assert "data" in data
