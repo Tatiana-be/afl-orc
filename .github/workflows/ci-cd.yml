@@ -283,8 +283,7 @@ jobs:
       - name: Test Docker image
         if: github.event_name == 'pull_request'
         run: |
-          IMAGE_TAG="ghcr.io/${{ github.repository }}:${{ github.sha }}"
-          IMAGE_TAG=$(echo "$IMAGE_TAG" | tr '[:upper:]' '[:lower:]')
+          IMAGE_TAG=$(echo "$DOCKER_METADATA_OUTPUT_TAGS" | head -n1)
           docker run --rm "$IMAGE_TAG" python --version
 
   # ============================================
