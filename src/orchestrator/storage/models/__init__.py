@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 """SQLAlchemy models."""
 
 from sqlalchemy.orm import DeclarativeBase
