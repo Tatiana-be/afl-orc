@@ -283,7 +283,9 @@ jobs:
       - name: Test Docker image
         if: github.event_name == 'pull_request'
         run: |
-          docker run --rm ghcr.io/${{ github.repository }}:${{ github.sha }} python --version
+          IMAGE_TAG="ghcr.io/${{ github.repository }}:${{ github.sha }}"
+          IMAGE_TAG=$(echo "$IMAGE_TAG" | tr '[:upper:]' '[:lower:]')
+          docker run --rm "$IMAGE_TAG" python --version
 
   # ============================================
   # Deploy to Staging (on develop branch)
