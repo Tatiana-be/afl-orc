@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 """API routes module."""
 
 from fastapi import APIRouter
