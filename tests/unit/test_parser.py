@@ -5,7 +5,12 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from src.orchestrator.parser.afl_parser import AFLParser
+from src.orchestrator.parser.afl_parser import (
+    _MIGRATIONS,
+    AFLParser,
+    SchemaMigrationError,
+    register_migration,
+)
 from src.orchestrator.parser.schema import (
     AFLConfig,
     AgentConfig,
@@ -1236,3 +1241,119 @@ workflow:
         err = errors[0]
         assert err["line"] == 8
         assert err["column"] == 13  # position of "ghost_agent" (1-based)
+
+
+# ============================================
+# Schema Versioning (PARSER-008)
+# ============================================
+
+
+class TestSchemaVersioning:
+    """Tests for schema version support (PARSER-008)."""
+
+    def test_get_schema_version(self, parser):
+        """get_schema_version() should return latest version."""
+        version = parser.get_schema_version()
+        assert isinstance(version, str)
+        assert version == "1.0"
+
+    def test_get_supported_versions(self, parser):
+        """get_supported_versions() should return version descriptions."""
+        versions = parser.get_supported_versions()
+        assert isinstance(versions, dict)
+        assert "1.0" in versions
+        assert isinstance(versions["1.0"], str)
+
+    def test_validate_supported_version(self, parser):
+        """Supported version should produce no errors."""
+        errors = parser.validate_schema_version("1.0")
+        assert len(errors) == 0
+
+    def test_validate_unsupported_version(self, parser):
+        """Unsupported version should produce an error."""
+        errors = parser.validate_schema_version("99.0")
+        assert len(errors) == 1
+        err = errors[0]
+        assert err["type"] == "unsupported_schema_version"
+        assert err["version"] == "99.0"
+        assert "Supported versions" in err["message"]
+        assert "1.0" in err["supported_versions"]
+
+    def test_validate_config_with_unsupported_version(self, parser):
+        """Config with unsupported version should have validation error."""
+        config = AFLConfig(
+            version="99.0",
+            project="Test",
+            agents=[AgentConfig(id="a1", type="llm")],
+            workflow=[WorkflowStep(step="s1", agent="a1")],
+        )
+        errors = parser.validate(config)
+        version_errors = [e for e in errors if e.get("type") == "unsupported_schema_version"]
+        assert len(version_errors) == 1
+
+    def test_validate_config_with_supported_version(self, parser):
+        """Config with supported version should pass validation."""
+        config = AFLConfig(
+            version="1.0",
+            project="Test",
+            agents=[AgentConfig(id="a1", type="llm")],
+            workflow=[WorkflowStep(step="s1", agent="a1")],
+        )
+        errors = parser.validate(config)
+        version_errors = [e for e in errors if e.get("type") == "unsupported_schema_version"]
+        assert len(version_errors) == 0
+
+    def test_migrate_same_version(self, parser):
+        """Migrating to same version should return config unchanged."""
+        config = {"version": "1.0", "project": "Test"}
+        result = parser.migrate(config)
+        assert result == config
+
+    def test_migrate_unsupported_version(self, parser):
+        """Migrating from unsupported version should raise error."""
+        config = {"version": "99.0", "project": "Test"}
+        with pytest.raises(SchemaMigrationError):
+            parser.migrate(config)
+
+    def test_migrate_missing_function(self, parser):
+        """Migrating when no migration function exists should raise error."""
+        # Register a fake intermediate version without migration function
+        from src.orchestrator.parser import schema as schema_mod
+
+        schema_mod.SCHEMA_VERSIONS["1.1"] = "Fake future version"
+        try:
+            config = {"version": "1.0", "project": "Test"}
+            with pytest.raises(SchemaMigrationError, match="Missing migration function"):
+                parser.migrate(config)
+        finally:
+            del schema_mod.SCHEMA_VERSIONS["1.1"]
+
+    def test_migration_path_not_found(self, parser):
+        """When source version is not in registry, should raise error."""
+        config = {"version": "0.0", "project": "Test"}
+        with pytest.raises(SchemaMigrationError, match="No migration path"):
+            parser.migrate(config)
+
+    def test_migration_chain_applied(self, parser):
+        """Migration chain should be applied in order."""
+        from src.orchestrator.parser import schema as schema_mod
+
+        schema_mod.SCHEMA_VERSIONS["2.0"] = "Added priority field"
+
+        @register_migration("1.0", "2.0")
+        def add_priority_field(config: dict) -> dict:
+            config["priority"] = "normal"
+            return config
+
+        try:
+            config = {"version": "1.0", "project": "Test"}
+            result = parser.migrate(config)
+            assert result["version"] == "2.0"
+            assert result["priority"] == "normal"
+        finally:
+            del schema_mod.SCHEMA_VERSIONS["2.0"]
+            del _MIGRATIONS[("1.0", "2.0")]
+
+    def test_schema_migration_error_is_value_error(self):
+        """SchemaMigrationError should inherit from ValueError."""
+        assert issubclass(SchemaMigrationError, ValueError)
