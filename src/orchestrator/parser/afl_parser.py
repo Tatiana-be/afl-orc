@@ -1,11 +1,38 @@
 """AFL Config parser."""
 
 import json
+from collections.abc import Callable
 from typing import Any
 
 import yaml
 
-from src.orchestrator.parser.schema import AFLConfig
+from src.orchestrator.parser.schema import SCHEMA_VERSION, SCHEMA_VERSIONS, AFLConfig
+
+
+class SchemaMigrationError(ValueError):
+    """Raised when schema migration fails."""
+
+    pass
+
+
+# Migration registry: (from_version, to_version) -> migration function
+_MIGRATIONS: dict[tuple[str, str], Callable[[dict[str, Any]], dict[str, Any]]] = {}
+
+
+def register_migration(
+    from_ver: str, to_ver: str
+) -> Callable[
+    [Callable[[dict[str, Any]], dict[str, Any]]], Callable[[dict[str, Any]], dict[str, Any]]
+]:
+    """Decorator to register a migration function."""
+
+    def decorator(
+        func: Callable[[dict[str, Any]], dict[str, Any]],
+    ) -> Callable[[dict[str, Any]], dict[str, Any]]:
+        _MIGRATIONS[(from_ver, to_ver)] = func
+        return func
+
+    return decorator
 
 
 class AFLParser:
@@ -13,6 +40,16 @@ class AFLParser:
 
     def __init__(self) -> None:
         self._raw_content: str = ""
+
+    @staticmethod
+    def get_schema_version() -> str:
+        """Return the latest schema version."""
+        return SCHEMA_VERSION
+
+    @staticmethod
+    def get_supported_versions() -> dict[str, str]:
+        """Return all supported schema versions with descriptions."""
+        return dict(SCHEMA_VERSIONS)
 
     def parse_yaml(self, content: str) -> AFLConfig:
         """Parse YAML content into AFLConfig.
@@ -39,10 +76,92 @@ class AFLParser:
         else:
             raise ValueError(f"Unsupported format: {format}")
 
+    def validate_schema_version(self, config_version: str) -> list[dict[str, Any]]:
+        """Validate that the config schema version is supported.
+
+        Returns a list with a single error dict if unsupported, empty list otherwise.
+        """
+        if config_version not in SCHEMA_VERSIONS:
+            return [
+                {
+                    "type": "unsupported_schema_version",
+                    "message": (
+                        f"Unsupported schema version '{config_version}'. "
+                        f"Supported versions: {', '.join(sorted(SCHEMA_VERSIONS))}"
+                    ),
+                    "version": config_version,
+                    "supported_versions": sorted(SCHEMA_VERSIONS),
+                }
+            ]
+        return []
+
+    def migrate(self, config: dict[str, Any]) -> dict[str, Any]:
+        """Migrate a config dict to the latest schema version.
+
+        Applies migrations sequentially from the config's version to the
+        latest version in SCHEMA_VERSIONS.
+
+        Args:
+            config: Raw config dict with a 'version' field.
+
+        Returns:
+            Migrated config dict with updated version.
+
+        Raises:
+            SchemaMigrationError: If migration path doesn't exist.
+        """
+        current = config.get("version", "1.0")
+        versions = sorted(SCHEMA_VERSIONS)
+        target = versions[-1] if versions else SCHEMA_VERSION
+
+        if current == target:
+            return config
+
+        path = self._find_migration_path(current, target)
+        if not path:
+            raise SchemaMigrationError(
+                f"No migration path from '{current}' to '{target}'. "
+                f"Supported versions: {', '.join(sorted(SCHEMA_VERSIONS))}"
+            )
+
+        result = dict(config)
+        for from_ver, to_ver in path:
+            migrate_fn = _MIGRATIONS.get((from_ver, to_ver))
+            if not migrate_fn:
+                raise SchemaMigrationError(f"Missing migration function: {from_ver} → {to_ver}")
+            result = migrate_fn(result)
+            result["version"] = to_ver
+
+        return result
+
+    @staticmethod
+    def _find_migration_path(from_ver: str, to_ver: str) -> list[tuple[str, str]] | None:
+        """Find a sequential migration path between two versions.
+
+        Versions are compared lexicographically. A path exists if every
+        intermediate version is registered in SCHEMA_VERSIONS.
+        """
+        versions = sorted(SCHEMA_VERSIONS)
+
+        try:
+            start = versions.index(from_ver)
+            end = versions.index(to_ver)
+        except ValueError:
+            return None
+
+        if start >= end:
+            return None
+
+        path: list[tuple[str, str]] = []
+        for i in range(start, end):
+            path.append((versions[i], versions[i + 1]))
+        return path
+
     def validate(self, config: AFLConfig) -> list[dict[str, Any]]:
         """Validate AFL configuration.
 
         Checks:
+        - Schema version support
         - Agent references in workflow steps
         - Artifact references in workflow steps
         - Guardrail references in agents
@@ -50,6 +169,9 @@ class AFLParser:
         - Circular dependencies in workflow
         """
         errors: list[dict[str, Any]] = []
+
+        # Validate schema version
+        errors.extend(self.validate_schema_version(config.version))
 
         # Build lookup sets
         agent_ids = {agent.id for agent in config.agents}
