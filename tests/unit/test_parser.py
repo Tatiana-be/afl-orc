@@ -1041,3 +1041,198 @@ class TestComprehensiveValidation:
         assert "type" in error
         assert "message" in error
         assert error["type"] == "invalid_reference"
+
+
+# ============================================
+# Error Detail Enrichment — Line/Column (PARSER-007)
+# ============================================
+
+
+class TestErrorDetailEnrichment:
+    """Tests for line/column information in validation errors (PARSER-007)."""
+
+    def test_invalid_agent_error_has_line_column(self, parser):
+        """Invalid agent reference should include line and column."""
+        yaml_content = """version: "1.0"
+project: "Test"
+agents:
+  - id: "agent_a"
+    type: "llm"
+workflow:
+  - step: "step1"
+    agent: "nonexistent_agent"
+"""
+        config = parser.parse_yaml(yaml_content)
+        errors = parser.validate(config)
+        agent_errors = [e for e in errors if e.get("field") == "agent"]
+        assert len(agent_errors) == 1
+        err = agent_errors[0]
+        assert "line" in err
+        assert "column" in err
+        assert err["line"] is not None
+        assert err["column"] is not None
+
+    def test_invalid_artifact_error_has_line_column(self, parser):
+        """Invalid artifact reference should include line and column."""
+        yaml_content = """version: "1.0"
+project: "Test"
+agents:
+  - id: "agent_a"
+    type: "llm"
+artifacts:
+  - id: "report"
+    type: file
+workflow:
+  - step: "step1"
+    agent: "agent_a"
+    artifact: "ghost_file"
+"""
+        config = parser.parse_yaml(yaml_content)
+        errors = parser.validate(config)
+        artifact_errors = [e for e in errors if e.get("field") == "artifact"]
+        assert len(artifact_errors) == 1
+        err = artifact_errors[0]
+        assert err["line"] is not None
+        assert err["column"] is not None
+
+    def test_invalid_guardrail_error_has_line_column(self, parser):
+        """Invalid guardrail reference should include line and column."""
+        yaml_content = """version: "1.0"
+project: "Test"
+agents:
+  - id: "agent_a"
+    type: "llm"
+    guardrails:
+      - ghost_rule
+guardrails:
+  - id: real_rule
+    type: regex
+workflow:
+  - step: "step1"
+    agent: "agent_a"
+"""
+        config = parser.parse_yaml(yaml_content)
+        errors = parser.validate(config)
+        guardrail_errors = [e for e in errors if e.get("field") == "guardrail"]
+        assert len(guardrail_errors) == 1
+        err = guardrail_errors[0]
+        assert err["line"] is not None
+        assert err["column"] is not None
+
+    def test_invalid_dependency_error_has_line_column(self, parser):
+        """Invalid dependency reference should include line and column."""
+        yaml_content = """version: "1.0"
+project: "Test"
+agents:
+  - id: "agent_a"
+    type: "llm"
+workflow:
+  - step: "step_a"
+    agent: "agent_a"
+  - step: "step_b"
+    agent: "agent_a"
+    depends_on:
+      - ghost_step
+"""
+        config = parser.parse_yaml(yaml_content)
+        errors = parser.validate(config)
+        dep_errors = [e for e in errors if e.get("field") == "depends_on"]
+        assert len(dep_errors) == 1
+        err = dep_errors[0]
+        assert err["line"] is not None
+        assert err["column"] is not None
+
+    def test_json_error_has_line_column(self, parser):
+        """Invalid reference in JSON should also include line and column."""
+        json_content = """{
+    "version": "1.0",
+    "project": "Test",
+    "agents": [{"id": "a1", "type": "llm"}],
+    "workflow": [
+        {"step": "s1", "agent": "ghost_agent"}
+    ]
+}"""
+        config = parser.parse_json(json_content)
+        errors = parser.validate(config)
+        agent_errors = [e for e in errors if e.get("field") == "agent"]
+        assert len(agent_errors) == 1
+        err = agent_errors[0]
+        assert "line" in err
+        assert "column" in err
+        assert err["line"] is not None
+
+    def test_valid_config_no_errors_no_line_column(self, parser):
+        """Valid config should produce empty errors list."""
+        yaml_content = """version: "1.0"
+project: "Test"
+agents:
+  - id: "agent_a"
+    type: "llm"
+workflow:
+  - step: "step1"
+    agent: "agent_a"
+"""
+        config = parser.parse_yaml(yaml_content)
+        errors = parser.validate(config)
+        assert len(errors) == 0
+
+    def test_multiple_errors_all_have_line_column(self, parser):
+        """Multiple validation errors should all include line and column."""
+        yaml_content = """version: "1.0"
+project: "Test"
+agents:
+  - id: "agent_a"
+    type: "llm"
+    guardrails: [ghost_gr]
+artifacts:
+  - id: "artifact_x"
+    type: file
+workflow:
+  - step: "s1"
+    agent: "ghost_agent"
+    artifact: "ghost_artifact"
+    depends_on: [ghost_dep]
+"""
+        config = parser.parse_yaml(yaml_content)
+        errors = parser.validate(config)
+        assert len(errors) >= 3
+        for err in errors:
+            assert "line" in err
+            assert "column" in err
+
+    def test_error_without_raw_content(self, parser):
+        """Errors should still have line=None when no raw content stored."""
+        # Create config directly without parsing (no raw content)
+        config = AFLConfig(
+            version="1.0",
+            project="Test",
+            agents=[],
+            workflow=[
+                WorkflowStep(step="s1", agent="ghost"),
+            ],
+        )
+        errors = parser.validate(config)
+        assert len(errors) > 0
+        # line/column will be None since no raw content
+        err = errors[0]
+        assert "line" in err
+        assert "column" in err
+        assert err["line"] is None
+        assert err["column"] is None
+
+    def test_line_column_accuracy(self, parser):
+        """Line and column should point to the actual value in source."""
+        yaml_content = """version: "1.0"
+project: "Test"
+agents:
+  - id: "agent_a"
+    type: "llm"
+workflow:
+  - step: "s1"
+    agent: "ghost_agent"
+"""
+        config = parser.parse_yaml(yaml_content)
+        errors = parser.validate(config)
+        err = errors[0]
+        assert err["line"] == 8
+        assert err["column"] == 13  # position of "ghost_agent" (1-based)
