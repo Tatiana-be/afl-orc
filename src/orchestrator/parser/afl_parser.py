@@ -11,17 +11,22 @@ from src.orchestrator.parser.schema import AFLConfig
 class AFLParser:
     """Parser for AFL configuration files."""
 
+    def __init__(self) -> None:
+        self._raw_content: str = ""
+
     def parse_yaml(self, content: str) -> AFLConfig:
         """Parse YAML content into AFLConfig.
 
         Supports YAML anchors (&), aliases (*), and merge keys (<<:).
         Uses FullLoader for safe merging support.
         """
+        self._raw_content = content
         data = yaml.load(content, Loader=yaml.FullLoader)  # nosec B506
         return AFLConfig(**data)
 
     def parse_json(self, content: str) -> AFLConfig:
         """Parse JSON content into AFLConfig."""
+        self._raw_content = content
         data = json.loads(content)
         return AFLConfig(**data)
 
@@ -66,6 +71,9 @@ class AFLParser:
 
         # Check for circular dependencies
         errors.extend(self._detect_circular_dependencies(config))
+
+        # Enrich errors with line/column info
+        self._enrich_with_line_column(errors)
 
         return errors
 
@@ -200,3 +208,29 @@ class AFLParser:
             )
 
         return errors
+
+    def _enrich_with_line_column(self, errors: list[dict[str, Any]]) -> None:
+        """Add line and column information to validation errors.
+
+        Searches the raw content for the referenced value and adds
+        ``line`` and ``column`` fields to each error dict.
+        """
+        lines = self._raw_content.splitlines() if self._raw_content else []
+
+        for error in errors:
+            value = error.get("value", "")
+            if not value or not lines:
+                error["line"] = None
+                error["column"] = None
+                continue
+
+            # Find the value in raw content
+            for line_num, line in enumerate(lines, start=1):
+                col_idx = line.find(value)
+                if col_idx >= 0:
+                    error["line"] = line_num
+                    error["column"] = col_idx + 1  # 1-based
+                    break
+            else:
+                error["line"] = None
+                error["column"] = None
