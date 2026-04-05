@@ -86,7 +86,95 @@ references, circular dependencies) наравне с обычными конфи
 
 ---
 
-## 3. JSON Parsing (PARSER-004)
+## 3. Circular Dependency Detection (PARSER-006)
+
+Парсер обнаруживает циклические зависимости в графе workflow с помощью DFS
+(Depth-First Search) с трёхцветной раскраской вершин.
+
+### 3.1 Алгоритм
+
+1. Построить граф зависимостей (adjacency list): `step → depends_on[]`
+2. DFS с цветовой маркировкой:
+   - **WHITE** — не посещён
+   - **GRAY** — в обработке (в текущем пути)
+   - **BLACK** — завершён
+3. Если найден GRAY-сосед → обнаружен цикл
+4. Отслеживать путь для формирования полного цикла
+
+### 3.2 Примеры
+
+**Прямой цикл (A → B → A):**
+
+```yaml
+workflow:
+  - step: step_a
+    agent: agent_a
+    depends_on: [step_b]
+  - step: step_b
+    agent: agent_b
+    depends_on: [step_a]
+```
+
+**Результат:**
+
+```json
+{
+  "type": "circular_dependency",
+  "field": "depends_on",
+  "cycle": ["step_a", "step_b", "step_a"],
+  "message": "Circular dependency detected: step_a -> step_b -> step_a"
+}
+```
+
+**Косвенный цикл (A → B → C → A):**
+
+```yaml
+workflow:
+  - step: a
+    agent: agent_a
+    depends_on: [c]
+  - step: b
+    agent: agent_a
+    depends_on: [a]
+  - step: c
+    agent: agent_a
+    depends_on: [b]
+```
+
+**Самозависимость:**
+
+```yaml
+workflow:
+  - step: a
+    agent: agent_a
+    depends_on: [a]
+```
+
+**Валидный DAG (без циклов):**
+
+```yaml
+workflow:
+  - step: a
+    agent: agent_a
+  - step: b
+    agent: agent_a
+    depends_on: [a]
+  - step: c
+    agent: agent_a
+    depends_on: [a]
+  - step: d
+    agent: agent_a
+    depends_on: [b, c]
+```
+
+### 3.3 Множественные циклы
+
+Если в графе несколько независимых циклов — все будут обнаружены и
+отражены в списке ошибок.
+
+---
+
+## 4. JSON Parsing (PARSER-004)
 
 Парсер поддерживает JSON как альтернативный формат конфигурации. Используется
 стандартный `json.loads()` с последующей валидацией через Pydantic.
