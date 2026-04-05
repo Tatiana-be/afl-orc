@@ -86,9 +86,115 @@ references, circular dependencies) наравне с обычными конфи
 
 ---
 
-## 3. Схема Конфигурации (AFLConfig)
+## 3. JSON Parsing (PARSER-004)
 
-### 2.1 Корневая модель
+Парсер поддерживает JSON как альтернативный формат конфигурации. Используется
+стандартный `json.loads()` с последующей валидацией через Pydantic.
+
+| Аспект              | YAML                      | JSON                       |
+| ------------------- | ------------------------- | -------------------------- |
+| **Метод**           | `parse_yaml()`, `parse()` | `parse_json()`, `parse()`  |
+| **Loader**          | `yaml.FullLoader`         | `json.loads()`             |
+| **Anchors/Aliases** | ✅ Да (`&`, `*`, `<<:`)   | ❌ Нет (не поддерживается) |
+| **Comments**        | ✅ Да                     | ❌ Нет                     |
+| **Unicode**         | ✅ UTF-8                  | ✅ UTF-8                   |
+
+### 3.1 Программный API
+
+```python
+from src.orchestrator.parser.afl_parser import AFLParser
+
+parser = AFLParser()
+
+# Прямой вызов
+config = parser.parse_json(json_string)
+
+# Через универсальный метод
+config = parser.parse(json_string, format="json")
+```
+
+### 3.2 Пример: полный JSON-конфиг
+
+```json
+{
+  "version": "1.0",
+  "project": "Code Review Pipeline",
+  "budget": {
+    "total_tokens": 100000,
+    "warning_threshold": 0.8,
+    "hard_limit": 120000
+  },
+  "agents": [
+    {
+      "id": "reviewer",
+      "type": "llm",
+      "model": "gpt-4",
+      "tools": ["file_read", "diff"],
+      "guardrails": ["no_secrets"]
+    }
+  ],
+  "artifacts": [
+    { "id": "report", "type": "json", "path": "/output/review.json" }
+  ],
+  "guardrails": [{ "id": "no_secrets", "type": "regex", "action": "block" }],
+  "workflow": [
+    {
+      "step": "review",
+      "agent": "reviewer",
+      "artifact": "report",
+      "depends_on": []
+    }
+  ]
+}
+```
+
+### 3.3 Ошибки парсинга
+
+| Ошибка             | Исключение                 | Причина                 |
+| ------------------ | -------------------------- | ----------------------- |
+| Невалидный JSON    | `json.JSONDecodeError`     | Синтаксическая ошибка   |
+| Schema mismatch    | `pydantic.ValidationError` | Неверные типы/поля      |
+| Неизвестный формат | `ValueError`               | `format != "yaml/json"` |
+
+```python
+# Malformed JSON → JSONDecodeError
+parser.parse_json('{"broken": }')
+
+# Bad schema → ValidationError
+parser.parse_json('{"version": "bad", "project": "Test", "agents": [], "workflow": []}')
+# pydantic.ValidationError: version doesn't match pattern ^\d+\.\d+$
+```
+
+### 3.4 Unicode
+
+JSON полностью поддерживает Unicode — кириллица, эмодзи, CJK:
+
+```json
+{
+  "version": "1.0",
+  "project": "Тест Юникод Проект 🚀",
+  "agents": [{ "id": "агент_1", "type": "llm" }],
+  "workflow": [{ "step": "анализ", "agent": "агент_1" }]
+}
+```
+
+### 3.5 Когда использовать JSON vs YAML
+
+| Критерий            | YAML | JSON |
+| ------------------- | ---- | ---- |
+| Человеко-читаемость | ✅   | ⚠️   |
+| Комментарии         | ✅   | ❌   |
+| Anchors/Merge keys  | ✅   | ❌   |
+| Machine-generated   | ⚠️   | ✅   |
+| Строгая типизация   | ⚠️   | ✅   |
+
+**Рекомендация:** YAML для ручной настройки, JSON для программной генерации.
+
+---
+
+## 4. Схема Конфигурации (AFLConfig)
+
+### 4.1 Корневая модель
 
 ```typescript
 interface AFLConfig {
@@ -102,7 +208,7 @@ interface AFLConfig {
 }
 ```
 
-### 2.2 BudgetConfig
+### 4.2 BudgetConfig
 
 ```typescript
 interface BudgetConfig {
@@ -112,7 +218,7 @@ interface BudgetConfig {
 }
 ```
 
-### 2.3 AgentConfig
+### 4.3 AgentConfig
 
 ```typescript
 interface AgentConfig {
@@ -124,7 +230,7 @@ interface AgentConfig {
 }
 ```
 
-### 2.4 ArtifactConfig
+### 4.4 ArtifactConfig
 
 ```typescript
 interface ArtifactConfig {
@@ -135,7 +241,7 @@ interface ArtifactConfig {
 }
 ```
 
-### 2.5 GuardrailConfig
+### 4.5 GuardrailConfig
 
 ```typescript
 interface GuardrailConfig {
@@ -145,7 +251,7 @@ interface GuardrailConfig {
 }
 ```
 
-### 2.6 WorkflowStep
+### 4.6 WorkflowStep
 
 ```typescript
 interface WorkflowStep {
@@ -158,9 +264,9 @@ interface WorkflowStep {
 
 ---
 
-## 3. REST API Эндпоинты
+## 5. REST API Эндпоинты
 
-### 3.1 Загрузка конфига
+### 5.1 Загрузка конфига
 
 ```
 POST /api/v1/projects/{project_id}/configs
@@ -241,7 +347,7 @@ curl -X POST https://api.afl-orchestrator.com/api/v1/projects/proj_xyz/configs \
 
 ---
 
-### 3.2 Валидация конфига (без сохранения)
+### 5.2 Валидация конфига (без сохранения)
 
 ```
 POST /api/v1/projects/{project_id}/configs/validate
@@ -326,7 +432,7 @@ curl -X POST https://api.afl-orchestrator.com/api/v1/projects/proj_xyz/configs/v
 
 ---
 
-### 3.3 Список версий конфига
+### 5.3 Список версий конфига
 
 ```
 GET /api/v1/projects/{project_id}/configs
@@ -372,7 +478,7 @@ GET /api/v1/projects/{project_id}/configs
 
 ---
 
-### 3.4 Получение конкретной версии
+### 5.4 Получение конкретной версии
 
 ```
 GET /api/v1/projects/{project_id}/configs/{version}
@@ -456,7 +562,7 @@ GET /api/v1/projects/{project_id}/configs/{version}
 
 ---
 
-### 3.5 Последняя версия
+### 5.5 Последняя версия
 
 ```
 GET /api/v1/projects/{project_id}/configs/latest
@@ -483,7 +589,7 @@ GET /api/v1/projects/{project_id}/configs/latest
 
 ---
 
-### 3.6 Сравнение версий
+### 5.6 Сравнение версий
 
 ```
 GET /api/v1/projects/{project_id}/configs/{v1}/diff/{v2}
@@ -529,9 +635,9 @@ GET /api/v1/projects/{project_id}/configs/{v1}/diff/{v2}
 
 ---
 
-## 4. Программа API (Python)
+## 6. Программа API (Python)
 
-### 4.1 AFLParser
+### 6.1 AFLParser
 
 Основной класс парсера. Доступен через
 `from src.orchestrator.parser.afl_parser import AFLParser`.
@@ -622,9 +728,9 @@ else:
 
 ---
 
-## 5. Типы Ошибок Валидации
+## 7. Типы Ошибок Валидации
 
-### 5.1 invalid_reference
+### 7.1 invalid_reference
 
 Неверная перекрёстная ссылка. Возникает когда workflow step ссылается на
 несуществующий agent, artifact или depends_on шаг, либо когда agent ссылается на
@@ -690,7 +796,7 @@ else:
 }
 ```
 
-### 5.2 circular_dependency
+### 7.2 circular_dependency
 
 Циклическая зависимость в графе workflow. Обнаруживается через DFS.
 
@@ -735,12 +841,12 @@ else:
 
 ---
 
-## 6. Валидация Схемы (Pydantic)
+## 8. Валидация Схемы (Pydantic)
 
 Помимо логической валидации (`validate()`), Pydantic автоматически проверяет
 структурную целостность при парсинге.
 
-### 6.1 Schema-Level Ошибки
+### 8.1 Schema-Level Ошибки
 
 | Поле                       | Ограничение          | Код ошибки                              |
 | -------------------------- | -------------------- | --------------------------------------- |
@@ -752,7 +858,7 @@ else:
 | `workflow.step`            | required             | `missing`                               |
 | `workflow.agent`           | required             | `missing`                               |
 
-### 6.2 Пример Schema-Level Ошибки
+### 8.2 Пример Schema-Level Ошибки
 
 ```json
 {
@@ -766,9 +872,9 @@ else:
 
 ---
 
-## 7. Полный Пример Workflow
+## 9. Полный Пример Workflow
 
-### 7.1 YAML-конфигурация
+### 9.1 YAML-конфигурация
 
 ```yaml
 version: "1.0"
@@ -828,7 +934,7 @@ workflow:
     depends_on: [generate_summary]
 ```
 
-### 7.2 Валидация через API
+### 9.2 Валидация через API
 
 ```bash
 # 1. Validate without saving
@@ -852,7 +958,7 @@ curl -X GET https://api.afl-orchestrator.com/api/v1/projects/proj_123/configs/la
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### 7.3 Программная валидация
+### 9.3 Программная валидация
 
 ```python
 from src.orchestrator.parser.afl_parser import AFLParser
@@ -886,7 +992,7 @@ else:
 
 ---
 
-## 8. Таблица Всех Ошибок
+## 10. Таблица Всех Ошибок
 
 | Код                   | Тип                         | Причина          | HTTP Status |
 | --------------------- | --------------------------- | ---------------- | ----------- |
@@ -900,7 +1006,7 @@ else:
 
 ---
 
-## 9. Матрица Валидации
+## 11. Матрица Валидации
 
 | Проверка              | Метод        | Когда          | Что                                                          |
 | --------------------- | ------------ | -------------- | ------------------------------------------------------------ |
@@ -914,7 +1020,7 @@ else:
 
 ---
 
-## 10. Changelog
+## 12. Changelog
 
 | Версия | Дата       | Изменение                          |
 | ------ | ---------- | ---------------------------------- |
