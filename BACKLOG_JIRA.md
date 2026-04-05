@@ -66,7 +66,7 @@
 | **PARSER-004** | JSON парсинг (альтернативный формат)          | Task  | 3   | 🟡 Medium | ✅ Done | PARSER-002     |
 | **PARSER-005** | Валидация ссылок (agent/artifact/guardrail)   | Story | 5   | 🔴 High   | ✅ Done | PARSER-002     |
 | **PARSER-006** | Проверка циклов в графе зависимостей workflow | Story | 8   | 🔴 High   | 🔴 Todo | PARSER-002     |
-| **PARSER-007** | Детализация ошибок (строка/колонка)           | Task  | 5   | 🟡 Medium | 🔴 Todo | PARSER-003     |
+| **PARSER-007** | Детализация ошибок (строка/колонка)           | Task  | 5   | 🟡 Medium | ✅ Done | PARSER-003     |
 | **PARSER-008** | Версионирование схемы AFL (migration support) | Story | 5   | 🟡 Medium | 🔴 Todo | PARSER-002     |
 | **PARSER-009** | Юнит-тесты парсера (покрытие ≥90%)            | Test  | 8   | 🔴 High   | 🔴 Todo | PARSER-003-008 |
 | **PARSER-010** | Документация API парсера                      | Doc   | 2   | 🟢 Low    | ✅ Done | PARSER-009     |
