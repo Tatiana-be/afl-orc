@@ -2,6 +2,14 @@
 
 from pydantic import BaseModel, Field
 
+# Latest schema version
+SCHEMA_VERSION = "1.0"
+
+# Supported schema versions and their descriptions
+SCHEMA_VERSIONS: dict[str, str] = {
+    "1.0": "Initial schema version",
+}
+
 
 class BudgetConfig(BaseModel):
     """Budget configuration."""
