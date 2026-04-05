@@ -12,8 +12,12 @@ class AFLParser:
     """Parser for AFL configuration files."""
 
     def parse_yaml(self, content: str) -> AFLConfig:
-        """Parse YAML content into AFLConfig."""
-        data = yaml.safe_load(content)
+        """Parse YAML content into AFLConfig.
+
+        Supports YAML anchors (&), aliases (*), and merge keys (<<:).
+        Uses FullLoader for safe merging support.
+        """
+        data = yaml.load(content, Loader=yaml.FullLoader)  # nosec B506
         return AFLConfig(**data)
 
     def parse_json(self, content: str) -> AFLConfig:

@@ -26,7 +26,67 @@
 
 ---
 
-## 2. Схема Конфигурации (AFLConfig)
+## 2. YAML Anchors & Aliases (PARSER-003)
+
+Парсер использует `yaml.FullLoader`, который поддерживает:
+
+| Синтаксис      | Описание                                       | Пример           |
+| -------------- | ---------------------------------------------- | ---------------- |
+| `&name`        | Anchor — именованная ссылка                    | `type: &t "llm"` |
+| `*name`        | Alias — разрешение ссылки                      | `type: *t`       |
+| `<<: *name`    | Merge key — слияние объекта с переопределением | `<<: *defaults`  |
+| `<<: [*a, *b]` | Множественное слияние (ограниченная поддержка) | —                |
+
+### 2.1 Пример: базовый anchor + alias
+
+```yaml
+agents:
+  - id: agent_a
+    type: &agent_type "llm" # anchor
+    model: "gpt-4"
+  - id: agent_b
+    type: *agent_type # alias → "llm"
+    model: "claude-3"
+```
+
+### 2.2 Пример: merge key (`<<:`)
+
+```yaml
+agents:
+  - &defaults
+    id: agent_a
+    type: llm
+    tools:
+      - file_read
+    guardrails: []
+
+  - <<: *defaults # merge с переопределением
+    id: agent_b
+    model: claude-3
+    tools:
+      - web_search
+      - code_exec
+
+  - <<: *defaults # merge без переопределений
+    id: agent_c
+```
+
+**Результат парсинга:**
+
+| Агент   | type | model    | tools                   |
+| ------- | ---- | -------- | ----------------------- |
+| agent_a | llm  | gpt-4    | [file_read]             |
+| agent_b | llm  | claude-3 | [web_search, code_exec] |
+| agent_c | llm  | gpt-4    | [file_read]             |
+
+### 2.3 Валидация + Anchors
+
+Merge-конфигурации проходят все проверки валидации (agent/artifact/guardrail
+references, circular dependencies) наравне с обычными конфигами.
+
+---
+
+## 3. Схема Конфигурации (AFLConfig)
 
 ### 2.1 Корневая модель
 
