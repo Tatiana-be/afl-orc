@@ -1,6 +1,9 @@
 """Unit tests for AFL Parser."""
 
+import json
+
 import pytest
+from pydantic import ValidationError
 
 from src.orchestrator.parser.afl_parser import AFLParser
 from src.orchestrator.parser.schema import AFLConfig
@@ -52,6 +55,172 @@ def test_parse_json(parser):
     config = parser.parse_json(json_config)
     assert isinstance(config, AFLConfig)
     assert config.version == "1.0"
+
+
+def test_parse_method_dispatch_json(parser):
+    """Test parse() method dispatches to parse_json."""
+    json_config = """
+{
+    "version": "1.0",
+    "project": "Dispatch Test",
+    "agents": [{"id": "agent_a", "type": "llm"}],
+    "workflow": [{"step": "s1", "agent": "agent_a"}]
+}
+"""
+    config = parser.parse(json_config, format="json")
+    assert isinstance(config, AFLConfig)
+    assert config.agents[0].id == "agent_a"
+
+
+# ============================================
+# JSON Parsing Tests (PARSER-004)
+# ============================================
+
+
+class TestJSONParsing:
+    """Tests for JSON configuration parsing."""
+
+    def test_parse_full_json_config(self, parser):
+        """Test parsing a complete JSON configuration."""
+        json_config = """
+{
+    "version": "1.0",
+    "project": "Full JSON Config Test",
+    "budget": {
+        "total_tokens": 100000,
+        "warning_threshold": 0.8
+    },
+    "agents": [
+        {
+            "id": "reviewer",
+            "type": "llm",
+            "model": "gpt-4",
+            "tools": ["file_read", "diff"],
+            "guardrails": ["no_secrets"]
+        }
+    ],
+    "artifacts": [
+        {"id": "report", "type": "json"}
+    ],
+    "guardrails": [
+        {"id": "no_secrets", "type": "regex"}
+    ],
+    "workflow": [
+        {
+            "step": "review",
+            "agent": "reviewer",
+            "artifact": "report",
+            "depends_on": []
+        }
+    ]
+}
+"""
+        config = parser.parse_json(json_config)
+        assert config.version == "1.0"
+        assert config.project == "Full JSON Config Test"
+        assert config.budget.total_tokens == 100000
+        assert len(config.agents) == 1
+        assert config.agents[0].tools == ["file_read", "diff"]
+        assert config.agents[0].guardrails == ["no_secrets"]
+        assert len(config.artifacts) == 1
+        assert config.guardrails[0].id == "no_secrets"
+        assert config.workflow[0].step == "review"
+
+    def test_json_validation_passes(self, parser):
+        """Test that valid JSON config passes validation."""
+        json_config = """
+{
+    "version": "1.0",
+    "project": "JSON Validation Test",
+    "agents": [{"id": "a1", "type": "llm"}],
+    "workflow": [{"step": "s1", "agent": "a1"}]
+}
+"""
+        config = parser.parse_json(json_config)
+        errors = parser.validate(config)
+        assert len(errors) == 0
+
+    def test_json_validation_catches_invalid_refs(self, parser):
+        """Test that JSON config validation catches invalid references."""
+        json_config = """
+{
+    "version": "1.0",
+    "project": "Invalid JSON Test",
+    "agents": [{"id": "a1", "type": "llm"}],
+    "workflow": [
+        {"step": "s1", "agent": "nonexistent"},
+        {"step": "s2", "agent": "a1", "depends_on": ["ghost_step"]}
+    ]
+}
+"""
+        config = parser.parse_json(json_config)
+        errors = parser.validate(config)
+        agent_errors = [e for e in errors if e.get("field") == "agent"]
+        dep_errors = [e for e in errors if e.get("field") == "depends_on"]
+        assert len(agent_errors) == 1
+        assert len(dep_errors) == 1
+
+    def test_json_schema_validation(self, parser):
+        """Test that JSON schema validation catches type errors."""
+        json_config = """
+{
+    "version": "bad-version",
+    "project": "Schema Test",
+    "agents": [],
+    "workflow": []
+}
+"""
+        with pytest.raises(ValidationError):
+            parser.parse_json(json_config)
+
+    def test_json_malformed(self, parser):
+        """Test that malformed JSON raises JSONDecodeError."""
+        malformed = '{"version": "1.0", "project":}'
+        with pytest.raises(json.JSONDecodeError):
+            parser.parse_json(malformed)
+
+    def test_json_unicode_strings(self, parser):
+        """Test that JSON with unicode strings parses correctly."""
+        json_config = """
+{
+    "version": "1.0",
+    "project": "Тест Юникод Проект 🚀",
+    "agents": [{"id": "агент_1", "type": "llm", "model": "gpt-4"}],
+    "workflow": [{"step": "анализ", "agent": "агент_1"}]
+}
+"""
+        config = parser.parse_json(json_config)
+        assert config.project == "Тест Юникод Проект 🚀"
+        assert config.agents[0].id == "агент_1"
+        assert config.workflow[0].step == "анализ"
+
+    def test_json_empty_arrays(self, parser):
+        """Test JSON with empty arrays for optional fields."""
+        json_config = """
+{
+    "version": "1.0",
+    "project": "Empty Arrays Test",
+    "agents": [],
+    "artifacts": [],
+    "guardrails": [],
+    "workflow": []
+}
+"""
+        config = parser.parse_json(json_config)
+        assert config.agents == []
+        assert config.artifacts == []
+        assert config.guardrails == []
+        assert config.workflow == []
+
+    def test_json_minimal_config(self, parser):
+        """Test minimal valid JSON config (required fields only)."""
+        json_config = """
+{"version": "1.0", "project": "Minimal", "agents": [], "workflow": []}
+"""
+        config = parser.parse_json(json_config)
+        assert config.version == "1.0"
+        assert config.project == "Minimal"
+        assert config.budget is None
 
 
 def test_validate_valid_config(parser, valid_yaml_config):
