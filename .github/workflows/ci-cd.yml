@@ -47,7 +47,9 @@ jobs:
           pip install pre-commit
 
       - name: Run pre-commit hooks
-        run: pre-commit run --all-files --show-diff-on-failure
+        run:
+          SKIP=no-commit-to-branch pre-commit run --all-files
+          --show-diff-on-failure
 
       - name: Run MyPy
         run: |
