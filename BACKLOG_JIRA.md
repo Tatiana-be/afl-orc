@@ -24,7 +24,7 @@
 
 | Epic ID  | Название                   | Фаза   | Статус         | Задач | Выполнено |
 | -------- | -------------------------- | ------ | -------------- | ----- | --------- |
-| EPIC-001 | Parser Module              | MVP    | 🟡 In Progress | 10    | 6         |
+| EPIC-001 | Parser Module              | MVP    | ✅ Complete    | 10    | 10        |
 | EPIC-002 | Workflow Engine            | MVP    | 🟡 In Progress | 13    | 3         |
 | EPIC-003 | Budget Tracker             | MVP    | 🔴 Not Started | 12    | 0         |
 | EPIC-004 | Agent Executor             | MVP    | 🔴 Not Started | 15    | 0         |
@@ -53,8 +53,8 @@
 ## EPIC-001: Parser Module
 
 **Описание**: Парсинг и валидация AFL-конфигураций **Срок**: Недели 1-2
-**Ответственный**: Core Team **DoD**: Раздел 5.1.5 ТЗ **Прогресс**: 6/10 задач
-(60%)
+**Ответственный**: Core Team **DoD**: Раздел 5.1.5 ТЗ **Прогресс**: 10/10 задач
+(100%) ✅
 
 ### Задачи
 
@@ -65,10 +65,10 @@
 | **PARSER-003** | YAML парсинг с поддержкой anchors/aliases     | Story | 5   | 🔴 High   | ✅ Done | PARSER-002     |
 | **PARSER-004** | JSON парсинг (альтернативный формат)          | Task  | 3   | 🟡 Medium | ✅ Done | PARSER-002     |
 | **PARSER-005** | Валидация ссылок (agent/artifact/guardrail)   | Story | 5   | 🔴 High   | ✅ Done | PARSER-002     |
-| **PARSER-006** | Проверка циклов в графе зависимостей workflow | Story | 8   | 🔴 High   | 🔴 Todo | PARSER-002     |
+| **PARSER-006** | Проверка циклов в графе зависимостей workflow | Story | 8   | 🔴 High   | ✅ Done | PARSER-002     |
 | **PARSER-007** | Детализация ошибок (строка/колонка)           | Task  | 5   | 🟡 Medium | ✅ Done | PARSER-003     |
-| **PARSER-008** | Версионирование схемы AFL (migration support) | Story | 5   | 🟡 Medium | 🔴 Todo | PARSER-002     |
-| **PARSER-009** | Юнит-тесты парсера (покрытие ≥90%)            | Test  | 8   | 🔴 High   | 🔴 Todo | PARSER-003-008 |
+| **PARSER-008** | Версионирование схемы AFL (migration support) | Story | 5   | 🟡 Medium | ✅ Done | PARSER-002     |
+| **PARSER-009** | Юнит-тесты парсера (покрытие ≥90%)            | Test  | 8   | 🔴 High   | ✅ Done | PARSER-003-008 |
 | **PARSER-010** | Документация API парсера                      | Doc   | 2   | 🟢 Low    | ✅ Done | PARSER-009     |
 
 ---
@@ -547,7 +547,7 @@ Core Team **Прогресс**: 1/14 задач (7%)
 
 | Эпик             | Задач | Выполнено | Осталось SP |
 | ---------------- | ----- | --------- | ----------- |
-| EPIC-001 Parser  | 10    | 6         | ~34         |
+| EPIC-001 Parser  | 10    | 10        | 0 ✅        |
 | EPIC-007 Storage | 16    | 2         | ~55         |
 | EPIC-009 LLM     | 13    | 0         | ~65         |
 | EPIC-014 Deploy  | 16    | 8         | ~30         |
@@ -619,13 +619,13 @@ Core Team **Прогресс**: 1/14 задач (7%)
 | **EPIC-014 в работе** | 8/16 задач — Python 3.12, GHCR, staging/prod deploy, OWASP ZAP     | 🟡 В работе      |
 | **EPIC-012 в работе** | 1/14 задач — DAST сканирование                                     | 🟡 В работе      |
 | **EPIC-016 в работе** | 6/13 задач — PoC результаты, аудит                                 | 🟡 В работе      |
-| **EPIC-001 в работе** | 6/10 задач — YAML/JSON парсинг, валидация ссылок, API документация | 🟡 В работе      |
+| **EPIC-001 завершён** | 10/10 задач ✅ — YAML/JSON, anchors, валидация, циклы, line/column, миграции, тесты 98% | ✅ Завершён |
 | **EPIC-007 в работе** | 2/16 задач — PostgreSQL + Alembic готовы                           | 🟡 В работе      |
 | **EPIC-002 в работе** | 3/13 задач — State Machine готова                                  | 🟡 В работе      |
 | **EPIC-008 в работе** | 1/14 задач — FastAPI настроен                                      | 🟡 В работе      |
 | **Pre-commit fixes**  | 8 проблем исправлены — ruff, mypy, black, isort, detect-secrets    | ✅ Завершён      |
-| **Всего выполнено**   | 44/240 задач (18%)                                                 | +2 задачи с v3.0 |
-| **Story Points**      | ~238/~1310 (18.2%)                                                 | +138 SP          |
+| **Всего выполнено**   | 50/240 задач (20.8%)                                               | +8 задач с v3.0  |
+| **Story Points**      | ~262/~1310 (20%)                                                   | +162 SP          |
 
 ---
 
