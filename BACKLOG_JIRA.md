@@ -15,7 +15,7 @@
 | **В работе**               | 0        |
 | **Осталось**               | 198      |
 | **Story Points всего**     | ~1310    |
-| **Story Points выполнено** | ~230     |
+| **Story Points выполнено** | ~262     |
 | **Прогресс**               | 17.6%    |
 
 ---
@@ -30,7 +30,7 @@
 | EPIC-004 | Agent Executor             | MVP    | 🔴 Not Started | 15    | 0         |
 | EPIC-005 | Context Manager            | MVP ✅ | 🔴 Not Started | 16    | 0         |
 | EPIC-006 | Guardrail Engine           | MVP ✅ | 🔴 Not Started | 18    | 0         |
-| EPIC-007 | Storage Layer              | MVP    | 🟡 In Progress | 16    | 2         |
+| EPIC-007 | Storage Layer              | MVP    | 🟡 In Progress | 23    | 2         |
 | EPIC-008 | REST API                   | MVP    | 🟡 In Progress | 14    | 1         |
 | EPIC-009 | LLM Integrations           | MVP    | 🔴 Not Started | 13    | 0         |
 | EPIC-010 | Git Integration            | Alpha  | 🔴 Not Started | 13    | 0         |
@@ -221,28 +221,35 @@
 ## EPIC-007: Storage Layer
 
 **Описание**: База данных, кэш, хранилище артефактов **Срок**: Недели 1-2
-**Ответственный**: Core Team **Прогресс**: 2/16 задач (13%)
+**Ответственный**: Core Team **Прогресс**: 2/23 задач (9%)
 
 ### Задачи
 
-| ID              | Задача                            | Тип   | SP  | Приоритет | Статус  | Зависимости     |
-| --------------- | --------------------------------- | ----- | --- | --------- | ------- | --------------- |
-| **STORAGE-001** | Настройка PostgreSQL + SQLAlchemy | Task  | 5   | 🔴 High   | ✅ Done | —               |
-| **STORAGE-002** | Миграции БД (Alembic)             | Task  | 5   | 🔴 High   | ✅ Done | STORAGE-001     |
-| **STORAGE-003** | Модель: Project                   | Task  | 2   | 🔴 High   | 🔴 Todo | STORAGE-002     |
-| **STORAGE-004** | Модель: Workflow                  | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
-| **STORAGE-005** | Модель: WorkflowExecution         | Task  | 5   | 🔴 High   | 🔴 Todo | STORAGE-002     |
-| **STORAGE-006** | Модель: AgentExecution            | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
-| **STORAGE-007** | Модель: TaskExecution             | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
-| **STORAGE-008** | Модель: ArtifactVersion           | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
-| **STORAGE-009** | Модель: GuardrailCheck            | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
-| **STORAGE-010** | Модель: CostRecord                | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
-| **STORAGE-011** | Модель: AuditLog                  | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
-| **STORAGE-012** | Индексы для производительности    | Task  | 5   | 🔴 High   | 🔴 Todo | STORAGE-003-011 |
-| **STORAGE-013** | Настройка Redis (кэш)             | Task  | 5   | 🔴 High   | 🔴 Todo | —               |
-| **STORAGE-014** | Настройка MinIO/S3 (артефакты)    | Task  | 5   | 🔴 High   | 🔴 Todo | —               |
-| **STORAGE-015** | Repository Pattern (абстракция)   | Story | 5   | 🔴 High   | 🔴 Todo | STORAGE-003-011 |
-| **STORAGE-016** | Юнит-тесты репозиториев           | Test  | 8   | 🔴 High   | 🔴 Todo | STORAGE-015     |
+| ID              | Задача                            | Тип   | SP  | Приоритет | Статус  | Зависимости       |
+| --------------- | --------------------------------- | ----- | --- | --------- | ------- | ----------------- |
+| **STORAGE-001** | Настройка PostgreSQL + SQLAlchemy | Task  | 5   | 🔴 High   | ✅ Done | —                 |
+| **STORAGE-002** | Миграции БД (Alembic)             | Task  | 5   | 🔴 High   | ✅ Done | STORAGE-001       |
+| **STORAGE-003** | Модель: users                     | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
+| **STORAGE-004** | Модель: projects                  | Task  | 2   | 🔴 High   | 🔴 Todo | STORAGE-002       |
+| **STORAGE-005** | Модель: config_versions           | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
+| **STORAGE-006** | Модель: workflows                 | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
+| **STORAGE-007** | Модель: tasks                     | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
+| **STORAGE-008** | Модель: agents                    | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
+| **STORAGE-009** | Модель: artifacts                 | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
+| **STORAGE-010** | Модель: events                    | Task  | 5   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
+| **STORAGE-011** | Модель: audit_logs                | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
+| **STORAGE-012** | Модель: budget_transactions       | Task  | 5   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
+| **STORAGE-013** | Модель: budget_alerts             | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
+| **STORAGE-014** | Модель: api_keys                  | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
+| **STORAGE-015** | Модель: user_projects             | Task  | 2   | 🔴 High   | 🔴 Todo | STORAGE-002       |
+| **STORAGE-016** | Модель: webhooks                  | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
+| **STORAGE-017** | Модель: webhook_deliveries        | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
+| **STORAGE-018** | Модель: task_attempts             | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
+| **STORAGE-019** | Индексы для производительности    | Task  | 5   | 🔴 High   | 🔴 Todo | STORAGE-003-018   |
+| **STORAGE-020** | Настройка Redis (кэш)             | Task  | 5   | 🔴 High   | 🔴 Todo | —                 |
+| **STORAGE-021** | Настройка MinIO/S3 (артефакты)    | Task  | 5   | 🔴 High   | 🔴 Todo | —                 |
+| **STORAGE-022** | Repository Pattern (абстракция)   | Story | 5   | 🔴 High   | 🔴 Todo | STORAGE-003-018   |
+| **STORAGE-023** | Юнит-тесты репозиториев           | Test  | 8   | 🔴 High   | 🔴 Todo | STORAGE-022       |
 
 ---
 
@@ -548,7 +555,7 @@ Core Team **Прогресс**: 1/14 задач (7%)
 | Эпик             | Задач | Выполнено | Осталось SP |
 | ---------------- | ----- | --------- | ----------- |
 | EPIC-001 Parser  | 10    | 10        | 0 ✅        |
-| EPIC-007 Storage | 16    | 2         | ~55         |
+| EPIC-007 Storage | 23    | 2         | ~76         |
 | EPIC-009 LLM     | 13    | 0         | ~65         |
 | EPIC-014 Deploy  | 16    | 8         | ~30         |
 | EPIC-015 PoC     | 8     | 8         | 0 ✅        |
@@ -620,12 +627,12 @@ Core Team **Прогресс**: 1/14 задач (7%)
 | **EPIC-012 в работе** | 1/14 задач — DAST сканирование                                                          | 🟡 В работе     |
 | **EPIC-016 в работе** | 6/13 задач — PoC результаты, аудит                                                      | 🟡 В работе     |
 | **EPIC-001 завершён** | 10/10 задач ✅ — YAML/JSON, anchors, валидация, циклы, line/column, миграции, тесты 98% | ✅ Завершён     |
-| **EPIC-007 в работе** | 2/16 задач — PostgreSQL + Alembic готовы                                                | 🟡 В работе     |
+| **EPIC-007 в работе** | 2/23 задач — PostgreSQL + Alembic готовы. Добавлены 7 новых моделей из схемы БД       | 🟡 В работе     |
 | **EPIC-002 в работе** | 3/13 задач — State Machine готова                                                       | 🟡 В работе     |
 | **EPIC-008 в работе** | 1/14 задач — FastAPI настроен                                                           | 🟡 В работе     |
 | **Pre-commit fixes**  | 8 проблем исправлены — ruff, mypy, black, isort, detect-secrets                         | ✅ Завершён     |
-| **Всего выполнено**   | 50/240 задач (20.8%)                                                                    | +8 задач с v3.0 |
-| **Story Points**      | ~262/~1310 (20%)                                                                        | +162 SP         |
+| **Всего выполнено**   | 50/247 задач (20.2%)                                                                    | +8 задач с v3.0 |
+| **Story Points**      | ~262/~1317 (20%)                                                                        | +162 SP         |
 
 ---
 
