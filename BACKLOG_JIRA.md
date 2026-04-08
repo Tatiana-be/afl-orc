@@ -30,7 +30,7 @@
 | EPIC-004 | Agent Executor             | MVP    | 🔴 Not Started | 15    | 0         |
 | EPIC-005 | Context Manager            | MVP ✅ | 🔴 Not Started | 16    | 0         |
 | EPIC-006 | Guardrail Engine           | MVP ✅ | 🔴 Not Started | 18    | 0         |
-| EPIC-007 | Storage Layer              | MVP    | 🟡 In Progress | 23    | 2         |
+| EPIC-007 | Storage Layer              | MVP    | 🟡 In Progress | 25    | 2         |
 | EPIC-008 | REST API                   | MVP    | 🟡 In Progress | 14    | 1         |
 | EPIC-009 | LLM Integrations           | MVP    | 🔴 Not Started | 13    | 0         |
 | EPIC-010 | Git Integration            | Alpha  | 🔴 Not Started | 13    | 0         |
@@ -250,6 +250,8 @@
 | **STORAGE-021** | Настройка MinIO/S3 (артефакты)    | Task  | 5   | 🔴 High   | 🔴 Todo | —               |
 | **STORAGE-022** | Repository Pattern (абстракция)   | Story | 5   | 🔴 High   | 🔴 Todo | STORAGE-003-018 |
 | **STORAGE-023** | Юнит-тесты репозиториев           | Test  | 8   | 🔴 High   | 🔴 Todo | STORAGE-022     |
+| **STORAGE-024** | Модель: WorkflowExecution         | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-025** | Модель: GuardrailCheck            | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
 
 ---
 
@@ -555,7 +557,7 @@ Core Team **Прогресс**: 1/14 задач (7%)
 | Эпик             | Задач | Выполнено | Осталось SP |
 | ---------------- | ----- | --------- | ----------- |
 | EPIC-001 Parser  | 10    | 10        | 0 ✅        |
-| EPIC-007 Storage | 23    | 2         | ~76         |
+| EPIC-007 Storage | 25    | 2         | ~82         |
 | EPIC-009 LLM     | 13    | 0         | ~65         |
 | EPIC-014 Deploy  | 16    | 8         | ~30         |
 | EPIC-015 PoC     | 8     | 8         | 0 ✅        |
@@ -627,12 +629,12 @@ Core Team **Прогресс**: 1/14 задач (7%)
 | **EPIC-012 в работе** | 1/14 задач — DAST сканирование                                                          | 🟡 В работе     |
 | **EPIC-016 в работе** | 6/13 задач — PoC результаты, аудит                                                      | 🟡 В работе     |
 | **EPIC-001 завершён** | 10/10 задач ✅ — YAML/JSON, anchors, валидация, циклы, line/column, миграции, тесты 98% | ✅ Завершён     |
-| **EPIC-007 в работе** | 2/23 задач — PostgreSQL + Alembic готовы. Добавлены 7 новых моделей из схемы БД         | 🟡 В работе     |
+| **EPIC-007 в работе** | 2/25 задач — PostgreSQL + Alembic готовы. Добавлены модели Execution/Check из ТЗ        | 🟡 В работе     |
 | **EPIC-002 в работе** | 3/13 задач — State Machine готова                                                       | 🟡 В работе     |
 | **EPIC-008 в работе** | 1/14 задач — FastAPI настроен                                                           | 🟡 В работе     |
 | **Pre-commit fixes**  | 8 проблем исправлены — ruff, mypy, black, isort, detect-secrets                         | ✅ Завершён     |
-| **Всего выполнено**   | 50/247 задач (20.2%)                                                                    | +8 задач с v3.0 |
-| **Story Points**      | ~262/~1317 (20%)                                                                        | +162 SP         |
+| **Всего выполнено**   | 50/249 задач (20.1%)                                                                    | +8 задач с v3.0 |
+| **Story Points**      | ~268/~1317 (20.3%)                                                                      | +162 SP         |
 
 ---
 
