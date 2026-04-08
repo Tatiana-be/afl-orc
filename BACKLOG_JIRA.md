@@ -225,31 +225,31 @@
 
 ### Задачи
 
-| ID              | Задача                            | Тип   | SP  | Приоритет | Статус  | Зависимости       |
-| --------------- | --------------------------------- | ----- | --- | --------- | ------- | ----------------- |
-| **STORAGE-001** | Настройка PostgreSQL + SQLAlchemy | Task  | 5   | 🔴 High   | ✅ Done | —                 |
-| **STORAGE-002** | Миграции БД (Alembic)             | Task  | 5   | 🔴 High   | ✅ Done | STORAGE-001       |
-| **STORAGE-003** | Модель: users                     | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
-| **STORAGE-004** | Модель: projects                  | Task  | 2   | 🔴 High   | 🔴 Todo | STORAGE-002       |
-| **STORAGE-005** | Модель: config_versions           | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
-| **STORAGE-006** | Модель: workflows                 | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
-| **STORAGE-007** | Модель: tasks                     | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
-| **STORAGE-008** | Модель: agents                    | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
-| **STORAGE-009** | Модель: artifacts                 | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
-| **STORAGE-010** | Модель: events                    | Task  | 5   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
-| **STORAGE-011** | Модель: audit_logs                | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
-| **STORAGE-012** | Модель: budget_transactions       | Task  | 5   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
-| **STORAGE-013** | Модель: budget_alerts             | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
-| **STORAGE-014** | Модель: api_keys                  | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002       |
-| **STORAGE-015** | Модель: user_projects             | Task  | 2   | 🔴 High   | 🔴 Todo | STORAGE-002       |
-| **STORAGE-016** | Модель: webhooks                  | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
-| **STORAGE-017** | Модель: webhook_deliveries        | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
-| **STORAGE-018** | Модель: task_attempts             | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002       |
-| **STORAGE-019** | Индексы для производительности    | Task  | 5   | 🔴 High   | 🔴 Todo | STORAGE-003-018   |
-| **STORAGE-020** | Настройка Redis (кэш)             | Task  | 5   | 🔴 High   | 🔴 Todo | —                 |
-| **STORAGE-021** | Настройка MinIO/S3 (артефакты)    | Task  | 5   | 🔴 High   | 🔴 Todo | —                 |
-| **STORAGE-022** | Repository Pattern (абстракция)   | Story | 5   | 🔴 High   | 🔴 Todo | STORAGE-003-018   |
-| **STORAGE-023** | Юнит-тесты репозиториев           | Test  | 8   | 🔴 High   | 🔴 Todo | STORAGE-022       |
+| ID              | Задача                            | Тип   | SP  | Приоритет | Статус  | Зависимости     |
+| --------------- | --------------------------------- | ----- | --- | --------- | ------- | --------------- |
+| **STORAGE-001** | Настройка PostgreSQL + SQLAlchemy | Task  | 5   | 🔴 High   | ✅ Done | —               |
+| **STORAGE-002** | Миграции БД (Alembic)             | Task  | 5   | 🔴 High   | ✅ Done | STORAGE-001     |
+| **STORAGE-003** | Модель: users                     | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-004** | Модель: projects                  | Task  | 2   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-005** | Модель: config_versions           | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-006** | Модель: workflows                 | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-007** | Модель: tasks                     | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-008** | Модель: agents                    | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-009** | Модель: artifacts                 | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-010** | Модель: events                    | Task  | 5   | 🟡 Medium | 🔴 Todo | STORAGE-002     |
+| **STORAGE-011** | Модель: audit_logs                | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-012** | Модель: budget_transactions       | Task  | 5   | 🟡 Medium | 🔴 Todo | STORAGE-002     |
+| **STORAGE-013** | Модель: budget_alerts             | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002     |
+| **STORAGE-014** | Модель: api_keys                  | Task  | 3   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-015** | Модель: user_projects             | Task  | 2   | 🔴 High   | 🔴 Todo | STORAGE-002     |
+| **STORAGE-016** | Модель: webhooks                  | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002     |
+| **STORAGE-017** | Модель: webhook_deliveries        | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002     |
+| **STORAGE-018** | Модель: task_attempts             | Task  | 3   | 🟡 Medium | 🔴 Todo | STORAGE-002     |
+| **STORAGE-019** | Индексы для производительности    | Task  | 5   | 🔴 High   | 🔴 Todo | STORAGE-003-018 |
+| **STORAGE-020** | Настройка Redis (кэш)             | Task  | 5   | 🔴 High   | 🔴 Todo | —               |
+| **STORAGE-021** | Настройка MinIO/S3 (артефакты)    | Task  | 5   | 🔴 High   | 🔴 Todo | —               |
+| **STORAGE-022** | Repository Pattern (абстракция)   | Story | 5   | 🔴 High   | 🔴 Todo | STORAGE-003-018 |
+| **STORAGE-023** | Юнит-тесты репозиториев           | Test  | 8   | 🔴 High   | 🔴 Todo | STORAGE-022     |
 
 ---
 
@@ -627,7 +627,7 @@ Core Team **Прогресс**: 1/14 задач (7%)
 | **EPIC-012 в работе** | 1/14 задач — DAST сканирование                                                          | 🟡 В работе     |
 | **EPIC-016 в работе** | 6/13 задач — PoC результаты, аудит                                                      | 🟡 В работе     |
 | **EPIC-001 завершён** | 10/10 задач ✅ — YAML/JSON, anchors, валидация, циклы, line/column, миграции, тесты 98% | ✅ Завершён     |
-| **EPIC-007 в работе** | 2/23 задач — PostgreSQL + Alembic готовы. Добавлены 7 новых моделей из схемы БД       | 🟡 В работе     |
+| **EPIC-007 в работе** | 2/23 задач — PostgreSQL + Alembic готовы. Добавлены 7 новых моделей из схемы БД         | 🟡 В работе     |
 | **EPIC-002 в работе** | 3/13 задач — State Machine готова                                                       | 🟡 В работе     |
 | **EPIC-008 в работе** | 1/14 задач — FastAPI настроен                                                           | 🟡 В работе     |
 | **Pre-commit fixes**  | 8 проблем исправлены — ruff, mypy, black, isort, detect-secrets                         | ✅ Завершён     |
