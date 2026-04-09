@@ -10,13 +10,13 @@
 
 | Метрика                    | Значение |
 | -------------------------- | -------- |
-| **Всего задач**            | 240      |
-| **Выполнено**              | 42 (18%) |
+| **Всего задач**            | 278      |
+| **Выполнено**              | 44 (16%) |
 | **В работе**               | 0        |
-| **Осталось**               | 198      |
-| **Story Points всего**     | ~1310    |
-| **Story Points выполнено** | ~262     |
-| **Прогресс**               | 17.6%    |
+| **Осталось**               | 246      |
+| **Story Points всего**     | ~1440    |
+| **Story Points выполнено** | ~268     |
+| **Прогресс**               | 18.6%    |
 
 ---
 
@@ -31,7 +31,7 @@
 | EPIC-005 | Context Manager            | MVP ✅ | 🔴 Not Started | 16    | 0         |
 | EPIC-006 | Guardrail Engine           | MVP ✅ | 🔴 Not Started | 18    | 0         |
 | EPIC-007 | Storage Layer              | MVP    | 🟡 In Progress | 25    | 2         |
-| EPIC-008 | REST API                   | MVP    | 🟡 In Progress | 14    | 1         |
+| EPIC-008 | REST API                   | MVP    | 🟡 In Progress | 52    | 1         |
 | EPIC-009 | LLM Integrations           | MVP    | 🔴 Not Started | 13    | 0         |
 | EPIC-010 | Git Integration            | Alpha  | 🔴 Not Started | 13    | 0         |
 | EPIC-011 | Issue Tracker Integration  | Alpha  | 🔴 Not Started | 14    | 0         |
@@ -258,26 +258,64 @@
 ## EPIC-008: REST API
 
 **Описание**: Внешнее API для интеграции **Срок**: Недели 2-3 **Ответственный**:
-Core Team **Прогресс**: 1/14 задач (7%)
+Core Team **Прогресс**: 1/40 задач (3%)
 
 ### Задачи
 
-| ID          | Задача                                         | Тип   | SP  | Приоритет | Статус  | Зависимости     |
-| ----------- | ---------------------------------------------- | ----- | --- | --------- | ------- | --------------- |
-| **API-001** | Настройка FastAPI проекта                      | Task  | 3   | 🔴 High   | ✅ Done | —               |
-| **API-002** | Модель: WorkflowCreateRequest                  | Task  | 2   | 🔴 High   | 🔴 Todo | API-001         |
-| **API-003** | Модель: WorkflowStatusResponse                 | Task  | 2   | 🔴 High   | 🔴 Todo | API-001         |
-| **API-004** | Endpoint: POST /api/v1/workflows               | Story | 5   | 🔴 High   | 🔴 Todo | API-002, WF-003 |
-| **API-005** | Endpoint: GET /api/v1/workflows/{id}           | Story | 3   | 🔴 High   | 🔴 Todo | API-003, WF-003 |
-| **API-006** | Endpoint: POST /api/v1/workflows/{id}/pause    | Story | 3   | 🔴 High   | 🔴 Todo | WF-004          |
-| **API-007** | Endpoint: POST /api/v1/workflows/{id}/resume   | Story | 3   | 🔴 High   | 🔴 Todo | WF-004          |
-| **API-008** | Endpoint: GET /api/v1/workflows/{id}/artifacts | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-008     |
-| **API-009** | Endpoint: GET /api/v1/metrics/budget           | Story | 5   | 🟡 Medium | 🔴 Todo | BUDGET-002      |
-| **API-010** | WebSocket для real-time уведомлений            | Story | 8   | 🟡 Medium | 🔴 Todo | API-005         |
-| **API-011** | Аутентификация API (API keys)                  | Story | 5   | 🔴 High   | 🔴 Todo | API-001         |
-| **API-012** | Rate limiting                                  | Story | 5   | 🟡 Medium | 🔴 Todo | API-011         |
-| **API-013** | OpenAPI документация (/docs)                   | Task  | 2   | 🟢 Low    | 🔴 Todo | API-004-010     |
-| **API-014** | Интеграционные тесты API                       | Test  | 8   | 🔴 High   | 🔴 Todo | API-004-012     |
+| ID          | Задача                                                     | Тип   | SP  | Приоритет | Статус  | Зависимости     |
+| ----------- | ---------------------------------------------------------- | ----- | --- | --------- | ------- | --------------- |
+| **API-001** | Настройка FastAPI проекта                                  | Task  | 3   | 🔴 High   | ✅ Done | —               |
+| **API-002** | Модель: WorkflowCreateRequest                              | Task  | 2   | 🔴 High   | 🔴 Todo | API-001         |
+| **API-003** | Модель: WorkflowStatusResponse                             | Task  | 2   | 🔴 High   | 🔴 Todo | API-001         |
+| **API-004** | Endpoint: POST /api/v1/workflows                           | Story | 5   | 🔴 High   | 🔴 Todo | API-002, WF-003 |
+| **API-005** | Endpoint: GET /api/v1/workflows/{id}                       | Story | 3   | 🔴 High   | 🔴 Todo | API-003, WF-003 |
+| **API-006** | Endpoint: POST /api/v1/workflows/{id}/pause                | Story | 3   | 🔴 High   | 🔴 Todo | WF-004          |
+| **API-007** | Endpoint: POST /api/v1/workflows/{id}/resume               | Story | 3   | 🔴 High   | 🔴 Todo | WF-004          |
+| **API-008** | Endpoint: GET /api/v1/workflows/{id}/artifacts             | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-008     |
+| **API-009** | Endpoint: GET /api/v1/metrics/budget                       | Story | 5   | 🟡 Medium | 🔴 Todo | BUDGET-002      |
+| **API-010** | WebSocket для real-time уведомлений                        | Story | 8   | 🟡 Medium | 🔴 Todo | API-005         |
+| **API-011** | Аутентификация API (API keys)                              | Story | 5   | 🔴 High   | 🔴 Todo | API-001         |
+| **API-012** | Rate limiting                                              | Story | 5   | 🟡 Medium | 🔴 Todo | API-011         |
+| **API-013** | OpenAPI документация (/docs)                               | Task  | 2   | 🟢 Low    | 🔴 Todo | API-004-010     |
+| **API-014** | Интеграционные тесты API                                   | Test  | 8   | 🔴 High   | 🔴 Todo | API-004-012     |
+| **API-015** | Endpoint: POST /api/v1/projects                            | Story | 5   | 🔴 High   | 🔴 Todo | STORAGE-004     |
+| **API-016** | Endpoint: GET /api/v1/projects                             | Story | 3   | 🔴 High   | 🔴 Todo | STORAGE-004     |
+| **API-017** | Endpoint: GET /api/v1/projects/{id}                        | Story | 3   | 🔴 High   | 🔴 Todo | STORAGE-004     |
+| **API-018** | Endpoint: PUT /api/v1/projects/{id}                        | Story | 3   | 🟡 Medium | 🔴 Todo | STORAGE-004     |
+| **API-019** | Endpoint: DELETE /api/v1/projects/{id}                     | Story | 3   | 🟡 Medium | 🔴 Todo | STORAGE-004     |
+| **API-020** | Endpoint: GET/PUT /api/v1/projects/{id}/settings           | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-004     |
+| **API-021** | Endpoint: GET/POST /api/v1/projects/{id}/members           | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-004     |
+| **API-022** | Endpoint: POST /api/v1/projects/{id}/configs               | Story | 5   | 🔴 High   | 🔴 Todo | PARSER-004      |
+| **API-023** | Endpoint: GET /api/v1/projects/{id}/configs                | Story | 3   | 🔴 High   | 🔴 Todo | STORAGE-005     |
+| **API-024** | Endpoint: GET /api/v1/projects/{id}/configs/{version}      | Story | 3   | 🔴 High   | 🔴 Todo | STORAGE-005     |
+| **API-025** | Endpoint: POST /api/v1/projects/{id}/configs/validate      | Story | 5   | 🔴 High   | 🔴 Todo | PARSER-004      |
+| **API-026** | Endpoint: GET /api/v1/projects/{id}/configs/{v1}/diff/{v2} | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-005     |
+| **API-027** | Endpoint: GET /api/v1/projects/{id}/configs/latest         | Story | 3   | 🟡 Medium | 🔴 Todo | STORAGE-005     |
+| **API-028** | Endpoint: GET /api/v1/agents                               | Story | 3   | 🟡 Medium | 🔴 Todo | STORAGE-008     |
+| **API-029** | Endpoint: GET /api/v1/agents/{id}                          | Story | 3   | 🟡 Medium | 🔴 Todo | STORAGE-008     |
+| **API-030** | Endpoint: GET /api/v1/agents/{id}/logs                     | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-011     |
+| **API-031** | Endpoint: GET /api/v1/agents/{id}/history                  | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-006     |
+| **API-032** | Endpoint: GET /api/v1/agents/pool/stats                    | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-008     |
+| **API-033** | Endpoint: GET /api/v1/agents/types                         | Story | 3   | 🟢 Low    | 🔴 Todo | —               |
+| **API-034** | Endpoint: GET /api/v1/workflows (paginated)                | Story | 5   | 🔴 High   | 🔴 Todo | STORAGE-004     |
+| **API-035** | Endpoint: DELETE /api/v1/workflows/{id}                    | Story | 3   | 🔴 High   | 🔴 Todo | WF-004          |
+| **API-036** | Endpoint: POST /api/v1/workflows/{id}/retry                | Story | 5   | 🟡 Medium | 🔴 Todo | WF-004          |
+| **API-037** | Endpoint: GET /api/v1/workflows/{id}/steps                 | Story | 3   | 🟡 Medium | 🔴 Todo | STORAGE-007     |
+| **API-038** | Endpoint: GET/PUT /api/v1/projects/{id}/budget             | Story | 5   | 🔴 High   | 🔴 Todo | STORAGE-012     |
+| **API-039** | Endpoint: GET /api/v1/projects/{id}/metrics/tokens         | Story | 3   | 🟡 Medium | 🔴 Todo | STORAGE-012     |
+| **API-040** | Endpoint: GET /api/v1/projects/{id}/metrics/cost           | Story | 3   | 🟡 Medium | 🔴 Todo | STORAGE-012     |
+| **API-041** | Endpoint: GET /api/v1/projects/{id}/metrics/usage          | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-012     |
+| **API-042** | Endpoint: GET /api/v1/projects/{id}/metrics/export         | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-012     |
+| **API-043** | Endpoint: GET/POST /api/v1/budget/alerts                   | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-013     |
+| **API-044** | Endpoint: GET /api/v1/events                               | Story | 3   | 🟡 Medium | 🔴 Todo | STORAGE-010     |
+| **API-045** | Endpoint: GET/POST /api/v1/webhooks                        | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-016     |
+| **API-046** | Endpoint: PUT/DELETE /api/v1/webhooks/{id}                 | Story | 3   | 🟡 Medium | 🔴 Todo | STORAGE-016     |
+| **API-047** | Endpoint: POST /api/v1/webhooks/{id}/test                  | Story | 3   | 🟡 Medium | 🔴 Todo | STORAGE-016     |
+| **API-048** | Endpoint: GET /api/v1/webhooks/{id}/deliveries             | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-017     |
+| **API-049** | Endpoint: POST /api/v1/webhooks/{id}/deliveries/{id}/retry | Story | 5   | 🟡 Medium | 🔴 Todo | STORAGE-017     |
+| **API-050** | Endpoint: GET /api/v1/admin/audit-logs                     | Story | 5   | 🔴 High   | 🔴 Todo | STORAGE-011     |
+| **API-051** | Endpoint: GET /api/v1/admin/system/health                  | Story | 2   | 🔴 High   | 🔴 Todo | —               |
+| **API-052** | Endpoint: GET /api/v1/admin/system/config                  | Story | 3   | 🟢 Low    | 🔴 Todo | —               |
 
 ---
 
@@ -619,22 +657,22 @@ Core Team **Прогресс**: 1/14 задач (7%)
 
 ## Изменения v3.0 → v4.0
 
-| Изменение             | Описание                                                                                | Статус          |
-| --------------------- | --------------------------------------------------------------------------------------- | --------------- |
-| **EPIC-018 завершён** | 13/13 задач ✅                                                                          | ✅ Завершён     |
-| **EPIC-017 завершён** | 13/13 задач ✅                                                                          | ✅ Завершён     |
-| **EPIC-015 завершён** | 8/8 задач ✅                                                                            | ✅ Завершён     |
-| **EPIC-013 в работе** | 8/22 задач — JSON логи, Prometheus, Grafana, алерты                                     | 🟡 В работе     |
-| **EPIC-014 в работе** | 8/16 задач — Python 3.12, GHCR, staging/prod deploy, OWASP ZAP                          | 🟡 В работе     |
-| **EPIC-012 в работе** | 1/14 задач — DAST сканирование                                                          | 🟡 В работе     |
-| **EPIC-016 в работе** | 6/13 задач — PoC результаты, аудит                                                      | 🟡 В работе     |
-| **EPIC-001 завершён** | 10/10 задач ✅ — YAML/JSON, anchors, валидация, циклы, line/column, миграции, тесты 98% | ✅ Завершён     |
-| **EPIC-007 в работе** | 2/25 задач — PostgreSQL + Alembic готовы. Добавлены модели Execution/Check из ТЗ        | 🟡 В работе     |
-| **EPIC-002 в работе** | 3/13 задач — State Machine готова                                                       | 🟡 В работе     |
-| **EPIC-008 в работе** | 1/14 задач — FastAPI настроен                                                           | 🟡 В работе     |
-| **Pre-commit fixes**  | 8 проблем исправлены — ruff, mypy, black, isort, detect-secrets                         | ✅ Завершён     |
-| **Всего выполнено**   | 50/249 задач (20.1%)                                                                    | +8 задач с v3.0 |
-| **Story Points**      | ~268/~1317 (20.3%)                                                                      | +162 SP         |
+| Изменение             | Описание                                                                                | Статус           |
+| --------------------- | --------------------------------------------------------------------------------------- | ---------------- |
+| **EPIC-018 завершён** | 13/13 задач ✅                                                                          | ✅ Завершён      |
+| **EPIC-017 завершён** | 13/13 задач ✅                                                                          | ✅ Завершён      |
+| **EPIC-015 завершён** | 8/8 задач ✅                                                                            | ✅ Завершён      |
+| **EPIC-013 в работе** | 8/22 задач — JSON логи, Prometheus, Grafana, алерты                                     | 🟡 В работе      |
+| **EPIC-014 в работе** | 8/16 задач — Python 3.12, GHCR, staging/prod deploy, OWASP ZAP                          | 🟡 В работе      |
+| **EPIC-012 в работе** | 1/14 задач — DAST сканирование                                                          | 🟡 В работе      |
+| **EPIC-016 в работе** | 6/13 задач — PoC результаты, аудит                                                      | 🟡 В работе      |
+| **EPIC-001 завершён** | 10/10 задач ✅ — YAML/JSON, anchors, валидация, циклы, line/column, миграции, тесты 98% | ✅ Завершён      |
+| **EPIC-007 в работе** | 2/25 задач — PostgreSQL + Alembic готовы. Добавлены модели Execution/Check из ТЗ        | 🟡 В работе      |
+| **EPIC-002 в работе** | 3/13 задач — State Machine готова                                                       | 🟡 В работе      |
+| **EPIC-008 в работе** | 1/52 задач — FastAPI настроен, добавлены 38 endpoint задач из API_SPECIFICATION         | 🟡 В работе      |
+| **Pre-commit fixes**  | 8 проблем исправлены — ruff, mypy, black, isort, detect-secrets                         | ✅ Завершён      |
+| **Всего выполнено**   | 52/278 задач (18.7%)                                                                    | +10 задач с v3.0 |
+| **Story Points**      | ~268/~1440 (18.6%)                                                                      | +168 SP          |
 
 ---
 
