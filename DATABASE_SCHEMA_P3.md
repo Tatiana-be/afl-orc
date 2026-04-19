@@ -16,9 +16,10 @@
 │   ├── 003_add_agents_table.py
 │   ├── 004_add_budget_tracking.py
 │   ├── 005_add_audit_logs.py
-│   ├── 006_add_webhooks.py
+│   ├── 006_add_workflow_executions_and_guardrail.py
 │   ├── 007_add_indexes_performance.py
-│   └── 008_add_partitioning.py
+│   ├── 008_add_webhooks.py
+│   └── 009_add_partitioning.py
 ├── env.py
 ├── script.py.mako
 └── README.md
@@ -770,6 +771,158 @@ def downgrade():
     op.execute('DROP TABLE events')
 ```
 
+#### Миграция 006: Add Workflow Executions & Guardrail Checks
+
+```python
+"""Add workflow_executions and guardrail_checks tables
+
+Revision ID: 006
+Revises: 005
+Create Date: 2026-04-05 12:00:00.000000
+
+"""
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+
+revision = '006'
+down_revision = '005'
+branch_labels = None
+depends_on = None
+
+
+def upgrade():
+    # === workflow_executions ===
+    op.create_table('workflow_executions',
+        sa.Column('id', postgresql.UUID(as_uuid=True),
+                  server_default=sa.text('gen_random_uuid()'),
+                  primary_key=True),
+        sa.Column('workflow_id', postgresql.UUID(as_uuid=True),
+                  sa.ForeignKey('workflows.id', ondelete='CASCADE'),
+                  nullable=False),
+        sa.Column('status', sa.VARCHAR(50), nullable=False,
+                  server_default='queued'),
+        sa.Column('current_state', postgresql.JSONB,
+                  server_default='{}'),
+        sa.Column('result', postgresql.JSONB),
+        sa.Column('error', postgresql.JSONB),
+        sa.Column('queued_at', sa.TIMESTAMPTZ, nullable=False,
+                  server_default=sa.func.now()),
+        sa.Column('started_at', sa.TIMESTAMPTZ),
+        sa.Column('finished_at', sa.TIMESTAMPTZ),
+        sa.Column('created_at', sa.TIMESTAMPTZ, nullable=False,
+                  server_default=sa.func.now()),
+        sa.Column('triggered_by', postgresql.UUID(as_uuid=True)),
+        sa.Column('config_version', sa.VARCHAR(50)),
+        sa.Column('parameters', postgresql.JSONB,
+                  server_default='{}'),
+        sa.CheckConstraint(
+            "status IN ('queued','pending','running','paused',"
+            "'completed','failed','cancelled')",
+            name='check_wf_exec_status'
+        )
+    )
+
+    # Indexes for workflow_executions
+    op.create_index('idx_wf_exec_workflow_id',
+                    'workflow_executions', ['workflow_id'])
+    op.create_index('idx_wf_exec_status',
+                    'workflow_executions', ['status'])
+    op.create_index('idx_wf_exec_queued_at',
+                    'workflow_executions',
+                    [sa.text('queued_at DESC')])
+    op.create_index('idx_wf_exec_finished',
+                    'workflow_executions',
+                    [sa.text('finished_at DESC')],
+                    postgresql_where=sa.text('finished_at IS NOT NULL'))
+    op.create_index('idx_wf_exec_current_state',
+                    'workflow_executions',
+                    ['current_state'],
+                    postgresql_using='gin')
+    op.create_index('idx_wf_exec_parameters',
+                    'workflow_executions',
+                    ['parameters'],
+                    postgresql_using='gin')
+    op.create_index('idx_wf_exec_running',
+                    'workflow_executions',
+                    ['workflow_id', 'started_at'],
+                    postgresql_where=sa.text("status = 'running'"))
+    op.create_index('idx_wf_exec_failed',
+                    'workflow_executions',
+                    ['workflow_id', 'finished_at'],
+                    postgresql_where=sa.text("status = 'failed'"))
+
+    # === guardrail_checks ===
+    op.create_table('guardrail_checks',
+        sa.Column('id', postgresql.UUID(as_uuid=True),
+                  server_default=sa.text('gen_random_uuid()'),
+                  primary_key=True),
+        sa.Column('guardrail_definition_id',
+                  postgresql.UUID(as_uuid=True),
+                  sa.ForeignKey('guardrail_definitions.id',
+                                ondelete='CASCADE'),
+                  nullable=False),
+        sa.Column('task_execution_id', postgresql.UUID(as_uuid=True),
+                  sa.ForeignKey('task_executions.id',
+                                ondelete='CASCADE'),
+                  nullable=False),
+        sa.Column('passed', sa.BOOLEAN, nullable=False),
+        sa.Column('severity', sa.VARCHAR(50), nullable=False,
+                  server_default='error'),
+        sa.Column('message', sa.TEXT),
+        sa.Column('details', postgresql.JSONB,
+                  server_default='{}'),
+        sa.Column('input_hash', sa.VARCHAR(64)),
+        sa.Column('check_duration_ms', sa.INTEGER),
+        sa.Column('checked_at', sa.TIMESTAMPTZ, nullable=False,
+                  server_default=sa.func.now()),
+        sa.CheckConstraint(
+            "severity IN ('info','warning','error','critical')",
+            name='check_gr_severity'
+        ),
+        sa.CheckConstraint(
+            'char_length(message) <= 2000',
+            name='check_gr_message_length'
+        )
+    )
+
+    # Indexes for guardrail_checks
+    op.create_index('idx_gr_check_definition',
+                    'guardrail_checks',
+                    ['guardrail_definition_id'])
+    op.create_index('idx_gr_check_task',
+                    'guardrail_checks',
+                    ['task_execution_id'])
+    op.create_index('idx_gr_check_passed',
+                    'guardrail_checks', ['passed'])
+    op.create_index('idx_gr_check_checked_at',
+                    'guardrail_checks',
+                    [sa.text('checked_at DESC')])
+    op.create_index('idx_gr_check_task_passed',
+                    'guardrail_checks',
+                    ['task_execution_id', 'passed'])
+    op.create_index('idx_gr_check_details',
+                    'guardrail_checks',
+                    ['details'],
+                    postgresql_using='gin')
+    op.create_index('idx_gr_check_violations',
+                    'guardrail_checks',
+                    ['guardrail_definition_id',
+                     sa.text('checked_at DESC')],
+                    postgresql_where=sa.text('passed = FALSE'))
+
+    # Comments
+    op.execute("COMMENT ON TABLE workflow_executions IS "
+               "'История запусков workflow'")
+    op.execute("COMMENT ON TABLE guardrail_checks IS "
+               "'Аудит-лог проверок гардрейлов'")
+
+
+def downgrade():
+    op.drop_table('guardrail_checks')
+    op.drop_table('workflow_executions')
+```
+
 ### 4.3 Rollback Стратегия
 
 ```bash
@@ -1051,10 +1204,12 @@ ORDER BY n_dead_tup DESC;
 | **projects**            | 50 rows / 25 KB      | 200 rows / 100 KB    | 500 rows / 250 KB    |
 | **workflows**           | 5K rows / 5 MB       | 30K rows / 30 MB     | 60K rows / 60 MB     |
 | **tasks**               | 50K rows / 50 MB     | 300K rows / 300 MB   | 600K rows / 600 MB   |
+| **workflow_executions** | 5K rows / 10 MB      | 30K rows / 60 MB     | 60K rows / 120 MB    |
+| **guardrail_checks**    | 100K rows / 50 MB    | 600K rows / 300 MB   | 1.2M rows / 600 MB   |
 | **budget_transactions** | 100K rows / 50 MB    | 600K rows / 300 MB   | 1.2M rows / 600 MB   |
 | **events**              | 500K rows / 250 MB   | 3M rows / 1.5 GB     | 6M rows / 3 GB       |
 | **audit_logs**          | 50K rows / 25 MB     | 300K rows / 150 MB   | 600K rows / 300 MB   |
-| **Итого**               | ~655K rows / ~380 MB | ~4.2M rows / ~2.3 GB | ~8.4M rows / ~4.6 GB |
+| **Итого**               | ~810K rows / ~440 MB | ~4.8M rows / ~2.6 GB | ~9.6M rows / ~5.2 GB |
 
 ### 7.2 Скрипт Генерации Тестовых Данных
 

@@ -764,6 +764,130 @@ CREATE INDEX idx_task_attempts_running ON task_attempts(task_id)
 COMMENT ON TABLE task_attempts IS 'История попыток выполнения задач (для retry)';
 ```
 
+### 2.16 Таблица: workflow_executions
+
+```sql
+-- Таблица истории выполнений workflow
+CREATE TABLE workflow_executions (
+    -- Primary Key
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    -- Связь с workflow
+    workflow_id UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+
+    -- Состояние
+    status VARCHAR(50) NOT NULL DEFAULT 'queued',
+
+    -- Текущее состояние (JSONB)
+    current_state JSONB DEFAULT '{}'::jsonb,
+
+    -- Результат
+    result JSONB,
+    error JSONB,
+
+    -- Временные метки
+    queued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    started_at TIMESTAMPTZ,
+    finished_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    -- Метаданные запуска
+    triggered_by UUID,
+    config_version VARCHAR(50),
+    parameters JSONB DEFAULT '{}'::jsonb,
+
+    -- Ограничения
+    CONSTRAINT check_wf_exec_status CHECK (status IN (
+        'queued', 'pending', 'running', 'paused', 'completed', 'failed', 'cancelled'
+    ))
+);
+
+-- Индексы
+CREATE INDEX idx_wf_exec_workflow_id ON workflow_executions(workflow_id);
+CREATE INDEX idx_wf_exec_status ON workflow_executions(status);
+CREATE INDEX idx_wf_exec_queued_at ON workflow_executions(queued_at DESC);
+CREATE INDEX idx_wf_exec_finished ON workflow_executions(finished_at DESC)
+    WHERE finished_at IS NOT NULL;
+
+-- GIN индексы
+CREATE INDEX idx_wf_exec_current_state ON workflow_executions USING GIN(current_state);
+CREATE INDEX idx_wf_exec_parameters ON workflow_executions USING GIN(parameters);
+
+-- Частичные индексы
+CREATE INDEX idx_wf_exec_running ON workflow_executions(workflow_id, started_at)
+    WHERE status = 'running';
+
+CREATE INDEX idx_wf_exec_failed ON workflow_executions(workflow_id, finished_at)
+    WHERE status = 'failed';
+
+-- Комментарии
+COMMENT ON TABLE workflow_executions IS 'История запусков workflow — каждая execution = один прогон';
+COMMENT ON COLUMN workflow_executions.current_state IS 'Текущее состояние: {current_step, progress, variables}';
+COMMENT ON COLUMN workflow_executions.result IS 'Результат успешного выполнения: {artifacts, metrics}';
+COMMENT ON COLUMN workflow_executions.error IS 'Ошибка при failed: {type, message, traceback}';
+COMMENT ON COLUMN workflow_executions.triggered_by IS 'Кто запустил: user_id или API key';
+COMMENT ON COLUMN workflow_executions.config_version IS 'Версия конфига AFL на момент запуска';
+
+-- Триггер updated_at не нужен — immutable после finished
+```
+
+### 2.17 Таблица: guardrail_checks
+
+```sql
+-- Таблица результатов проверок гардрейлов
+CREATE TABLE guardrail_checks (
+    -- Primary Key
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    -- Связь с гардрейлом и задачей
+    guardrail_definition_id UUID NOT NULL REFERENCES guardrail_definitions(id) ON DELETE CASCADE,
+    task_execution_id UUID NOT NULL REFERENCES task_executions(id) ON DELETE CASCADE,
+
+    -- Результат проверки
+    passed BOOLEAN NOT NULL,
+    severity VARCHAR(50) NOT NULL DEFAULT 'error',
+
+    -- Детали
+    message TEXT,
+    details JSONB DEFAULT '{}'::jsonb,
+    input_hash VARCHAR(64),  -- хеш проверяемого контента
+
+    -- Метрики
+    check_duration_ms INTEGER,
+
+    -- Временные метки
+    checked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    -- Ограничения
+    CONSTRAINT check_gr_severity CHECK (severity IN ('info', 'warning', 'error', 'critical')),
+    CONSTRAINT check_gr_message_length CHECK (char_length(message) <= 2000)
+);
+
+-- Индексы
+CREATE INDEX idx_gr_check_definition ON guardrail_checks(guardrail_definition_id);
+CREATE INDEX idx_gr_check_task ON guardrail_checks(task_execution_id);
+CREATE INDEX idx_gr_check_passed ON guardrail_checks(passed);
+CREATE INDEX idx_gr_check_checked_at ON guardrail_checks(checked_at DESC);
+
+-- Составной индекс
+CREATE INDEX idx_gr_check_task_passed ON guardrail_checks(task_execution_id, passed);
+
+-- GIN индекс
+CREATE INDEX idx_gr_check_details ON guardrail_checks USING GIN(details);
+
+-- Частичный индекс для нарушений
+CREATE INDEX idx_gr_check_violations ON guardrail_checks(guardrail_definition_id, checked_at DESC)
+    WHERE passed = FALSE;
+
+-- Комментарии
+COMMENT ON TABLE guardrail_checks IS 'Аудит-лог проверок гардрейлов — кто, что, когда проверил';
+COMMENT ON COLUMN guardrail_checks.input_hash IS 'Хеш (SHA-256) контента, который проверялся';
+COMMENT ON COLUMN guardrail_checks.details IS 'Дополнительные данные: {matched_pattern, confidence, context}';
+
+-- Партиционирование по дате (опционально, как events/audit_logs)
+-- ALTER TABLE guardrail_checks PARTITION BY RANGE (checked_at);
+```
+
 ---
 
 ## 3. Индексы и Оптимизация
